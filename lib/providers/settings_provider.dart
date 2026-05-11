@@ -32,6 +32,7 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyPathColor = 'path_color';
   static const _keyPathThickness = 'path_thickness';
   static const _keyMapTrackingMode = 'map_tracking_mode';
+  static const _keyStartTab = 'start_tab';
 
   bool _useKmh = true;
   bool _gpsHighAccuracy = true;
@@ -61,6 +62,7 @@ class SettingsProvider extends ChangeNotifier {
   String _pathColor = 'blue';
   int _pathThickness = 5;
   String _mapTrackingMode = 'none';
+  int _startTab = 0;
 
   bool get useKmh => _useKmh;
   bool get gpsHighAccuracy => _gpsHighAccuracy;
@@ -91,6 +93,7 @@ class SettingsProvider extends ChangeNotifier {
   String get pathColor => _pathColor;
   int get pathThickness => _pathThickness;
   String get mapTrackingMode => _mapTrackingMode;
+  int get startTab => _startTab;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -129,6 +132,7 @@ class SettingsProvider extends ChangeNotifier {
     _pathColor = prefs.getString(_keyPathColor) ?? 'blue';
     _pathThickness = prefs.getInt(_keyPathThickness) ?? 5;
     _mapTrackingMode = prefs.getString(_keyMapTrackingMode) ?? 'none';
+    _startTab = prefs.getInt(_keyStartTab) ?? 0;
     notifyListeners();
   }
 
@@ -344,6 +348,13 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyPathThickness, value);
+  }
+
+  Future<void> setStartTab(int value) async {
+    _startTab = value.clamp(0, 4);
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyStartTab, _startTab);
   }
 
   Future<void> setMapTrackingMode(String value) async {

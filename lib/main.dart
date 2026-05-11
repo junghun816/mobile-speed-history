@@ -104,6 +104,18 @@ class _MainScreenState extends State<MainScreen> {
   DateTime? _lastBackPressed;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _currentIndex = context.read<SettingsProvider>().startTab;
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,

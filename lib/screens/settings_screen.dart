@@ -635,6 +635,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // 기타
                   SizedBox(key: _sectionKeys[5]),
                   _sectionTitle('기타', sectionColor),
+                  _startTabTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 10),
                   _weightTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
                   const SizedBox(height: 10),
                   _settingTile(
@@ -949,6 +951,83 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               );
             }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _startTabTile(SettingsProvider settings, Color panelColor,
+      Color titleColor, Color subtitleColor, Color btnBgOff, Color btnBorderOff, Color btnTextOff) {
+    const labels = ['속도계', '지도', '기록', '목표', '설정'];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: panelColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.home_outlined, color: Colors.deepPurple, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('시작 탭',
+                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text('앱 실행 시 처음 열리는 탭',
+                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(labels.length, (i) {
+              final isSelected = settings.startTab == i;
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    settings.setStartTab(i);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.deepPurple.withOpacity(0.15) : btnBgOff,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected ? Colors.deepPurple : btnBorderOff,
+                      ),
+                    ),
+                    child: Text(
+                      labels[i],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isSelected ? Colors.deepPurple : btnTextOff,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ],
       ),

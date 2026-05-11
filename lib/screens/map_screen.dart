@@ -88,7 +88,9 @@ class _MapScreenState extends State<MapScreen> {
           // 지도
           Expanded(
             key: ValueKey(settings.mapType),
-            child: NaverMap(
+            child: Stack(
+              children: [
+            NaverMap(
               options: NaverMapViewOptions(
                 initialCameraPosition: const NCameraPosition(
                   target: NLatLng(37.5665, 126.9780),
@@ -129,35 +131,31 @@ class _MapScreenState extends State<MapScreen> {
                 }
               },
             ),
+            Positioned(
+              top: 12,
+              left: 12,
+              child: _speedBadge(ride, settings),
+            ),
+          ]),
           ),
 
           // 하단 통계
           Container(
             color: cardColor,
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _statCard(
-                  '거리',
-                  '${formatDistance(ride.totalDistance, useKmh)} ${distanceUnit(useKmh)}',
-                  Icons.straighten,
-                  textColor,
-                ),
+                _statCard('거리',
+                    '${formatDistance(ride.totalDistance, useKmh)}', distanceUnit(useKmh), textColor),
                 _divider(dividerColor),
-                _statCard(
-                  '시간',
-                  ride.formattedDuration,
-                  Icons.timer,
-                  textColor,
-                ),
+                _statCard('시간', ride.formattedDuration, '', textColor),
                 _divider(dividerColor),
-                _statCard(
-                  '최고속도',
-                  '${formatSpeed(ride.maxSpeed, useKmh)} ${speedUnit(useKmh)}',
-                  Icons.speed,
-                  textColor,
-                ),
+                _statCard('최고속도',
+                    '${formatSpeed(ride.maxSpeed, useKmh)}', speedUnit(useKmh), textColor),
+                _divider(dividerColor),
+                _statCard('평균속도',
+                    '${formatSpeed(_avgSpeed(ride), useKmh)}', speedUnit(useKmh), textColor),
               ],
             ),
           ),
@@ -217,25 +215,66 @@ class _MapScreenState extends State<MapScreen> {
     _pathOverlayAdded = true;
   }
 
-  Widget _statCard(String label, String value, IconData icon, Color textColor) {
+  double _avgSpeed(RideProvider ride) {
+    final durationHours = ride.duration / 3600.0;
+    return durationHours > 0 ? ride.totalDistance / durationHours : 0.0;
+  }
+
+  Widget _speedBadge(RideProvider ride, SettingsProvider settings) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: (isDark ? Colors.black : Colors.white).withOpacity(0.82),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            formatSpeed(ride.currentSpeed, settings.useKmh),
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              height: 1.0,
+            ),
+          ),
+          Text(
+            speedUnit(settings.useKmh),
+            style: const TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statCard(String label, String value, String unit, Color textColor) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.blue, size: 20),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                color: textColor,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (unit.isNotEmpty) ...[
+              const SizedBox(width: 2),
+              Text(unit, style: const TextStyle(color: Colors.blue, fontSize: 11)),
+            ],
+          ],
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.grey, fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
       ],
     );
   }
