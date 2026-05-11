@@ -17,6 +17,7 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyAppTheme = 'app_theme';
   static const _keyMinRecordDuration = 'min_record_duration';
   static const _keySpeedAlertKmh = 'speed_alert_kmh';
+  static const _keySpeedMinAlertKmh = 'speed_min_alert_kmh';
   static const _keyMapType = 'map_type';
   static const _keyYearlyGoalKm = 'yearly_goal_km';
   static const _keyMonthlyGoalKm = 'monthly_goal_km';
@@ -42,6 +43,7 @@ class SettingsProvider extends ChangeNotifier {
   String _appTheme = 'dark';
   int _minRecordDurationSec = 0;
   double? _speedAlertKmh;
+  double? _speedMinAlertKmh;
   String _mapType = 'basic';
   double? _yearlyGoalKm;
   double? _monthlyGoalKm;
@@ -69,6 +71,7 @@ class SettingsProvider extends ChangeNotifier {
       _appTheme == 'dark' ? ThemeMode.dark : ThemeMode.light;
   int get minRecordDurationSec => _minRecordDurationSec;
   double? get speedAlertKmh => _speedAlertKmh;
+  double? get speedMinAlertKmh => _speedMinAlertKmh;
   String get mapType => _mapType;
   double? get yearlyGoalKm => _yearlyGoalKm;
   double? get monthlyGoalKm => _monthlyGoalKm;
@@ -95,6 +98,7 @@ class SettingsProvider extends ChangeNotifier {
     _appTheme = prefs.getString(_keyAppTheme) ?? 'dark';
     _minRecordDurationSec = prefs.getInt(_keyMinRecordDuration) ?? 0;
     _speedAlertKmh = prefs.getDouble(_keySpeedAlertKmh);
+    _speedMinAlertKmh = prefs.getDouble(_keySpeedMinAlertKmh);
     _mapType = prefs.getString(_keyMapType) ?? 'basic';
     _yearlyGoalKm = prefs.getDouble(_keyYearlyGoalKm);
     _monthlyGoalKm = prefs.getDouble(_keyMonthlyGoalKm);
@@ -216,12 +220,37 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> setSpeedAlertKmh(double? value) async {
     _speedAlertKmh = value != null ? value.clamp(kDebugMode ? 0.0 : 1.0, 999.0) : null;
+    // 미만 알림과 충돌(초과 ≤ 미만)이면 미만 알림 해제
+    if (_speedAlertKmh != null && _speedMinAlertKmh != null &&
+        _speedAlertKmh! <= _speedMinAlertKmh!) {
+      _speedMinAlertKmh = null;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_keySpeedMinAlertKmh);
+    }
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     if (_speedAlertKmh != null) {
       await prefs.setDouble(_keySpeedAlertKmh, _speedAlertKmh!);
     } else {
       await prefs.remove(_keySpeedAlertKmh);
+    }
+  }
+
+  Future<void> setSpeedMinAlertKmh(double? value) async {
+    _speedMinAlertKmh = value != null ? value.clamp(kDebugMode ? 0.0 : 1.0, 999.0) : null;
+    // 초과 알림과 충돌(미만 ≥ 초과)이면 초과 알림 해제
+    if (_speedMinAlertKmh != null && _speedAlertKmh != null &&
+        _speedMinAlertKmh! >= _speedAlertKmh!) {
+      _speedAlertKmh = null;
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_keySpeedAlertKmh);
+    }
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (_speedMinAlertKmh != null) {
+      await prefs.setDouble(_keySpeedMinAlertKmh, _speedMinAlertKmh!);
+    } else {
+      await prefs.remove(_keySpeedMinAlertKmh);
     }
   }
 

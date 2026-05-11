@@ -486,6 +486,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 10),
             _speedAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
             const SizedBox(height: 10),
+            _speedMinAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
+            const SizedBox(height: 10),
             _distanceAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
             const SizedBox(height: 24),
 
@@ -1231,24 +1233,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.15),
+                  color: Colors.red.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.notifications_active_outlined,
-                    color: Colors.amber, size: 20),
+                child: const Icon(Icons.speed_outlined,
+                    color: Colors.red, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('속도 알림',
+                    Text('속도 초과 알림',
                         style: TextStyle(
                             color: titleColor,
                             fontSize: 14,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 2),
-                    Text('설정 속도 초과 시 진동 알림',
+                    Text('설정 속도 초과 시 진동 + 빨간색 표시',
                         style: TextStyle(color: subtitleColor, fontSize: 12)),
                   ],
                 ),
@@ -1263,8 +1265,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     settings.setSpeedAlertKmh(null);
                   }
                 },
-                activeThumbColor: Colors.amber,
-                activeTrackColor: Colors.amber.withOpacity(0.4),
+                activeThumbColor: Colors.red,
+                activeTrackColor: Colors.red.withOpacity(0.4),
                 inactiveTrackColor: inactiveTrackColor,
               ),
             ],
@@ -1330,6 +1332,140 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SystemSound.play(SystemSoundType.click);
                     final next = (currentKmh + 5).clamp(kDebugMode ? 0 : 1, 999);
                     settings.setSpeedAlertKmh(next.toDouble());
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: btnBgOff,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.add, color: titleColor, size: 20),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _speedMinAlertTile(SettingsProvider settings, Color panelColor,
+      Color titleColor, Color subtitleColor, Color btnBgOff) {
+    final inactiveTrackColor = Theme.of(context).colorScheme.outlineVariant;
+    final isOn = settings.speedMinAlertKmh != null;
+    final currentKmh = settings.speedMinAlertKmh?.toInt() ?? 10;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: panelColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.speed_outlined, color: Colors.blue, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('속도 미달 알림',
+                        style: TextStyle(
+                            color: titleColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text('설정 속도 미만 시 진동 + 파란색 표시',
+                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                  ],
+                ),
+              ),
+              Switch(
+                value: isOn,
+                onChanged: (v) {
+                  SystemSound.play(SystemSoundType.click);
+                  settings.setSpeedMinAlertKmh(v ? currentKmh.toDouble() : null);
+                },
+                activeThumbColor: Colors.blue,
+                activeTrackColor: Colors.blue.withOpacity(0.4),
+                inactiveTrackColor: inactiveTrackColor,
+              ),
+            ],
+          ),
+          if (isOn) ...[
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    final next = (currentKmh - 5).clamp(kDebugMode ? 0 : 1, 999);
+                    settings.setSpeedMinAlertKmh(next.toDouble());
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: btnBgOff,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.remove, color: titleColor, size: 20),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () async {
+                    SystemSound.play(SystemSoundType.click);
+                    final result = await NumberInputDialog.show(
+                      context,
+                      title: '속도 미달 알림 기준',
+                      initialValue: settings.speedMinAlertKmh,
+                      unit: 'km/h',
+                      maxDigits: 3,
+                      allowEmpty: false,
+                      allowDecimal: false,
+                    );
+                    if (result == null) return;
+                    settings.setSpeedMinAlertKmh(result.toDouble());
+                  },
+                  child: Container(
+                    width: 90,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: btnBgOff,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '$currentKmh km/h',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: titleColor,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    final next = (currentKmh + 5).clamp(kDebugMode ? 0 : 1, 999);
+                    settings.setSpeedMinAlertKmh(next.toDouble());
                   },
                   child: Container(
                     width: 40,

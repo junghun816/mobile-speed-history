@@ -28,6 +28,8 @@ class RideProvider extends ChangeNotifier {
   // 속도 알림
   double? _speedAlertKmh;
   bool _wasAboveSpeedAlert = false;
+  double? _speedMinAlertKmh;
+  bool _wasBelowSpeedAlert = false;
 
   // 거리 알림
   int? _distanceAlertKm;
@@ -109,6 +111,7 @@ class RideProvider extends ChangeNotifier {
     bool gpsHighAccuracy = true,
     bool autoPause = false,
     double? speedAlertKmh,
+    double? speedMinAlertKmh,
     SpeedMode speedMode = SpeedMode.normal,
     int? distanceAlertKm,
     bool useKmh = true,
@@ -137,6 +140,8 @@ class RideProvider extends ChangeNotifier {
     _manualPausedAt = null;
     _speedAlertKmh = speedAlertKmh;
     _wasAboveSpeedAlert = false;
+    _speedMinAlertKmh = speedMinAlertKmh;
+    _wasBelowSpeedAlert = false;
     _distanceAlertKm = distanceAlertKm;
     _lastAlertedKm = 0;
     _useKmh = useKmh;
@@ -219,7 +224,7 @@ class RideProvider extends ChangeNotifier {
 
     if (rawSpeed > _maxSpeed) _maxSpeed = rawSpeed;
 
-    // 속도 알림: 임계값 상향 돌파 시 1회 진동
+    // 속도 초과 알림: 임계값 상향 돌파 시 1회 진동
     final alertKmh = _speedAlertKmh;
     if (alertKmh != null) {
       final isAbove = rawSpeed >= alertKmh;
@@ -227,6 +232,17 @@ class RideProvider extends ChangeNotifier {
         HapticFeedback.heavyImpact();
       }
       _wasAboveSpeedAlert = isAbove;
+    }
+
+    // 속도 미만 알림: 임계값 하향 돌파 시 1회 진동 (정지·일시정지·초과 알림 활성 중 억제)
+    final minAlertKmh = _speedMinAlertKmh;
+    if (minAlertKmh != null) {
+      final suppressed = rawSpeed == 0 || _isManuallyPaused || _isAutoPaused || _wasAboveSpeedAlert;
+      final isBelow = !suppressed && rawSpeed < minAlertKmh;
+      if (isBelow && !_wasBelowSpeedAlert) {
+        HapticFeedback.heavyImpact();
+      }
+      _wasBelowSpeedAlert = isBelow;
     }
 
     if (_lastPosition != null) {

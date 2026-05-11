@@ -76,7 +76,18 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     final alertKmh = settings.speedAlertKmh;
     final isOverAlert = alertKmh != null && ride.isRiding && ride.currentSpeed >= alertKmh;
 
-    final speedTextColor = isOverAlert ? Colors.red : cs.onSurface;
+    final minAlertKmh = settings.speedMinAlertKmh;
+    final isUnderAlert = minAlertKmh != null &&
+        ride.isRiding &&
+        !ride.isPaused &&
+        ride.currentSpeed > 0 &&
+        ride.currentSpeed < minAlertKmh;
+
+    final speedTextColor = isOverAlert
+        ? Colors.red
+        : isUnderAlert
+            ? Colors.blue
+            : cs.onSurface;
     final panelColor = cs.surfaceContainer;
     final unitTextColor = cs.onSurfaceVariant;
     final dividerColor = cs.outlineVariant;
@@ -148,6 +159,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     maxSpeed: _maxSpeed,
                     isDark: isDark,
                     isOverAlert: isOverAlert,
+                    isUnderAlert: isUnderAlert,
                   ),
                   child: Center(
                     child: Column(
@@ -301,6 +313,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                         gpsHighAccuracy: settings.gpsHighAccuracy,
                         autoPause: settings.autoPause,
                         speedAlertKmh: settings.speedAlertKmh,
+                        speedMinAlertKmh: settings.speedMinAlertKmh,
                         speedMode: settings.speedMode,
                         distanceAlertKm: settings.distanceAlertKm,
                         useKmh: settings.useKmh,
@@ -642,12 +655,14 @@ class SpeedometerPainter extends CustomPainter {
   final double maxSpeed;
   final bool isDark;
   final bool isOverAlert;
+  final bool isUnderAlert;
 
   SpeedometerPainter({
     required this.speed,
     required this.maxSpeed,
     this.isDark = true,
     this.isOverAlert = false,
+    this.isUnderAlert = false,
   });
 
   @override
@@ -681,6 +696,8 @@ class SpeedometerPainter extends CustomPainter {
       final Color arcColor;
       if (isOverAlert) {
         arcColor = Colors.red;
+      } else if (isUnderAlert) {
+        arcColor = Colors.blue;
       } else if (speedRatio < 0.5) {
         arcColor = Colors.blue;
       } else if (speedRatio < 0.75) {
@@ -800,7 +817,11 @@ class SpeedometerPainter extends CustomPainter {
       tailEnd,
       needleEnd,
       Paint()
-        ..color = isOverAlert ? Colors.red : (isDark ? Colors.white : Colors.black87)
+        ..color = isOverAlert
+            ? Colors.red
+            : isUnderAlert
+                ? Colors.blue
+                : (isDark ? Colors.white : Colors.black87)
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round,
     );
@@ -811,6 +832,7 @@ class SpeedometerPainter extends CustomPainter {
     return oldDelegate.speed != speed ||
         oldDelegate.maxSpeed != maxSpeed ||
         oldDelegate.isDark != isDark ||
-        oldDelegate.isOverAlert != isOverAlert;
+        oldDelegate.isOverAlert != isOverAlert ||
+        oldDelegate.isUnderAlert != isUnderAlert;
   }
 }
