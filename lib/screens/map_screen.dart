@@ -20,6 +20,8 @@ class _MapScreenState extends State<MapScreen> {
   // 경로 오버레이 관리
   bool _pathOverlayAdded = false;
   int _lastPathLength = 0;
+  String? _lastPathColor;
+  int? _lastPathThickness;
 
   // 마커 보간용
   NLatLng? _prevLatLng;
@@ -46,9 +48,14 @@ class _MapScreenState extends State<MapScreen> {
     final dividerColor = cs.outlineVariant;
 
     if (_mapController != null && ride.pathPoints.isNotEmpty) {
-      if (ride.pathPoints.length != _lastPathLength) {
+      final needsRedraw = ride.pathPoints.length != _lastPathLength ||
+          settings.pathColor != _lastPathColor ||
+          settings.pathThickness != _lastPathThickness;
+      if (needsRedraw) {
         _lastPathLength = ride.pathPoints.length;
-        _drawPath(ride.pathPoints);
+        _lastPathColor = settings.pathColor;
+        _lastPathThickness = settings.pathThickness;
+        _drawPath(ride.pathPoints, settings.pathColor, settings.pathThickness);
       }
 
       final last = ride.pathPoints.last;
@@ -96,6 +103,9 @@ class _MapScreenState extends State<MapScreen> {
                 _locationOverlay = await controller.getLocationOverlay();
                 _locationOverlay?.setIsVisible(true);
 
+                final trackingMode = _toTrackingMode(settings.mapTrackingMode);
+                controller.setLocationTrackingMode(trackingMode);
+
                 try {
                   final position = await Geolocator.getCurrentPosition(
                     desiredAccuracy: LocationAccuracy.high,
@@ -111,7 +121,7 @@ class _MapScreenState extends State<MapScreen> {
                       target: NLatLng(position.latitude, position.longitude),
                       zoom: 16,
                     )..setAnimation(
-                      animation: NCameraAnimation.none,  // 애니메이션 없음
+                      animation: NCameraAnimation.none,
                     ),
                   );
                 } catch (e) {
@@ -161,7 +171,26 @@ class _MapScreenState extends State<MapScreen> {
     _locationOverlay?.setPosition(latLng);
   }
 
-  Future<void> _drawPath(List<Position> positions) async {
+  Color _pathStringToColor(String name) {
+    switch (name) {
+      case 'red': return Colors.red;
+      case 'green': return Colors.green;
+      case 'orange': return Colors.orange;
+      case 'purple': return Colors.purple;
+      case 'yellow': return Colors.yellow;
+      default: return Colors.blue;
+    }
+  }
+
+  NLocationTrackingMode _toTrackingMode(String mode) {
+    switch (mode) {
+      case 'follow': return NLocationTrackingMode.follow;
+      case 'face': return NLocationTrackingMode.face;
+      default: return NLocationTrackingMode.none;
+    }
+  }
+
+  Future<void> _drawPath(List<Position> positions, String colorName, int thickness) async {
     if (_mapController == null) return;
 
     if (_pathOverlayAdded) {
@@ -180,8 +209,8 @@ class _MapScreenState extends State<MapScreen> {
     final polyline = NPolylineOverlay(
       id: 'ride_path',
       coords: coords,
-      color: Colors.blue,
-      width: 5,
+      color: _pathStringToColor(colorName),
+      width: thickness.toDouble(),
     );
 
     await _mapController!.addOverlay(polyline);

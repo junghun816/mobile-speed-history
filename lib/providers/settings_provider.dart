@@ -29,6 +29,9 @@ class SettingsProvider extends ChangeNotifier {
   static const _keySpeedMode = 'speed_mode';
   static const _keyDistanceAlertKm = 'distance_alert_km';
   static const _keyClockDisplay = 'clock_display';
+  static const _keyPathColor = 'path_color';
+  static const _keyPathThickness = 'path_thickness';
+  static const _keyMapTrackingMode = 'map_tracking_mode';
 
   bool _useKmh = true;
   bool _gpsHighAccuracy = true;
@@ -55,6 +58,9 @@ class SettingsProvider extends ChangeNotifier {
   SpeedMode _speedMode = SpeedMode.normal;
   int? _distanceAlertKm;
   String _clockDisplay = 'none';
+  String _pathColor = 'blue';
+  int _pathThickness = 5;
+  String _mapTrackingMode = 'none';
 
   bool get useKmh => _useKmh;
   bool get gpsHighAccuracy => _gpsHighAccuracy;
@@ -82,6 +88,9 @@ class SettingsProvider extends ChangeNotifier {
   SpeedMode get speedMode => _speedMode;
   int? get distanceAlertKm => _distanceAlertKm;
   String get clockDisplay => _clockDisplay;
+  String get pathColor => _pathColor;
+  int get pathThickness => _pathThickness;
+  String get mapTrackingMode => _mapTrackingMode;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -117,6 +126,9 @@ class SettingsProvider extends ChangeNotifier {
     }
     _distanceAlertKm = prefs.getInt(_keyDistanceAlertKm);
     _clockDisplay = prefs.getString(_keyClockDisplay) ?? 'none';
+    _pathColor = prefs.getString(_keyPathColor) ?? 'blue';
+    _pathThickness = prefs.getInt(_keyPathThickness) ?? 5;
+    _mapTrackingMode = prefs.getString(_keyMapTrackingMode) ?? 'none';
     notifyListeners();
   }
 
@@ -318,6 +330,27 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keySpeedMode, value.name);
+  }
+
+  Future<void> setPathColor(String value) async {
+    _pathColor = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyPathColor, value);
+  }
+
+  Future<void> setPathThickness(int value) async {
+    _pathThickness = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyPathThickness, value);
+  }
+
+  Future<void> setMapTrackingMode(String value) async {
+    _mapTrackingMode = value;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyMapTrackingMode, value);
   }
 
   Future<void> setGoalMaxDurationMin(int? value) async {

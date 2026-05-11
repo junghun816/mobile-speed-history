@@ -27,6 +27,17 @@ class _HistoryDetailMapScreenState extends State<HistoryDetailMapScreen> {
     }
   }
 
+  Color _pathStringToColor(String name) {
+    switch (name) {
+      case 'red': return Colors.red;
+      case 'green': return Colors.green;
+      case 'orange': return Colors.orange;
+      case 'purple': return Colors.purple;
+      case 'yellow': return Colors.yellow;
+      default: return Colors.blue;
+    }
+  }
+
   List<NLatLng> _parsePathPoints() {
     try {
       final List decoded = jsonDecode(widget.record.pathPoints);
@@ -90,11 +101,12 @@ class _HistoryDetailMapScreenState extends State<HistoryDetailMapScreen> {
                 _mapController = controller;
 
                 if (points.length >= 2) {
+                  final pathColor = _pathStringToColor(settings.pathColor);
                   final polyline = NPolylineOverlay(
                     id: 'history_path',
                     coords: points,
-                    color: Colors.blue,
-                    width: 5,
+                    color: pathColor,
+                    width: settings.pathThickness.toDouble(),
                   );
                   await controller.addOverlay(polyline);
 

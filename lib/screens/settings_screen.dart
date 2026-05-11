@@ -34,10 +34,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isExportingGpx = false;
   String _appVersion = '';
 
+  final _scrollController = ScrollController();
+  final _tabScrollController = ScrollController();
+  int _activeTab = 0;
+  bool _isScrollingToSection = false;
+  double _sectionActiveThreshold = 130.0;
+  static const _tabLabels = ['테마', '주행', '화면', '알림', '지도', '기타'];
+  final _sectionKeys = List.generate(6, (_) => GlobalKey());
+  final _tabKeys = List.generate(6, (_) => GlobalKey());
+
   @override
   void initState() {
     super.initState();
     _loadAppVersion();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _tabScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadAppVersion() async {
@@ -45,6 +62,91 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       setState(() => _appVersion = info.version);
     }
+  }
+
+  void _onScroll() {
+    if (_isScrollingToSection) return;
+    if (!_scrollController.hasClients) return;
+    int newActive = 0;
+    for (int i = 0; i < _sectionKeys.length; i++) {
+      final ctx = _sectionKeys[i].currentContext;
+      if (ctx == null) continue;
+      final box = ctx.findRenderObject() as RenderBox?;
+      if (box == null || !box.attached) continue;
+      if (box.localToGlobal(Offset.zero).dy <= _sectionActiveThreshold) {
+        newActive = i;
+      }
+    }
+    if (_activeTab != newActive) {
+      setState(() => _activeTab = newActive);
+      _scrollTabToVisible(newActive);
+    }
+  }
+
+  void _scrollTabToVisible(int index) {
+    final ctx = _tabKeys[index].currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(ctx,
+        duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+  }
+
+  Future<void> _scrollToSection(int index) async {
+    SystemSound.play(SystemSoundType.click);
+    if (_activeTab != index) setState(() => _activeTab = index);
+    _scrollTabToVisible(index);
+    final ctx = _sectionKeys[index].currentContext;
+    if (ctx == null) return;
+    _isScrollingToSection = true;
+    await Scrollable.ensureVisible(ctx,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+        alignment: 0.0);
+    if (mounted) _isScrollingToSection = false;
+  }
+
+  Widget _buildTabBar() {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      height: 44,
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: cs.outline, width: 1.0)),
+      ),
+      child: ListView(
+        controller: _tabScrollController,
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        children: List.generate(_tabLabels.length, (i) {
+          final isActive = _activeTab == i;
+          return GestureDetector(
+            key: _tabKeys[i],
+            onTap: () => _scrollToSection(i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: isActive ? Colors.blue : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Center(
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  style: TextStyle(
+                    color: isActive ? Colors.blue : cs.onSurfaceVariant,
+                    fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 13,
+                  ),
+                  child: Text(_tabLabels[i]),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
   }
 
   void _showAppInfoDialog() {
@@ -421,152 +523,179 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final btnBorderOff = cs.outlineVariant;
     final btnTextOff = cs.onSurfaceVariant;
 
+    _sectionActiveThreshold = MediaQuery.of(context).padding.top + 88;
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
+        child: Column(
           children: [
-            _sectionTitle('테마', sectionColor),
-            _themeSelector(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 24),
+            _buildTabBar(),
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                  // 테마
+                  SizedBox(key: _sectionKeys[0]),
+                  _sectionTitle('테마', sectionColor),
+                  _themeSelector(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 24),
 
-            _sectionTitle('주행', sectionColor),
-            _speedModeTile(settings, panelColor, titleColor, subtitleColor),
-            const SizedBox(height: 10),
-            _switchTile(
-              icon: Icons.pause_circle_outline,
-              iconColor: Colors.orange,
-              title: '자동 일시정지',
-              subtitle: '정지 감지 시 타이머 자동 일시정지',
-              value: settings.autoPause,
-              onChanged: (v) => settings.setAutoPause(v),
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-            ),
-            const SizedBox(height: 10),
-            _minDistanceTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 10),
-            _minDurationTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 10),
-            _toggleTile(
-              icon: Icons.speed,
-              iconColor: Colors.blue,
-              title: '단위',
-              subtitle: '속도/거리 표시 단위',
-              leftLabel: 'km/h',
-              rightLabel: 'mph',
-              isLeft: settings.useKmh,
-              onToggle: (v) => settings.setUseKmh(v),
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-              btnBgOff: btnBgOff,
-              btnBorderOff: btnBorderOff,
-              btnTextOff: btnTextOff,
-            ),
-            const SizedBox(height: 10),
-            _toggleTile(
-              icon: Icons.gps_fixed,
-              iconColor: Colors.green,
-              title: 'GPS 정확도',
-              subtitle: '고정밀 모드는 배터리를 더 소모해요',
-              leftLabel: '고정밀',
-              rightLabel: '배터리 절약',
-              isLeft: settings.gpsHighAccuracy,
-              onToggle: (v) => settings.setGpsHighAccuracy(v),
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-              btnBgOff: btnBgOff,
-              btnBorderOff: btnBorderOff,
-              btnTextOff: btnTextOff,
-            ),
-            const SizedBox(height: 24),
+                  // 주행
+                  SizedBox(key: _sectionKeys[1]),
+                  _sectionTitle('주행', sectionColor),
+                  _speedModeTile(settings, panelColor, titleColor, subtitleColor),
+                  const SizedBox(height: 10),
+                  _switchTile(
+                    icon: Icons.pause_circle_outline,
+                    iconColor: Colors.orange,
+                    title: '자동 일시정지',
+                    subtitle: '정지 감지 시 타이머 자동 일시정지',
+                    value: settings.autoPause,
+                    onChanged: (v) => settings.setAutoPause(v),
+                    panelColor: panelColor,
+                    titleColor: titleColor,
+                    subtitleColor: subtitleColor,
+                  ),
+                  const SizedBox(height: 10),
+                  _minDistanceTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 10),
+                  _minDurationTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 10),
+                  _toggleTile(
+                    icon: Icons.speed,
+                    iconColor: Colors.blue,
+                    title: '단위',
+                    subtitle: '속도/거리 표시 단위',
+                    leftLabel: 'km/h',
+                    rightLabel: 'mph',
+                    isLeft: settings.useKmh,
+                    onToggle: (v) => settings.setUseKmh(v),
+                    panelColor: panelColor,
+                    titleColor: titleColor,
+                    subtitleColor: subtitleColor,
+                    btnBgOff: btnBgOff,
+                    btnBorderOff: btnBorderOff,
+                    btnTextOff: btnTextOff,
+                  ),
+                  const SizedBox(height: 10),
+                  _toggleTile(
+                    icon: Icons.gps_fixed,
+                    iconColor: Colors.green,
+                    title: 'GPS 정확도',
+                    subtitle: '고정밀 모드는 배터리를 더 소모해요',
+                    leftLabel: '고정밀',
+                    rightLabel: '배터리 절약',
+                    isLeft: settings.gpsHighAccuracy,
+                    onToggle: (v) => settings.setGpsHighAccuracy(v),
+                    panelColor: panelColor,
+                    titleColor: titleColor,
+                    subtitleColor: subtitleColor,
+                    btnBgOff: btnBgOff,
+                    btnBorderOff: btnBorderOff,
+                    btnTextOff: btnTextOff,
+                  ),
+                  const SizedBox(height: 24),
 
-            _sectionTitle('알림', sectionColor),
-            _speedAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
-            const SizedBox(height: 10),
-            _speedMinAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
-            const SizedBox(height: 10),
-            _distanceAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
-            const SizedBox(height: 24),
+                  // 화면
+                  SizedBox(key: _sectionKeys[2]),
+                  _sectionTitle('화면', sectionColor),
+                  _gaugeSpeedTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 10),
+                  _displayItemsTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 10),
+                  _clockDisplayTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 24),
 
-            _sectionTitle('주행 화면', sectionColor),
-            _gaugeSpeedTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 10),
-            _displayItemsTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 10),
-            _clockDisplayTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 24),
+                  // 알림
+                  SizedBox(key: _sectionKeys[3]),
+                  _sectionTitle('알림', sectionColor),
+                  _speedAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
+                  const SizedBox(height: 10),
+                  _speedMinAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
+                  const SizedBox(height: 10),
+                  _distanceAlertTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
+                  const SizedBox(height: 24),
 
-            _sectionTitle('지도', sectionColor),
-            _mapTypeTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 24),
+                  // 지도
+                  SizedBox(key: _sectionKeys[4]),
+                  _sectionTitle('지도', sectionColor),
+                  _mapTypeTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 10),
+                  _pathColorTile(settings, panelColor, titleColor, subtitleColor),
+                  const SizedBox(height: 10),
+                  _pathThicknessTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 10),
+                  _mapTrackingModeTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+                  const SizedBox(height: 24),
 
-            _sectionTitle('데이터', sectionColor),
-            _settingTile(
-              icon: Icons.upload_file,
-              iconColor: Colors.teal,
-              title: '백업 / 내보내기',
-              subtitle: '주행 기록을 파일로 저장 · 복원',
-              onTap: () => _showBackupSheet(),
-              isLoading: _isExporting || _isImporting || _isSharingExport || _isExportingGpx,
-              loadingColor: Colors.teal,
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-            ),
-            const SizedBox(height: 24),
+                  // 기타
+                  SizedBox(key: _sectionKeys[5]),
+                  _sectionTitle('기타', sectionColor),
+                  _weightTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
+                  const SizedBox(height: 10),
+                  _settingTile(
+                    icon: Icons.upload_file,
+                    iconColor: Colors.teal,
+                    title: '백업 / 내보내기',
+                    subtitle: '주행 기록을 파일로 저장 · 복원',
+                    onTap: () => _showBackupSheet(),
+                    isLoading: _isExporting || _isImporting || _isSharingExport || _isExportingGpx,
+                    loadingColor: Colors.teal,
+                    panelColor: panelColor,
+                    titleColor: titleColor,
+                    subtitleColor: subtitleColor,
+                  ),
+                  const SizedBox(height: 10),
+                  _settingTile(
+                    icon: Icons.info_outline,
+                    iconColor: Colors.grey,
+                    title: '앱 정보',
+                    subtitle: _appVersion.isEmpty ? _kAppName : '$_kAppName  v$_appVersion',
+                    onTap: () => _showAppInfoDialog(),
+                    isLoading: false,
+                    loadingColor: Colors.grey,
+                    panelColor: panelColor,
+                    titleColor: titleColor,
+                    subtitleColor: subtitleColor,
+                  ),
+                  const SizedBox(height: 24),
 
-            _sectionTitle('기타', sectionColor),
-            _weightTile(settings, panelColor, titleColor, subtitleColor, btnBgOff),
-            const SizedBox(height: 24),
-
-            _sectionTitle('앱 정보', sectionColor),
-            _settingTile(
-              icon: Icons.info_outline,
-              iconColor: Colors.grey,
-              title: '앱 정보',
-              subtitle: _appVersion.isEmpty ? _kAppName : '$_kAppName  v$_appVersion',
-              onTap: () => _showAppInfoDialog(),
-              isLoading: false,
-              loadingColor: Colors.grey,
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-            ),
-            const SizedBox(height: 24),
-
-            if (kDebugMode) ...[
-              _sectionTitle('개발', sectionColor),
-              _settingTile(
-                icon: Icons.delete_outline,
-                iconColor: Colors.red,
-                title: '데이터 제거',
-                subtitle: '전체 기록 삭제',
-                onTap: (_isDeleting || _isGenerating) ? null : _deleteAllData,
-                isLoading: _isDeleting,
-                loadingColor: Colors.red,
-                panelColor: panelColor,
-                titleColor: titleColor,
-                subtitleColor: subtitleColor,
+                  if (kDebugMode) ...[
+                    _sectionTitle('개발', sectionColor),
+                    _settingTile(
+                      icon: Icons.delete_outline,
+                      iconColor: Colors.red,
+                      title: '데이터 제거',
+                      subtitle: '전체 기록 삭제',
+                      onTap: (_isDeleting || _isGenerating) ? null : _deleteAllData,
+                      isLoading: _isDeleting,
+                      loadingColor: Colors.red,
+                      panelColor: panelColor,
+                      titleColor: titleColor,
+                      subtitleColor: subtitleColor,
+                    ),
+                    const SizedBox(height: 10),
+                    _settingTile(
+                      icon: Icons.add_chart,
+                      iconColor: Colors.blue,
+                      title: '데이터 생성',
+                      subtitle: '임시 샘플 데이터 삽입',
+                      onTap: (_isDeleting || _isGenerating) ? null : _generateSampleData,
+                      isLoading: _isGenerating,
+                      loadingColor: Colors.blue,
+                      panelColor: panelColor,
+                      titleColor: titleColor,
+                      subtitleColor: subtitleColor,
+                    ),
+                  ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 10),
-              _settingTile(
-                icon: Icons.add_chart,
-                iconColor: Colors.blue,
-                title: '데이터 생성',
-                subtitle: '임시 샘플 데이터 삽입',
-                onTap: (_isDeleting || _isGenerating) ? null : _generateSampleData,
-                isLoading: _isGenerating,
-                loadingColor: Colors.blue,
-                panelColor: panelColor,
-                titleColor: titleColor,
-                subtitleColor: subtitleColor,
-              ),
-            ],
+            ),
           ],
         ),
       ),
@@ -1008,12 +1137,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Expanded(
                 child: _twoStateButton(leftLabel, isLeft, () => onToggle(true),
-                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff),
+                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
+                    activeColor: iconColor),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: _twoStateButton(rightLabel, !isLeft, () => onToggle(false),
-                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff),
+                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
+                    activeColor: iconColor),
               ),
             ],
           ),
@@ -1026,6 +1157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required Color btnBgOff,
     required Color btnBorderOff,
     required Color btnTextOff,
+    Color activeColor = Colors.blue,
   }) {
     return GestureDetector(
       onTap: () {
@@ -1035,17 +1167,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
+          color: isSelected ? activeColor.withOpacity(0.15) : btnBgOff,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? Colors.blue : btnBorderOff,
+            color: isSelected ? activeColor : btnBorderOff,
           ),
         ),
         child: Text(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: isSelected ? Colors.blue : btnTextOff,
+            color: isSelected ? activeColor : btnTextOff,
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
@@ -1111,17 +1243,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.purple.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? Colors.blue : btnBorderOff,
+                        color: isSelected ? Colors.purple : btnBorderOff,
                       ),
                     ),
                     child: Text(
                       labels[i],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isSelected ? Colors.blue : btnTextOff,
+                        color: isSelected ? Colors.purple : btnTextOff,
                         fontSize: 12,
                       ),
                     ),
@@ -1703,21 +1835,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _speedModeTile(
-    SettingsProvider settings,
-    Color panelColor,
-    Color titleColor,
-    Color subtitleColor,
-  ) {
-    const modes = SpeedMode.values;
-    final selected = settings.speedMode;
-    final cs = Theme.of(context).colorScheme;
+  Color _pathStringToColor(String name) {
+    switch (name) {
+      case 'red': return Colors.red;
+      case 'green': return Colors.green;
+      case 'orange': return Colors.orange;
+      case 'purple': return Colors.purple;
+      case 'yellow': return Colors.yellow;
+      default: return Colors.blue;
+    }
+  }
 
-    final modeIcons = {
-      SpeedMode.normal: Icons.directions_bike,
-      SpeedMode.lowSpeed: Icons.directions_run,
-      SpeedMode.highSpeed: Icons.train,
-    };
+  Widget _pathColorTile(SettingsProvider settings, Color panelColor, Color titleColor, Color subtitleColor) {
+    const options = ['blue', 'red', 'green', 'orange', 'purple', 'yellow'];
+    const labels = ['파랑', '빨강', '초록', '주황', '보라', '노랑'];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -1734,10 +1865,289 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.15),
+                  color: Colors.blueAccent.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(modeIcons[selected], color: Colors.blue, size: 20),
+                child: const Icon(Icons.route, color: Colors.blueAccent, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('경로 색상',
+                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text('주행·기록 지도의 경로 선 색상',
+                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(options.length, (i) {
+              final pathColor = _pathStringToColor(options[i]);
+              final isSelected = settings.pathColor == options[i];
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    settings.setPathColor(options[i]);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? pathColor.withOpacity(0.15) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected ? pathColor : pathColor.withOpacity(0.4),
+                        width: isSelected ? 1.5 : 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 16,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: pathColor,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          labels[i],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isSelected ? pathColor : subtitleColor,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pathThicknessTile(SettingsProvider settings, Color panelColor,
+      Color titleColor, Color subtitleColor, Color btnBgOff, Color btnBorderOff, Color btnTextOff) {
+    const options = [3, 5, 8];
+    const labels = ['얇게', '보통', '굵게'];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: panelColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.indigo.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.line_weight, color: Colors.indigo, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('경로 두께',
+                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text('주행·기록 지도의 경로 선 굵기',
+                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(options.length, (i) {
+              final isSelected = settings.pathThickness == options[i];
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    settings.setPathThickness(options[i]);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.indigo.withOpacity(0.15) : btnBgOff,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected ? Colors.indigo : btnBorderOff,
+                      ),
+                    ),
+                    child: Text(
+                      labels[i],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isSelected ? Colors.indigo : btnTextOff,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _mapTrackingModeTile(SettingsProvider settings, Color panelColor,
+      Color titleColor, Color subtitleColor, Color btnBgOff, Color btnBorderOff, Color btnTextOff) {
+    const options = ['none', 'follow', 'face'];
+    const labels = ['없음', '위치 추적', '방위 추적'];
+    const descriptions = ['자동 이동 안 함', '현재 위치 따라감', '진행 방향 위로'];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: panelColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: Colors.teal.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.my_location, color: Colors.teal, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('지도 추적 모드 기본값',
+                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    Text('주행 지도 시작 시 초기 추적 모드',
+                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(options.length, (i) {
+              final isSelected = settings.mapTrackingMode == options[i];
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    settings.setMapTrackingMode(options[i]);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.teal.withOpacity(0.15) : btnBgOff,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected ? Colors.teal : btnBorderOff,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          labels[i],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isSelected ? Colors.teal : btnTextOff,
+                            fontSize: 12,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                        Text(
+                          descriptions[i],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isSelected ? Colors.teal.withOpacity(0.7) : subtitleColor,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _speedModeTile(
+    SettingsProvider settings,
+    Color panelColor,
+    Color titleColor,
+    Color subtitleColor,
+  ) {
+    const modes = SpeedMode.values;
+    final selected = settings.speedMode;
+
+    final modeIcons = {
+      SpeedMode.normal: Icons.directions_bike,
+      SpeedMode.lowSpeed: Icons.directions_run,
+      SpeedMode.highSpeed: Icons.train,
+    };
+    final modeColors = {
+      SpeedMode.normal: Colors.blue,
+      SpeedMode.lowSpeed: Colors.deepOrange,
+      SpeedMode.highSpeed: Colors.purple,
+    };
+    final selectedColor = modeColors[selected]!;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: panelColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: selectedColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(modeIcons[selected], color: selectedColor, size: 20),
               ),
               const SizedBox(width: 14),
               Column(
@@ -1759,6 +2169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Row(
             children: modes.map((mode) {
               final isSelected = mode == selected;
+              final modeColor = modeColors[mode]!;
               return Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(
@@ -1773,8 +2184,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? Colors.blue
-                            : cs.surfaceContainerHighest,
+                            ? modeColor
+                            : modeColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -1782,9 +2193,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           Icon(
                             modeIcons[mode],
                             size: 18,
-                            color: isSelected
-                                ? Colors.white
-                                : cs.onSurfaceVariant,
+                            color: isSelected ? Colors.white : modeColor,
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -1792,9 +2201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: isSelected
-                                  ? Colors.white
-                                  : cs.onSurfaceVariant,
+                              color: isSelected ? Colors.white : modeColor,
                             ),
                           ),
                         ],
@@ -1861,8 +2268,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SystemSound.play(SystemSoundType.click);
               onChanged(v);
             },
-            activeThumbColor: Colors.blue,
-            activeTrackColor: Colors.blue.withOpacity(0.4),
+            activeThumbColor: iconColor,
+            activeTrackColor: iconColor.withOpacity(0.4),
             inactiveTrackColor: inactiveTrackColor,
           ),
         ],
@@ -1888,11 +2295,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.15),
+                  color: Colors.lightBlue.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.palette_outlined,
-                    color: Colors.purple, size: 20),
+                    color: Colors.lightBlue, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1943,21 +2350,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
+          color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? Colors.blue : btnBorderOff,
+            color: isSelected ? Colors.lightBlue : btnBorderOff,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: isSelected ? Colors.blue : btnTextOff, size: 16),
+            Icon(icon, color: isSelected ? Colors.lightBlue : btnTextOff, size: 16),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.blue : btnTextOff,
+                color: isSelected ? Colors.lightBlue : btnTextOff,
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
