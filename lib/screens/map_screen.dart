@@ -23,6 +23,16 @@ class _MapScreenState extends State<MapScreen> {
   String? _lastPathColor;
   int? _lastPathThickness;
 
+  // 속도 뱃지 드래그 & 리사이즈
+  double _badgeLeft = 12.0;
+  double _badgeTop = 12.0;
+  double _badgeScale = 1.0;
+  bool _isResizeMode = false;
+  static const double _handleSize = 18.0;
+  static const double _handlePad = _handleSize / 2;
+  final _mapStackKey = GlobalKey();
+  final _badgeWidgetKey = GlobalKey();
+
   // 마커 보간용
   NLatLng? _prevLatLng;
   NLatLng? _targetLatLng;
@@ -89,6 +99,7 @@ class _MapScreenState extends State<MapScreen> {
           Expanded(
             key: ValueKey(settings.mapType),
             child: Stack(
+              key: _mapStackKey,
               children: [
             NaverMap(
               options: NaverMapViewOptions(
@@ -131,10 +142,18 @@ class _MapScreenState extends State<MapScreen> {
                 }
               },
             ),
+            if (_isResizeMode)
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _isResizeMode = false),
+                ),
+              ),
             Positioned(
-              top: 12,
-              left: 12,
-              child: _speedBadge(ride, settings),
+              key: const ValueKey('speed_badge'),
+              left: _badgeLeft - _handlePad,
+              top: _badgeTop - _handlePad,
+              child: _speedBadgeComposite(ride, settings),
             ),
           ]),
           ),
@@ -220,13 +239,55 @@ class _MapScreenState extends State<MapScreen> {
     return durationHours > 0 ? ride.totalDistance / durationHours : 0.0;
   }
 
-  Widget _speedBadge(RideProvider ride, SettingsProvider settings) {
+  Widget _speedBadgeComposite(RideProvider ride, SettingsProvider settings) {
+    final screenSize = MediaQuery.of(context).size;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => setState(() => _isResizeMode = !_isResizeMode),
+      onPanStart: (_) {
+        if (_isResizeMode) setState(() => _isResizeMode = false);
+      },
+      onPanUpdate: (d) {
+        if (_isResizeMode) return;
+        final mapBox = _mapStackKey.currentContext?.findRenderObject() as RenderBox?;
+        final mapHeight = mapBox?.size.height ?? screenSize.height;
+        final badgeBox = _badgeWidgetKey.currentContext?.findRenderObject() as RenderBox?;
+        final badgeW = badgeBox?.size.width ?? 60.0;
+        final badgeH = badgeBox?.size.height ?? 60.0;
+        setState(() {
+          _badgeLeft = (_badgeLeft + d.delta.dx).clamp(0.0, screenSize.width - badgeW);
+          _badgeTop = (_badgeTop + d.delta.dy).clamp(0.0, mapHeight - badgeH);
+        });
+      },
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(_handlePad),
+            child: _speedBadgeWidget(ride, settings),
+          ),
+          if (_isResizeMode) ...[
+            Positioned(top: 0, left: 0,     child: _resizeHandle(0)),
+            Positioned(top: 0, right: 0,    child: _resizeHandle(1)),
+            Positioned(bottom: 0, left: 0,  child: _resizeHandle(2)),
+            Positioned(bottom: 0, right: 0, child: _resizeHandle(3)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _speedBadgeWidget(RideProvider ride, SettingsProvider settings) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final s = _badgeScale;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      key: _badgeWidgetKey,
+      padding: EdgeInsets.symmetric(horizontal: 14 * s, vertical: 8 * s),
       decoration: BoxDecoration(
         color: (isDark ? Colors.black : Colors.white).withOpacity(0.82),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14 * s),
+        border: _isResizeMode
+            ? Border.all(color: Colors.blue.withOpacity(0.7), width: 1.5)
+            : null,
         boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 2))],
       ),
       child: Column(
@@ -236,16 +297,52 @@ class _MapScreenState extends State<MapScreen> {
             formatSpeed(ride.currentSpeed, settings.useKmh),
             style: TextStyle(
               color: isDark ? Colors.white : Colors.black87,
-              fontSize: 36,
+              fontSize: 36 * s,
               fontWeight: FontWeight.bold,
               height: 1.0,
             ),
           ),
           Text(
             speedUnit(settings.useKmh),
-            style: const TextStyle(color: Colors.grey, fontSize: 13),
+            style: TextStyle(color: Colors.grey, fontSize: 13 * s),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _resizeHandle(int corner) {
+    return GestureDetector(
+      onPanUpdate: (d) {
+        setState(() {
+          final badgeBox = _badgeWidgetKey.currentContext?.findRenderObject() as RenderBox?;
+          final naturalW = (badgeBox?.size.width ?? 80.0) / _badgeScale;
+          final naturalH = (badgeBox?.size.height ?? 60.0) / _badgeScale;
+
+          final double delta = switch (corner) {
+            0 => (-d.delta.dx - d.delta.dy) / 80, // TL
+            1 => (d.delta.dx - d.delta.dy) / 80,  // TR
+            2 => (-d.delta.dx + d.delta.dy) / 80, // BL
+            _ => (d.delta.dx + d.delta.dy) / 80,  // BR
+          };
+          final oldScale = _badgeScale;
+          _badgeScale = (_badgeScale + delta).clamp(0.5, 3.0);
+          final diff = _badgeScale - oldScale;
+
+          // 반대편 코너를 고정점으로 — 좌측 핸들은 우측 고정, 상단 핸들은 하단 고정
+          if (corner == 0 || corner == 2) _badgeLeft -= naturalW * diff;
+          if (corner == 0 || corner == 1) _badgeTop -= naturalH * diff;
+        });
+      },
+      child: Container(
+        width: _handleSize,
+        height: _handleSize,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.blue, width: 2),
+          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+        ),
       ),
     );
   }
