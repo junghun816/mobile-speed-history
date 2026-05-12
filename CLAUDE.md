@@ -15,7 +15,7 @@
 ```dart
 SystemSound.play(SystemSoundType.click);
 ```
-Flutter의 일부 위젯(예: `Switch`, `Checkbox`, `Radio`)은 자체적으로 시스템 음을 출력하므로 별도 처리가 필요 없다. 그 외 `GestureDetector`, `InkWell` 등 커스텀 탭 영역에는 반드시 명시적으로 추가한다.
+Flutter의 일부 위젯(예: `Switch`, `Checkbox`, `Radio`, `DropdownButton`)은 자체적으로 시스템 음을 출력하므로 별도 처리가 필요 없다. 그 외 `GestureDetector`, `InkWell` 등 커스텀 탭 영역에는 반드시 명시적으로 추가한다.
 
 ### 플랫폼 대응
 Android/iOS 양 플랫폼을 지원한다. 플랫폼 분기가 필요한 경우 `Platform.isAndroid` / `Platform.isIOS`로 처리한다. 플랫폼별 처리 예시:
@@ -167,7 +167,7 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 ## 미결 TODO
 
 - [ ] 지도 or 기타에 추가할 설정 고민
-- [ ] 설정에서 아이콘, 버튼 색 정리 필요
+- [x] 설정에서 아이콘, 버튼 색 정리 필요 — 모든 비시맨틱 아이콘/버튼 Colors.blue 통일 (알림 타일의 Switch 색·개발 섹션 제외)
 - [x] 지도에서 현재 속도 나타내는 팝업 드래그 이동 기능
 - [x] 지도에서 현재 속도 나타내는 팝업 크기 조절 기능
 - [ ] 이후 CLAUDE.md, README.md 정리

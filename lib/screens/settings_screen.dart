@@ -551,7 +551,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   _switchTile(
                     icon: Icons.pause_circle_outline,
-                    iconColor: Colors.orange,
+                    iconColor: Colors.deepOrange,
                     title: '자동 일시정지',
                     subtitle: '정지 감지 시 타이머 자동 일시정지',
                     value: settings.autoPause,
@@ -567,7 +567,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   _toggleTile(
                     icon: Icons.speed,
-                    iconColor: Colors.blue,
+                    iconColor: Colors.orange,
                     title: '단위',
                     subtitle: '속도/거리 표시 단위',
                     leftLabel: 'km/h',
@@ -584,7 +584,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   _toggleTile(
                     icon: Icons.gps_fixed,
-                    iconColor: Colors.green,
+                    iconColor: Colors.amber,
                     title: 'GPS 정확도',
                     subtitle: '고정밀 모드는 배터리를 더 소모해요',
                     leftLabel: '고정밀',
@@ -641,12 +641,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   _settingTile(
                     icon: Icons.upload_file,
-                    iconColor: Colors.teal,
+                    iconColor: Colors.blueGrey,
                     title: '백업 / 내보내기',
                     subtitle: '주행 기록을 파일로 저장 · 복원',
                     onTap: () => _showBackupSheet(),
                     isLoading: _isExporting || _isImporting || _isSharingExport || _isExportingGpx,
-                    loadingColor: Colors.teal,
+                    loadingColor: Colors.blueGrey,
                     panelColor: panelColor,
                     titleColor: titleColor,
                     subtitleColor: subtitleColor,
@@ -654,12 +654,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 10),
                   _settingTile(
                     icon: Icons.info_outline,
-                    iconColor: Colors.grey,
+                    iconColor: Colors.blueGrey,
                     title: '앱 정보',
                     subtitle: _appVersion.isEmpty ? _kAppName : '$_kAppName  v$_appVersion',
                     onTap: () => _showAppInfoDialog(),
                     isLoading: false,
-                    loadingColor: Colors.grey,
+                    loadingColor: Colors.blueGrey,
                     panelColor: panelColor,
                     titleColor: titleColor,
                     subtitleColor: subtitleColor,
@@ -726,10 +726,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.15),
+                  color: Colors.indigo.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.access_time, color: Colors.teal, size: 20),
+                child: const Icon(Icons.access_time, color: Colors.indigo, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -765,15 +765,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: isLast ? 0 : 6),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isOn ? Colors.teal.withOpacity(0.15) : btnBgOff,
+                      color: isOn ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: isOn ? Colors.teal : btnBorderOff),
+                      border: Border.all(color: isOn ? Colors.blue : btnBorderOff),
                     ),
                     child: Text(
                       label,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isOn ? Colors.teal : btnTextOff,
+                        color: isOn ? Colors.blue : btnTextOff,
                         fontSize: 12,
                         fontWeight: isOn ? FontWeight.bold : FontWeight.normal,
                       ),
@@ -806,10 +806,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.15),
+                  color: Colors.indigo.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.speed, color: Colors.blue, size: 20),
+                child: const Icon(Icons.speed, color: Colors.indigo, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -932,17 +932,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: isLast ? 0 : 6),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isOn ? Colors.indigo.withOpacity(0.15) : btnBgOff,
+                      color: isOn ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isOn ? Colors.indigo : btnBorderOff,
+                        color: isOn ? Colors.blue : btnBorderOff,
                       ),
                     ),
                     child: Text(
                       label,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isOn ? Colors.indigo : btnTextOff,
+                        color: isOn ? Colors.blue : btnTextOff,
                         fontSize: 12,
                         fontWeight: isOn ? FontWeight.bold : FontWeight.normal,
                       ),
@@ -976,10 +976,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple.withOpacity(0.15),
+                  color: Colors.blueGrey.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.home_outlined, color: Colors.deepPurple, size: 20),
+                child: const Icon(Icons.home_outlined, color: Colors.blueGrey, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1010,17 +1010,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.deepPurple.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? Colors.deepPurple : btnBorderOff,
+                        color: isSelected ? Colors.blue : btnBorderOff,
                       ),
                     ),
                     child: Text(
                       labels[i],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isSelected ? Colors.deepPurple : btnTextOff,
+                        color: isSelected ? Colors.blue : btnTextOff,
                         fontSize: 11,
                       ),
                     ),
@@ -1051,11 +1051,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.pink.withOpacity(0.15),
+                  color: Colors.blueGrey.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(Icons.person_outline,
-                    color: Colors.pink, size: 20),
+                    color: Colors.blueGrey, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1216,14 +1216,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Expanded(
                 child: _twoStateButton(leftLabel, isLeft, () => onToggle(true),
-                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
-                    activeColor: iconColor),
+                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: _twoStateButton(rightLabel, !isLeft, () => onToggle(false),
-                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
-                    activeColor: iconColor),
+                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff),
               ),
             ],
           ),
@@ -1285,10 +1283,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.15),
+                  color: Colors.amber.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.straighten, color: Colors.purple, size: 20),
+                child: const Icon(Icons.straighten, color: Colors.amber, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1322,17 +1320,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.purple.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? Colors.purple : btnBorderOff,
+                        color: isSelected ? Colors.blue : btnBorderOff,
                       ),
                     ),
                     child: Text(
                       labels[i],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isSelected ? Colors.purple : btnTextOff,
+                        color: isSelected ? Colors.blue : btnTextOff,
                         fontSize: 12,
                       ),
                     ),
@@ -1366,10 +1364,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.teal.withOpacity(0.15),
+                  color: Colors.amber.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.timer_outlined, color: Colors.teal, size: 20),
+                child: const Icon(Icons.timer_outlined, color: Colors.amber, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1403,17 +1401,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.teal.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? Colors.teal : btnBorderOff,
+                        color: isSelected ? Colors.blue : btnBorderOff,
                       ),
                     ),
                     child: Text(
                       labels[i],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isSelected ? Colors.teal : btnTextOff,
+                        color: isSelected ? Colors.blue : btnTextOff,
                         fontSize: 11,
                       ),
                     ),
@@ -1853,10 +1851,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.15),
+                  color: Colors.blue.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.map_outlined, color: Colors.green, size: 20),
+                child: const Icon(Icons.map_outlined, color: Colors.blue, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -1890,17 +1888,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.green.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? Colors.green : btnBorderOff,
+                        color: isSelected ? Colors.blue : btnBorderOff,
                       ),
                     ),
                     child: Text(
                       labels[i],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isSelected ? Colors.green : btnTextOff,
+                        color: isSelected ? Colors.blue : btnTextOff,
                         fontSize: 12,
                       ),
                     ),
@@ -1930,87 +1928,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
     const labels = ['파랑', '빨강', '초록', '주황', '보라', '노랑'];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: panelColor,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.route, color: Colors.blueAccent, size: 20),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('경로 색상',
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text('주행·기록 지도의 경로 선 색상',
-                        style: TextStyle(color: subtitleColor, fontSize: 12)),
-                  ],
-                ),
-              ),
-            ],
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.lightBlue.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.route, color: Colors.lightBlue, size: 20),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: List.generate(options.length, (i) {
-              final pathColor = _pathStringToColor(options[i]);
-              final isSelected = settings.pathColor == options[i];
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    SystemSound.play(SystemSoundType.click);
-                    settings.setPathColor(options[i]);
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? pathColor.withOpacity(0.15) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected ? pathColor : pathColor.withOpacity(0.4),
-                        width: isSelected ? 1.5 : 1,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('경로 색상',
+                    style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Text('주행·기록 지도의 경로 선 색상',
+                    style: TextStyle(color: subtitleColor, fontSize: 12)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: settings.pathColor,
+              dropdownColor: panelColor,
+              borderRadius: BorderRadius.circular(10),
+              onTap: () => SystemSound.play(SystemSoundType.click),
+              onChanged: (val) {
+                if (val == null) return;
+                settings.setPathColor(val);
+              },
+              selectedItemBuilder: (_) => List.generate(options.length, (i) {
+                final color = _pathStringToColor(options[i]);
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 18,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 16,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: pathColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
+                    const SizedBox(width: 6),
+                    Text(labels[i], style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.bold)),
+                  ],
+                );
+              }),
+              items: List.generate(options.length, (i) {
+                final color = _pathStringToColor(options[i]);
+                return DropdownMenuItem<String>(
+                  value: options[i],
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(2),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          labels[i],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: isSelected ? pathColor : subtitleColor,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(labels[i], style: TextStyle(color: titleColor, fontSize: 13)),
+                    ],
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
+            ),
           ),
         ],
       ),
@@ -2037,10 +2040,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: Colors.indigo.withOpacity(0.15),
+                  color: Colors.cyan.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.line_weight, color: Colors.indigo, size: 20),
+                child: const Icon(Icons.line_weight, color: Colors.cyan, size: 20),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -2071,17 +2074,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.indigo.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? Colors.indigo : btnBorderOff,
+                        color: isSelected ? Colors.blue : btnBorderOff,
                       ),
                     ),
                     child: Text(
                       labels[i],
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: isSelected ? Colors.indigo : btnTextOff,
+                        color: isSelected ? Colors.blue : btnTextOff,
                         fontSize: 12,
                       ),
                     ),
@@ -2150,10 +2153,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.teal.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? Colors.teal : btnBorderOff,
+                        color: isSelected ? Colors.blue : btnBorderOff,
                       ),
                     ),
                     child: Column(
@@ -2162,7 +2165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           labels[i],
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: isSelected ? Colors.teal : btnTextOff,
+                            color: isSelected ? Colors.blue : btnTextOff,
                             fontSize: 12,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                           ),
@@ -2171,7 +2174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           descriptions[i],
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: isSelected ? Colors.teal.withOpacity(0.7) : subtitleColor,
+                            color: isSelected ? Colors.blue.withOpacity(0.7) : subtitleColor,
                             fontSize: 10,
                           ),
                         ),
@@ -2195,18 +2198,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   ) {
     const modes = SpeedMode.values;
     final selected = settings.speedMode;
+    final cs = Theme.of(context).colorScheme;
+    final btnBgOff = cs.surfaceContainerHighest;
+    final btnBorderOff = cs.outlineVariant;
+    final btnTextOff = cs.onSurfaceVariant;
 
     final modeIcons = {
       SpeedMode.normal: Icons.directions_bike,
       SpeedMode.lowSpeed: Icons.directions_run,
       SpeedMode.highSpeed: Icons.train,
     };
-    final modeColors = {
-      SpeedMode.normal: Colors.blue,
-      SpeedMode.lowSpeed: Colors.deepOrange,
-      SpeedMode.highSpeed: Colors.purple,
-    };
-    final selectedColor = modeColors[selected]!;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -2223,10 +2224,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: selectedColor.withOpacity(0.15),
+                  color: Colors.orange.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(modeIcons[selected], color: selectedColor, size: 20),
+                child: Icon(modeIcons[selected], color: Colors.orange, size: 20),
               ),
               const SizedBox(width: 14),
               Column(
@@ -2248,7 +2249,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Row(
             children: modes.map((mode) {
               final isSelected = mode == selected;
-              final modeColor = modeColors[mode]!;
               return Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(
@@ -2262,25 +2262,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       duration: const Duration(milliseconds: 180),
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? modeColor
-                            : modeColor.withOpacity(0.1),
+                        color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isSelected ? Colors.blue : btnBorderOff,
+                        ),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             modeIcons[mode],
                             size: 18,
-                            color: isSelected ? Colors.white : modeColor,
+                            color: isSelected ? Colors.blue : btnTextOff,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             mode.label,
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? Colors.white : modeColor,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected ? Colors.blue : btnTextOff,
                             ),
                           ),
                         ],
@@ -2347,8 +2348,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SystemSound.play(SystemSoundType.click);
               onChanged(v);
             },
-            activeThumbColor: iconColor,
-            activeTrackColor: iconColor.withOpacity(0.4),
+            activeThumbColor: Colors.blue,
+            activeTrackColor: Colors.blue.withOpacity(0.4),
             inactiveTrackColor: inactiveTrackColor,
           ),
         ],
@@ -2403,11 +2404,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Expanded(
                   child: _themeButton(settings, 'dark', Icons.dark_mode_outlined, 'Dark',
-                      btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff)),
+                      fixedBg: Colors.grey[900]!, fixedFg: Colors.white, btnBorderOff: btnBorderOff)),
               const SizedBox(width: 6),
               Expanded(
                   child: _themeButton(settings, 'light', Icons.light_mode_outlined, 'Light',
-                      btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff)),
+                      fixedBg: Colors.white, fixedFg: Colors.black87, btnBorderOff: btnBorderOff)),
             ],
           ),
         ],
@@ -2416,9 +2417,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _themeButton(SettingsProvider settings, String theme, IconData icon, String label, {
-    required Color btnBgOff,
+    required Color fixedBg,
+    required Color fixedFg,
     required Color btnBorderOff,
-    required Color btnTextOff,
   }) {
     final isSelected = settings.appTheme == theme;
     return GestureDetector(
@@ -2427,23 +2428,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
         settings.setAppTheme(theme);
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
+          color: fixedBg,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? Colors.lightBlue : btnBorderOff,
+            color: isSelected ? Colors.blue : btnBorderOff,
+            width: isSelected ? 2 : 1,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: isSelected ? Colors.lightBlue : btnTextOff, size: 16),
+            Icon(icon, color: fixedFg, size: 16),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.lightBlue : btnTextOff,
+                color: fixedFg,
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
