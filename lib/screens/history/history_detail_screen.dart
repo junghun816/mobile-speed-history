@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../models/ride_record.dart';
 import '../../providers/ride_provider.dart';
@@ -68,7 +69,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       backgroundColor: dialogBg,
                       title: Text(
                         '연도 / 월 선택',
-                        style: TextStyle(color: textColor, fontSize: 15),
+                        style: TextStyle(color: textColor, fontSize: 15.sp),
                       ),
                       content: Row(
                         children: [
@@ -92,7 +93,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                               },
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12.w),
                           Expanded(
                             child: DropdownButton<int>(
                               value: tempMonth,
@@ -140,7 +141,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
 
             return SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16.r),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -148,11 +149,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       '날짜 선택',
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.h),
                     TableCalendar(
                       locale: 'ko_KR',
                       firstDay: firstDay,
@@ -179,15 +180,15 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                                   '${day.year}년 ${day.month}월',
                                   style: TextStyle(
                                     color: textColor,
-                                    fontSize: 16,
+                                    fontSize: 16.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(width: 2),
+                                SizedBox(width: 2.w),
                                 Icon(
                                   Icons.arrow_drop_down,
                                   color: textColor,
-                                  size: 22,
+                                  size: 22.r,
                                 ),
                               ],
                             ),
@@ -273,7 +274,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
 
             return SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24.r),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -281,11 +282,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       '날짜 선택',
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     Row(
                       children: [
                         Expanded(
@@ -300,7 +301,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                             textColor: textColor,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8.w),
                         Expanded(
                           child: _selectBox(
                             value: tempMonth,
@@ -313,7 +314,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                             textColor: textColor,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8.w),
                         Expanded(
                           child: _selectBox(
                             value: tempDay,
@@ -328,7 +329,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24.h),
                     SizedBox(
                       width: double.infinity,
                       child: GestureDetector(
@@ -339,17 +340,17 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                           Navigator.pop(context);
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
                           decoration: BoxDecoration(
                             color: Colors.blue,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
-                          child: const Text(
+                          child: Text(
                             '확인',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -377,10 +378,10 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
     required Color textColor,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
       decoration: BoxDecoration(
         color: boxColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: borderColor),
       ),
       child: DropdownButton<T>(
@@ -389,7 +390,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
         underline: const SizedBox(),
         dropdownColor: dropdownBg,
         menuMaxHeight: 200,
-        style: TextStyle(color: textColor, fontSize: 14),
+        style: TextStyle(color: textColor, fontSize: 14.sp),
         items: items.map((item) => DropdownMenuItem<T>(
           value: item,
           child: Text(format(item)),
@@ -444,7 +445,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
             // 날짜 선택 영역
             Container(
               color: cardColor,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               child: Row(
                 children: [
                   GestureDetector(
@@ -455,17 +456,17 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       });
                     },
                     child: Container(
-                      width: 32,
-                      height: 32,
+                      width: 32.r,
+                      height: 32.r,
                       decoration: BoxDecoration(
                         color: navBtnColor,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
-                      child: Icon(Icons.chevron_left, color: textColor, size: 20),
+                      child: Icon(Icons.chevron_left, color: textColor, size: 20.r),
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.w),
 
                   Expanded(
                     child: Text(
@@ -475,13 +476,13 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.w),
 
                   GestureDetector(
                     onTap: isToday
@@ -493,21 +494,21 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       });
                     },
                     child: Container(
-                      width: 32,
-                      height: 32,
+                      width: 32.r,
+                      height: 32.r,
                       decoration: BoxDecoration(
                         color: isToday ? navBtnDisabledColor : navBtnColor,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Icon(
                         Icons.chevron_right,
                         color: isToday ? subTextColor : textColor,
-                        size: 20,
+                        size: 20.r,
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.w),
 
                   GestureDetector(
                     onTap: () {
@@ -515,22 +516,22 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       _showSelectPicker();
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                       decoration: BoxDecoration(
                         color: navBtnColor,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.list, color: textColor, size: 16),
-                          const SizedBox(width: 4),
-                          Text('선택', style: TextStyle(color: textColor, fontSize: 13)),
+                          Icon(Icons.list, color: textColor, size: 16.r),
+                          SizedBox(width: 4.w),
+                          Text('선택', style: TextStyle(color: textColor, fontSize: 13.sp)),
                         ],
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8.w),
 
                   GestureDetector(
                     onTap: () {
@@ -538,16 +539,16 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       _pickDateFromCalendar();
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                       decoration: BoxDecoration(
                         color: navBtnColor,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.calendar_today, color: textColor, size: 16),
-                          const SizedBox(width: 4),
-                          Text('달력', style: TextStyle(color: textColor, fontSize: 13)),
+                          Icon(Icons.calendar_today, color: textColor, size: 16.r),
+                          SizedBox(width: 4.w),
+                          Text('달력', style: TextStyle(color: textColor, fontSize: 13.sp)),
                         ],
                       ),
                     ),
@@ -559,11 +560,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
             // 하루 합계 요약
             if (dayRecords.isNotEmpty)
               Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(16),
+                margin: EdgeInsets.all(16.r),
+                padding: EdgeInsets.all(16.r),
                 decoration: BoxDecoration(
                   color: Colors.blue.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(color: Colors.blue.withOpacity(0.4)),
                 ),
                 child: Column(
@@ -578,9 +579,9 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       ],
                     ),
                     if (weightKg != null) ...[
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                       Divider(color: Colors.blue.withOpacity(0.3), height: 1),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                       StatItem(label: '총 칼로리', value: '${formatNumber(calcCalories(totalDistance, weightKg)!)} kcal', textColor: textColor, labelBlue: true),
                     ],
                   ],
@@ -593,11 +594,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                   ? Center(
                 child: Text(
                   '해당 날짜에 주행기록이 없어요',
-                  style: TextStyle(color: subTextColor, fontSize: 16),
+                  style: TextStyle(color: subTextColor, fontSize: 16.sp),
                 ),
               )
                   : ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 itemCount: dayRecords.length,
                 itemBuilder: (context, index) {
                   final record = dayRecords[index];
@@ -613,11 +614,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       _showRecordDetail(context, record, useKmh, weightKg, isDark);
                     },
                     child: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
+                      margin: EdgeInsets.only(bottom: 12.h),
+                      padding: EdgeInsets.all(16.r),
                       decoration: BoxDecoration(
                         color: cardColor,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -626,13 +627,13 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                             '$timeStr 출발',
                             style: TextStyle(
                               color: textColor,
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6.h),
                           RecordBadges(recordId: record.id, bestIds: bestIds),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
@@ -644,26 +645,26 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                           ),
                           if (weightKg != null ||
                               (record.memo != null && record.memo!.isNotEmpty)) ...[
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8.h),
                             Row(
                               children: [
                                 if (weightKg != null)
                                   Text(
                                     '🔥 ${formatNumber(calcCalories(record.totalDistance, weightKg)!)} kcal',
-                                    style: const TextStyle(
-                                        color: Colors.orange, fontSize: 12),
+                                    style: TextStyle(
+                                        color: Colors.orange, fontSize: 12.sp),
                                   ),
                                 if (weightKg != null &&
                                     record.memo != null &&
                                     record.memo!.isNotEmpty)
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12.w),
                                 if (record.memo != null && record.memo!.isNotEmpty)
                                   Expanded(
                                     child: Text(
                                       '📝 ${record.memo}',
                                       style: TextStyle(
                                           color: isDark ? Colors.grey[400]! : Colors.grey[600]!,
-                                          fontSize: 12),
+                                          fontSize: 12.sp),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -705,10 +706,10 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
         child: StatefulBuilder(
         builder: (ctx, setDialogState) => Dialog(
           backgroundColor: dialogBg,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+          insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.r),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -723,11 +724,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                           '${record.year}년 ${record.month}월 ${record.day}일',
                           style: TextStyle(
                               color: textColor,
-                              fontSize: 16,
+                              fontSize: 16.sp,
                               fontWeight: FontWeight.bold),
                         ),
                         Text('$timeStr 출발',
-                            style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                            style: TextStyle(color: Colors.grey, fontSize: 13.sp)),
                       ],
                     ),
                     GestureDetector(
@@ -735,16 +736,16 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                         SystemSound.play(SystemSoundType.click);
                         Navigator.pop(ctx);
                       },
-                      child: const Icon(Icons.close, color: Colors.grey, size: 22),
+                      child: Icon(Icons.close, color: Colors.grey, size: 22.r),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(color: Colors.blue.withOpacity(0.3)),
                   ),
                   child: Column(
@@ -759,15 +760,15 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                         ],
                       ),
                       if (calories != null) ...[
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         Divider(color: Colors.blue.withOpacity(0.3), height: 1),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                         StatDetailItem(label: '칼로리', value: formatNumber(calories), unit: 'kcal', textColor: textColor),
                       ],
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 GestureDetector(
                   onTap: () async {
                     await showMemoBottomSheet(ctx, controller: ctrl);
@@ -780,29 +781,29 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                   },
                   child: Container(
                     width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: 60),
-                    padding: const EdgeInsets.all(12),
+                    constraints: BoxConstraints(minHeight: 60.h),
+                    padding: EdgeInsets.all(12.r),
                     decoration: BoxDecoration(
                       color: memoBoxColor,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: ctrl.text.isEmpty
                         ? Text('메모를 남겨보세요 (탭하여 입력)',
-                            style: TextStyle(color: Colors.grey[600], fontSize: 13))
+                            style: TextStyle(color: Colors.grey[600], fontSize: 13.sp))
                         : Text(ctrl.text,
-                            style: TextStyle(color: textColor, fontSize: 13)),
+                            style: TextStyle(color: textColor, fontSize: 13.sp)),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: btnBg,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                              borderRadius: BorderRadius.circular(12.r)),
                         ),
                         onPressed: () {
                           Navigator.pop(ctx);
@@ -812,22 +813,22 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                                 builder: (_) => HistoryDetailMapScreen(record: record)),
                           );
                         },
-                        icon: Icon(Icons.map_outlined, color: textColor, size: 18),
+                        icon: Icon(Icons.map_outlined, color: textColor, size: 18.r),
                         label: Text('경로 보기',
                             style: TextStyle(
                                 color: textColor,
-                                fontSize: 14,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Expanded(
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: btnBg,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
+                              borderRadius: BorderRadius.circular(12.r)),
                         ),
                         onPressed: isSharing ? null : () async {
                           setDialogState(() => isSharing = true);
@@ -839,16 +840,16 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                         },
                         icon: isSharing
                             ? SizedBox(
-                                width: 18,
-                                height: 18,
+                                width: 18.r,
+                                height: 18.r,
                                 child: CircularProgressIndicator(
                                     strokeWidth: 2, color: textColor))
-                            : const Icon(Icons.route,
-                                color: Colors.deepPurple, size: 18),
+                            : Icon(Icons.route,
+                                color: Colors.deepPurple, size: 18.r),
                         label: Text('GPX 공유',
                             style: TextStyle(
                                 color: isSharing ? Colors.grey : textColor,
-                                fontSize: 14,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.bold)),
                       ),
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
 import 'settings_widgets.dart';
@@ -23,7 +24,7 @@ class SettingsMapScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           children: [
             _multiOptionTile(
               icon: Icons.map_outlined,
@@ -39,9 +40,9 @@ class SettingsMapScreen extends StatelessWidget {
               btnBorderOff: btnBorderOff,
               btnTextOff: btnTextOff,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _pathColorTile(context, settings, panelColor, titleColor, subtitleColor),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _multiOptionTile(
               icon: Icons.line_weight,
               title: '경로 두께',
@@ -56,7 +57,7 @@ class SettingsMapScreen extends StatelessWidget {
               btnBorderOff: btnBorderOff,
               btnTextOff: btnTextOff,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _trackingModeTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
           ],
         ),
@@ -86,27 +87,27 @@ class SettingsMapScreen extends StatelessWidget {
           Row(
             children: [
               settingsIconBox(icon),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
+                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: List.generate(labels.length, (i) => Expanded(
               child: settingsOptionButton(
                 labels[i], selectedIndex == i, () => onSelect(i),
                 btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
-                margin: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
+                margin: EdgeInsets.only(right: i < labels.length - 1 ? 6.w : 0),
               ),
             )),
           ),
@@ -136,22 +137,22 @@ class SettingsMapScreen extends StatelessWidget {
           Row(
             children: [
               settingsIconBox(Icons.my_location),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('지도 추적 모드 기본값',
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
                     Text('주행 지도 시작 시 초기 추적 모드',
-                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: List.generate(options.length, (i) {
               final isSelected = settings.mapTrackingMode == options[i];
@@ -162,11 +163,11 @@ class SettingsMapScreen extends StatelessWidget {
                     settings.setMapTrackingMode(options[i]);
                   },
                   child: Container(
-                    margin: EdgeInsets.only(right: i < options.length - 1 ? 6 : 0),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    margin: EdgeInsets.only(right: i < options.length - 1 ? 6.w : 0),
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(color: isSelected ? Colors.lightBlue : btnBorderOff),
                     ),
                     child: Column(
@@ -175,14 +176,14 @@ class SettingsMapScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: isSelected ? Colors.lightBlue : btnTextOff,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             )),
                         Text(descriptions[i],
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: isSelected ? Colors.lightBlue.withOpacity(0.7) : subtitleColor,
-                              fontSize: 10,
+                              fontSize: 10.sp,
                             )),
                       ],
                     ),
@@ -208,35 +209,35 @@ class SettingsMapScreen extends StatelessWidget {
 
     return settingsPanelContainer(
       panelColor: panelColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
         children: [
           settingsIconBox(Icons.route),
-          const SizedBox(width: 14),
+          SizedBox(width: 14.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('경로 색상',
-                    style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 2),
+                    style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                SizedBox(height: 2.h),
                 Text('주행·기록 지도의 경로 선 색상',
-                    style: TextStyle(color: subtitleColor, fontSize: 12)),
+                    style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: EdgeInsets.symmetric(horizontal: 6.w),
             decoration: BoxDecoration(
               border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: settings.pathColor,
                 dropdownColor: panelColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.r),
                 onTap: () => SystemSound.play(SystemSoundType.click),
                 onChanged: (val) { if (val != null) settings.setPathColor(val); },
                 selectedItemBuilder: (_) => List.generate(options.length, (i) {
@@ -244,11 +245,11 @@ class SettingsMapScreen extends StatelessWidget {
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(width: 18, height: 4,
-                          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
-                      const SizedBox(width: 6),
+                      Container(width: 18.w, height: 4.h,
+                          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2.r))),
+                      SizedBox(width: 6.w),
                       Text(labels[i],
-                          style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.bold)),
+                          style: TextStyle(color: color, fontSize: 13.sp, fontWeight: FontWeight.bold)),
                     ],
                   );
                 }),
@@ -258,10 +259,10 @@ class SettingsMapScreen extends StatelessWidget {
                     value: options[i],
                     child: Row(
                       children: [
-                        Container(width: 20, height: 4,
-                            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
-                        const SizedBox(width: 10),
-                        Text(labels[i], style: TextStyle(color: titleColor, fontSize: 13)),
+                        Container(width: 20.w, height: 4.h,
+                            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2.r))),
+                        SizedBox(width: 10.w),
+                        Text(labels[i], style: TextStyle(color: titleColor, fontSize: 13.sp)),
                       ],
                     ),
                   );

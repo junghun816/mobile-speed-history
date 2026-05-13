@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../models/ride_record.dart';
 import '../../providers/ride_provider.dart';
@@ -110,7 +111,7 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
     return Column(
       children: [
         SizedBox(
-          height: 300,
+          height: 300.h,
           child: BarChartWidget(
             labels: labels,
             distanceData: distanceData,
@@ -137,12 +138,12 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
 
         if (_selectedIndex < 0)
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.r),
             child: Text(
               '막대를 탭하면 상세 정보를 볼 수 있어요',
               style: TextStyle(
                   color: isDark ? Colors.grey : Colors.grey[600],
-                  fontSize: 14),
+                  fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
           ),
@@ -150,25 +151,25 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
         if (_selectedIndex >= 0)
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '$selectedYear년',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.blue,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
 
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(color: Colors.blue.withOpacity(0.4)),
                     ),
                     child: Column(
@@ -182,21 +183,21 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
                             StatItem(label: '평균속도', value: '${formatSpeed(avgSpeed, useKmh)} ${speedUnit(useKmh)}', textColor: textColor, labelBlue: true),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         Text(
                           '총 ${formatNumber(selectedRecords.length)}회 주행',
-                          style: const TextStyle(
-                              color: Colors.blue, fontSize: 12),
+                          style: TextStyle(
+                              color: Colors.blue, fontSize: 12.sp),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
 
                   Container(
                     color: panelColor,
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12.r),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -208,11 +209,11 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 '월별 통계',
                                 style: TextStyle(
                                   color: Colors.orange,
-                                  fontSize: 13,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -221,13 +222,13 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
                                     ? Icons.keyboard_arrow_up
                                     : Icons.keyboard_arrow_down,
                                 color: Colors.orange,
-                                size: 20,
+                                size: 20.r,
                               ),
                             ],
                           ),
                         ),
                         if (_showMonthlyBreakdown) ...[
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           ...List.generate(12, (i) {
                             final month = i + 1;
                             final stat = monthlyStats[month]!;
@@ -239,11 +240,11 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
                             final avgSpd = stat['avgSpeed']!;
 
                             return Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(12),
+                              margin: EdgeInsets.only(bottom: 8.h),
+                              padding: EdgeInsets.all(12.r),
                               decoration: BoxDecoration(
                                 color: cardColor,
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(10.r),
                                 border: Border.all(color: borderColor),
                               ),
                               child: Column(
@@ -256,20 +257,20 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
                                         monthLabels[i],
                                         style: TextStyle(
                                           color: textColor,
-                                          fontSize: 13,
+                                          fontSize: 13.sp,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                       Text(
                                         '$count회 주행',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           color: Colors.blue,
-                                          fontSize: 12,
+                                          fontSize: 12.sp,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: 8.h),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [

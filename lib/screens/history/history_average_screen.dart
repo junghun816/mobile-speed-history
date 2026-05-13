@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../providers/ride_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -26,7 +27,7 @@ class HistoryAverageScreen extends StatelessWidget {
           '아직 주행기록이 없어요',
           style: TextStyle(
             color: isDark ? Colors.grey : Colors.grey[600],
-            fontSize: 16,
+            fontSize: 16.sp,
           ),
         ),
       );
@@ -92,14 +93,14 @@ class HistoryAverageScreen extends StatelessWidget {
         : weekdayAvgs.indexOf(weekdayAvgs.reduce((a, b) => a > b ? a : b));
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 전체 누적 헤더 카드 (그라디언트 — 항상 파란색)
+          // 전체 누적 헤더 카드
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20.r),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isDark
@@ -108,13 +109,13 @@ class HistoryAverageScreen extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
             ),
             child: Column(
               children: [
-                const Text('전체 누적',
-                    style: TextStyle(color: Colors.white60, fontSize: 12)),
-                const SizedBox(height: 16),
+                Text('전체 누적',
+                    style: TextStyle(color: Colors.white60, fontSize: 12.sp)),
+                SizedBox(height: 16.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -130,9 +131,9 @@ class HistoryAverageScreen extends StatelessWidget {
                   ],
                 ),
                 if (totalCalories != null) ...[
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14.h),
                   const Divider(color: Colors.white24, height: 1),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -147,9 +148,9 @@ class HistoryAverageScreen extends StatelessWidget {
                     ],
                   ),
                 ] else ...[
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14.h),
                   const Divider(color: Colors.white24, height: 1),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14.h),
                   _bigStat(
                       '최고 속도',
                       '${formatSpeed(bestSpeed, useKmh)} ${speedUnit(useKmh)}',
@@ -159,9 +160,9 @@ class HistoryAverageScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           _sectionLabel('1회 평균', textColor),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           Row(
             children: [
@@ -171,14 +172,14 @@ class HistoryAverageScreen extends StatelessWidget {
                     distanceUnit(useKmh), Icons.straighten, Colors.blue,
                     cardColor, textColor),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10.w),
               Expanded(
                 child: _avgCard('시간', formatDuration(avgDuration), '',
                     Icons.timer, Colors.teal, cardColor, textColor),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           Row(
             children: [
               Expanded(
@@ -191,7 +192,7 @@ class HistoryAverageScreen extends StatelessWidget {
                     cardColor,
                     textColor),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10.w),
               Expanded(
                 child: _avgCard(
                     '평균속도',
@@ -205,7 +206,7 @@ class HistoryAverageScreen extends StatelessWidget {
             ],
           ),
           if (avgCalories != null) ...[
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _statTile('1회 평균 칼로리', '${formatNumber(avgCalories)} kcal',
                 icon: Icons.local_fire_department,
                 iconColor: Colors.deepOrange,
@@ -214,20 +215,20 @@ class HistoryAverageScreen extends StatelessWidget {
                 subTextColor: subTextColor),
           ],
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           _sectionLabel('최근 30일', textColor),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           recent.isEmpty
               ? Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.r),
                   decoration: BoxDecoration(
                     color: cardColor,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text('최근 30일 기록 없음',
-                      style: TextStyle(color: subTextColor, fontSize: 13),
+                      style: TextStyle(color: subTextColor, fontSize: 13.sp),
                       textAlign: TextAlign.center),
                 )
               : Row(
@@ -243,7 +244,7 @@ class HistoryAverageScreen extends StatelessWidget {
                         subTextColor,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10.w),
                     Expanded(
                       child: _compareCard(
                         '평균 속도',
@@ -258,9 +259,9 @@ class HistoryAverageScreen extends StatelessWidget {
                   ],
                 ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           _sectionLabel('주행 패턴', textColor),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           Row(
             children: [
@@ -277,7 +278,7 @@ class HistoryAverageScreen extends StatelessWidget {
                   ),
                 ),
               if (avgIntervalDays != null && bestDayIdx >= 0)
-                const SizedBox(width: 10),
+                SizedBox(width: 10.w),
               if (bestDayIdx >= 0)
                 Expanded(
                   child: _statTile(
@@ -293,21 +294,21 @@ class HistoryAverageScreen extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           // 요일별 막대
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 12.h),
             decoration: BoxDecoration(
               color: cardColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('요일별 평균 거리',
-                    style: TextStyle(color: subTextColor, fontSize: 12)),
-                const SizedBox(height: 14),
+                    style: TextStyle(color: subTextColor, fontSize: 12.sp)),
+                SizedBox(height: 14.h),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: List.generate(7, (i) {
@@ -317,7 +318,7 @@ class HistoryAverageScreen extends StatelessWidget {
                     final isMax = i == bestDayIdx && weekdayCounts[i] > 0;
                     return Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        padding: EdgeInsets.symmetric(horizontal: 3.w),
                         child: Column(
                           children: [
                             weekdayCounts[i] > 0
@@ -327,14 +328,14 @@ class HistoryAverageScreen extends StatelessWidget {
                                       color: isMax
                                           ? Colors.blue
                                           : (isDark ? Colors.grey[600]! : Colors.grey[500]!),
-                                      fontSize: 9,
+                                      fontSize: 9.sp,
                                     ),
                                     textAlign: TextAlign.center,
                                   )
-                                : const SizedBox(height: 13),
-                            const SizedBox(height: 3),
+                                : SizedBox(height: 13.h),
+                            SizedBox(height: 3.h),
                             Container(
-                              height: 60 * ratio +
+                              height: 60.h * ratio +
                                   (weekdayCounts[i] > 0 ? 4 : 0),
                               decoration: BoxDecoration(
                                 color: isMax
@@ -342,15 +343,15 @@ class HistoryAverageScreen extends StatelessWidget {
                                     : weekdayCounts[i] > 0
                                         ? (isDark ? Colors.grey[700]! : Colors.grey[400]!)
                                         : (isDark ? Colors.grey[850]! : Colors.grey[300]!),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(4.r),
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6.h),
                             Text(
                               weekdayNames[i],
                               style: TextStyle(
                                 color: isMax ? Colors.blue : subTextColor,
-                                fontSize: 12,
+                                fontSize: 12.sp,
                                 fontWeight: isMax
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -366,17 +367,17 @@ class HistoryAverageScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           _sectionLabel('월별 거리 추이', textColor),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           _buildMonthlyChart(records, useKmh, isDark, cardColor, textColor, subTextColor),
 
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           _sectionLabel('시간대별 패턴', textColor),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           _buildTimeOfDayChart(records, isDark, cardColor, textColor, subTextColor),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
         ],
       ),
     );
@@ -386,53 +387,53 @@ class HistoryAverageScreen extends StatelessWidget {
     return Text(text,
         style: TextStyle(
             color: textColor,
-            fontSize: 15,
+            fontSize: 15.sp,
             fontWeight: FontWeight.bold));
   }
 
   Widget _bigStat(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white60, size: 18),
-        const SizedBox(height: 6),
+        Icon(icon, color: Colors.white60, size: 18.r),
+        SizedBox(height: 6.h),
         Text(value,
-            style: const TextStyle(
+            style: TextStyle(
                 color: Colors.white,
-                fontSize: 15,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.bold)),
-        const SizedBox(height: 2),
+        SizedBox(height: 2.h),
         Text(label,
-            style: const TextStyle(color: Colors.white54, fontSize: 11)),
+            style: TextStyle(color: Colors.white54, fontSize: 11.sp)),
       ],
     );
   }
 
   Widget _vDivider() =>
-      Container(width: 1, height: 48, color: Colors.white24);
+      Container(width: 1, height: 48.h, color: Colors.white24);
 
   Widget _avgCard(String label, String value, String unit, IconData icon,
       Color color, Color cardColor, Color textColor) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 18),
-          const SizedBox(height: 10),
+          Icon(icon, color: color, size: 18.r),
+          SizedBox(height: 10.h),
           Text(value,
               style: TextStyle(
                   color: textColor,
-                  fontSize: 20,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.bold)),
-          Text(unit, style: TextStyle(color: color, fontSize: 11)),
-          const SizedBox(height: 4),
+          Text(unit, style: TextStyle(color: color, fontSize: 11.sp)),
+          SizedBox(height: 4.h),
           Text(label,
-              style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              style: TextStyle(color: Colors.grey, fontSize: 12.sp)),
         ],
       ),
     );
@@ -442,37 +443,37 @@ class HistoryAverageScreen extends StatelessWidget {
       String label, String recentVal, String overallVal, bool isUp,
       Color cardColor, Color textColor, Color subTextColor) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
-              style: TextStyle(color: subTextColor, fontSize: 12)),
-          const SizedBox(height: 8),
+              style: TextStyle(color: subTextColor, fontSize: 12.sp)),
+          SizedBox(height: 8.h),
           Row(
             children: [
               Icon(
                 isUp ? Icons.arrow_upward : Icons.arrow_downward,
                 color: isUp ? Colors.green : Colors.red,
-                size: 14,
+                size: 14.r,
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: 4.w),
               Expanded(
                 child: Text(recentVal,
                     style: TextStyle(
                         color: textColor,
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold)),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Text(overallVal,
-              style: TextStyle(color: subTextColor, fontSize: 11)),
+              style: TextStyle(color: subTextColor, fontSize: 11.sp)),
         ],
       ),
     );
@@ -485,25 +486,25 @@ class HistoryAverageScreen extends StatelessWidget {
       required Color textColor,
       required Color subTextColor}) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
         children: [
           if (icon != null) ...[
-            Icon(icon, color: iconColor ?? Colors.grey, size: 16),
-            const SizedBox(width: 10),
+            Icon(icon, color: iconColor ?? Colors.grey, size: 16.r),
+            SizedBox(width: 10.w),
           ],
           Expanded(
             child: Text(label,
-                style: TextStyle(color: subTextColor, fontSize: 13)),
+                style: TextStyle(color: subTextColor, fontSize: 13.sp)),
           ),
           Text(value,
               style: TextStyle(
                   color: textColor,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold)),
         ],
       ),
@@ -531,17 +532,17 @@ class HistoryAverageScreen extends StatelessWidget {
         displayKeys.map((k) => k.split('-')[0]).toSet().length > 1;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 12.h),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('최근 ${displayKeys.length}개월',
-              style: TextStyle(color: subTextColor, fontSize: 12)),
-          const SizedBox(height: 14),
+              style: TextStyle(color: subTextColor, fontSize: 12.sp)),
+          SizedBox(height: 14.h),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: displayKeys.map((key) {
@@ -554,7 +555,7 @@ class HistoryAverageScreen extends StatelessWidget {
               final isMax = dist == maxDist;
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: EdgeInsets.symmetric(horizontal: 3.w),
                   child: Column(
                     children: [
                       Text(
@@ -565,28 +566,28 @@ class HistoryAverageScreen extends StatelessWidget {
                               : (isDark
                                   ? Colors.grey[600]!
                                   : Colors.grey[500]!),
-                          fontSize: 9,
+                          fontSize: 9.sp,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 3),
+                      SizedBox(height: 3.h),
                       Container(
-                        height: 60 * ratio + 4,
+                        height: 60.h * ratio + 4,
                         decoration: BoxDecoration(
                           color: isMax
                               ? Colors.blue
                               : (isDark
                                   ? Colors.grey[700]!
                                   : Colors.grey[400]!),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6.h),
                       Text(
                         label,
                         style: TextStyle(
                           color: isMax ? Colors.blue : subTextColor,
-                          fontSize: 10,
+                          fontSize: 10.sp,
                           fontWeight:
                               isMax ? FontWeight.bold : FontWeight.normal,
                         ),
@@ -627,17 +628,17 @@ class HistoryAverageScreen extends StatelessWidget {
     final bestIdx = counts.indexOf(maxCount);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 12.h),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('시간대별 주행 패턴',
-              style: TextStyle(color: subTextColor, fontSize: 12)),
-          const SizedBox(height: 14),
+              style: TextStyle(color: subTextColor, fontSize: 12.sp)),
+          SizedBox(height: 14.h),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: List.generate(4, (i) {
@@ -645,7 +646,7 @@ class HistoryAverageScreen extends StatelessWidget {
               final isMax = i == bestIdx;
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: EdgeInsets.symmetric(horizontal: 3.w),
                   child: Column(
                     children: [
                       counts[i] > 0
@@ -657,14 +658,14 @@ class HistoryAverageScreen extends StatelessWidget {
                                     : (isDark
                                         ? Colors.grey[600]!
                                         : Colors.grey[500]!),
-                                fontSize: 9,
+                                fontSize: 9.sp,
                               ),
                               textAlign: TextAlign.center,
                             )
-                          : const SizedBox(height: 13),
-                      const SizedBox(height: 3),
+                          : SizedBox(height: 13.h),
+                      SizedBox(height: 3.h),
                       Container(
-                        height: 60 * ratio + (counts[i] > 0 ? 4 : 0),
+                        height: 60.h * ratio + (counts[i] > 0 ? 4 : 0),
                         decoration: BoxDecoration(
                           color: isMax
                               ? slotColors[i]
@@ -675,15 +676,15 @@ class HistoryAverageScreen extends StatelessWidget {
                                   : (isDark
                                       ? Colors.grey[850]!
                                       : Colors.grey[300]!)),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(4.r),
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6.h),
                       Text(
                         slotLabels[i],
                         style: TextStyle(
                           color: isMax ? slotColors[i] : subTextColor,
-                          fontSize: 10,
+                          fontSize: 10.sp,
                           fontWeight:
                               isMax ? FontWeight.bold : FontWeight.normal,
                         ),

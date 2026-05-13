@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../models/ride_record.dart';
 import '../../providers/ride_provider.dart';
@@ -116,7 +117,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
         // 연도 네비게이션
         Container(
           color: panelColor,
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -129,15 +130,15 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                   });
                 } : null,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
                   child: Icon(Icons.chevron_left,
-                      color: hasPrev ? textColor : dividerColor, size: 24),
+                      color: hasPrev ? textColor : dividerColor, size: 24.r),
                 ),
               ),
               Text(
                 '$_selectedYear년',
                 style: TextStyle(
-                    color: textColor, fontSize: 15, fontWeight: FontWeight.bold),
+                    color: textColor, fontSize: 15.sp, fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 onTap: hasNext ? () {
@@ -148,9 +149,9 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                   });
                 } : null,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
                   child: Icon(Icons.chevron_right,
-                      color: hasNext ? textColor : dividerColor, size: 24),
+                      color: hasNext ? textColor : dividerColor, size: 24.r),
                 ),
               ),
             ],
@@ -158,7 +159,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
         ),
 
         SizedBox(
-          height: 300,
+          height: 300.h,
           child: BarChartWidget(
             labels: labels,
             distanceData: distanceData,
@@ -185,11 +186,11 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
 
         if (_selectedIndex < 0)
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.r),
             child: Text(
               '막대를 탭하면 상세 정보를 볼 수 있어요',
               style: TextStyle(
-                  color: isDark ? Colors.grey : Colors.grey[600], fontSize: 14),
+                  color: isDark ? Colors.grey : Colors.grey[600], fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
           ),
@@ -197,25 +198,25 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
         if (_selectedIndex >= 0)
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     selectedLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.blue,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
 
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(color: Colors.blue.withOpacity(0.4)),
                     ),
                     child: Column(
@@ -237,21 +238,21 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                                 isBlue: true, textColor: textColor),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         Text(
                           '총 ${formatNumber(selectedRecords.length)}회 주행',
-                          style: const TextStyle(color: Colors.blue, fontSize: 12),
+                          style: TextStyle(color: Colors.blue, fontSize: 12.sp),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
 
                   // 히트맵
                   Container(
                     color: panelColor,
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12.r),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -263,11 +264,11 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 '일별 거리 히트맵',
                                 style: TextStyle(
                                   color: Colors.orange,
-                                  fontSize: 13,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -276,18 +277,18 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                                     ? Icons.keyboard_arrow_up
                                     : Icons.keyboard_arrow_down,
                                 color: Colors.orange,
-                                size: 20,
+                                size: 20.r,
                               ),
                             ],
                           ),
                         ),
                         if (_showHeatmap) ...[
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: ['월', '화', '수', '목', '금', '토', '일']
                                 .map((d) => SizedBox(
-                              width: 36,
+                              width: 36.r,
                               child: Text(
                                 d,
                                 textAlign: TextAlign.center,
@@ -295,13 +296,13 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                                   color: d == '토' || d == '일'
                                       ? Colors.orange
                                       : (isDark ? Colors.grey : Colors.grey[600]!),
-                                  fontSize: 11,
+                                  fontSize: 11.sp,
                                 ),
                               ),
                             ))
                                 .toList(),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6.h),
                           _buildHeatmapCalendar(
                             selectedYear,
                             selectedMonth,
@@ -373,19 +374,19 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
 
     return Container(
       color: panelColor,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12.r),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '주차별 통계',
             style: TextStyle(
               color: Colors.orange,
-              fontSize: 13,
+              fontSize: 13.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           ...activeWeeks.map((e) {
             final week = e.key;
             final stat = e.value;
@@ -396,11 +397,11 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
             final avgSpeed = stat['avgSpeed']!;
 
             return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
+              margin: EdgeInsets.only(bottom: 8.h),
+              padding: EdgeInsets.all(12.r),
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(color: borderColor),
               ),
               child: Column(
@@ -413,17 +414,17 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                         '$week주차',
                         style: TextStyle(
                           color: textColor,
-                          fontSize: 13,
+                          fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         '$count회 주행',
-                        style: const TextStyle(color: Colors.blue, fontSize: 12),
+                        style: TextStyle(color: Colors.blue, fontSize: 12.sp),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -470,7 +471,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
             final day = cellIndex - startOffset + 1;
 
             if (day < 1 || day > daysInMonth) {
-              return const SizedBox(width: 36, height: 36);
+              return SizedBox(width: 36.r, height: 36.r);
             }
 
             final dist = dailyDistance[day] ?? 0.0;
@@ -480,12 +481,12 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                 DateTime.now().day == day;
 
             return Container(
-              width: 36,
-              height: 36,
-              margin: const EdgeInsets.symmetric(vertical: 2),
+              width: 36.r,
+              height: 36.r,
+              margin: EdgeInsets.symmetric(vertical: 2.h),
               decoration: BoxDecoration(
                 color: color,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(6.r),
                 border: isToday
                     ? Border.all(color: Colors.orange, width: 1.5)
                     : null,
@@ -499,16 +500,16 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                       color: dist > 0
                           ? Colors.white
                           : (isDark ? Colors.grey[600]! : Colors.grey[500]!),
-                      fontSize: 11,
+                      fontSize: 11.sp,
                       fontWeight: dist > 0 ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   if (dist > 0)
                     Text(
                       '${formatDouble(dist, 0)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 8,
+                        fontSize: 8.sp,
                       ),
                     ),
                 ],
@@ -528,16 +529,16 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
           value,
           style: TextStyle(
             color: textColor,
-            fontSize: 13,
+            fontSize: 13.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Text(
           label,
           style: TextStyle(
             color: isBlue ? Colors.blue : Colors.grey,
-            fontSize: 11,
+            fontSize: 11.sp,
           ),
         ),
       ],

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../db/database_helper.dart';
@@ -61,12 +62,12 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           children: [
             _themeTile(settings, panelColor, titleColor, subtitleColor, btnBorderOff),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _startTabTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _navTile(
               icon: Icons.upload_file,
               title: '백업 / 내보내기',
@@ -77,7 +78,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               titleColor: titleColor,
               subtitleColor: subtitleColor,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _navTile(
               icon: Icons.info_outline,
               title: '앱 정보',
@@ -89,11 +90,11 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               subtitleColor: subtitleColor,
             ),
             if (kDebugMode) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               Padding(
-                padding: const EdgeInsets.only(bottom: 8, left: 4),
+                padding: EdgeInsets.only(bottom: 8.h, left: 4.w),
                 child: Text('개발',
-                    style: TextStyle(color: sectionColor, fontSize: 12,
+                    style: TextStyle(color: sectionColor, fontSize: 12.sp,
                         fontWeight: FontWeight.bold, letterSpacing: 1.0)),
               ),
               _navTile(
@@ -107,7 +108,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
                 subtitleColor: subtitleColor,
                 iconColor: Colors.red,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               _navTile(
                 icon: Icons.add_chart,
                 title: '데이터 생성',
@@ -140,27 +141,27 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           Row(
             children: [
               settingsIconBox(Icons.palette_outlined),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('테마',
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
                     Text('속도계 화면 색상 테마',
-                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: [
               Expanded(child: _themeButton(settings, 'dark', Icons.dark_mode_outlined, 'Dark',
                   fixedBg: Colors.grey[900]!, fixedFg: Colors.white, btnBorderOff: btnBorderOff)),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Expanded(child: _themeButton(settings, 'light', Icons.light_mode_outlined, 'Light',
                   fixedBg: Colors.white, fixedFg: Colors.black87, btnBorderOff: btnBorderOff)),
             ],
@@ -182,10 +183,10 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         settings.setAppTheme(theme);
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: EdgeInsets.symmetric(vertical: 10.h),
         decoration: BoxDecoration(
           color: fixedBg,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: isSelected ? Colors.lightBlue : btnBorderOff,
             width: isSelected ? 2 : 1,
@@ -194,10 +195,10 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: fixedFg, size: 16),
-            const SizedBox(width: 6),
+            Icon(icon, color: fixedFg, size: 16.r),
+            SizedBox(width: 6.w),
             Text(label,
-                style: TextStyle(color: fixedFg, fontSize: 13,
+                style: TextStyle(color: fixedFg, fontSize: 13.sp,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
           ],
         ),
@@ -223,29 +224,29 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           Row(
             children: [
               settingsIconBox(Icons.home_outlined),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('시작 탭',
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
                     Text('앱 실행 시 처음 열리는 탭',
-                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: List.generate(labels.length, (i) => Expanded(
               child: settingsOptionButton(
                 labels[i], settings.startTab == i, () => settings.setStartTab(i),
                 btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
                 fontSize: 11,
-                margin: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
+                margin: EdgeInsets.only(right: i < labels.length - 1 ? 6.w : 0),
               ),
             )),
           ),
@@ -277,29 +278,29 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           child: Row(
             children: [
               Container(
-                width: 36, height: 36,
+                width: 36.r, height: 36.r,
                 decoration: BoxDecoration(
                   color: iconColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(icon, color: iconColor, size: 20),
+                child: Icon(icon, color: iconColor, size: 20.r),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
+                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
               isLoading
-                  ? SizedBox(width: 20, height: 20,
+                  ? SizedBox(width: 20.r, height: 20.r,
                       child: CircularProgressIndicator(strokeWidth: 2, color: iconColor))
-                  : Icon(Icons.chevron_right, color: subtitleColor, size: 20),
+                  : Icon(Icons.chevron_right, color: subtitleColor, size: 20.r),
             ],
           ),
         ),
@@ -316,43 +317,43 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        insetPadding: EdgeInsets.symmetric(horizontal: 40.w),
         child: Padding(
-          padding: const EdgeInsets.all(28),
+          padding: EdgeInsets.all(28.r),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 56, height: 56,
+                width: 56.r, height: 56.r,
                 decoration: BoxDecoration(
                   color: Colors.lightBlue.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
-                child: const Icon(Icons.speed, color: Colors.lightBlue, size: 30),
+                child: Icon(Icons.speed, color: Colors.lightBlue, size: 30.r),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14.h),
               Text(_kAppName,
-                  style: TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 4),
+                  style: TextStyle(color: textColor, fontSize: 20.sp, fontWeight: FontWeight.bold)),
+              SizedBox(height: 4.h),
               Text(_appVersion.isEmpty ? '-' : 'v$_appVersion',
-                  style: const TextStyle(color: Colors.lightBlue, fontSize: 14)),
-              const SizedBox(height: 20),
+                  style: TextStyle(color: Colors.lightBlue, fontSize: 14.sp)),
+              SizedBox(height: 20.h),
               Divider(color: divColor, height: 1),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               _infoRow('업데이트', _kUpdateDate, textColor, subColor),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               Divider(color: divColor, height: 1),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               _infoRow('개발자', _kDeveloperName, textColor, subColor),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               _infoRow('이메일', _kDeveloperEmail, textColor, subColor),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text('닫기', style: TextStyle(color: subColor, fontSize: 14)),
+                  child: Text('닫기', style: TextStyle(color: subColor, fontSize: 14.sp)),
                 ),
               ),
             ],
@@ -366,8 +367,8 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(color: subColor, fontSize: 13)),
-        Text(value, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w500)),
+        Text(label, style: TextStyle(color: subColor, fontSize: 13.sp)),
+        Text(value, style: TextStyle(color: textColor, fontSize: 13.sp, fontWeight: FontWeight.w500)),
       ],
     );
   }
@@ -382,17 +383,17 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
       context: context,
       backgroundColor: cs.surfaceContainer,
       useSafeArea: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r))),
       builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(24, 20, 24, 32 + MediaQuery.of(ctx).viewPadding.bottom),
+        padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 32.h + MediaQuery.of(ctx).viewPadding.bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('백업 / 내보내기',
-                style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
+                style: TextStyle(color: textColor, fontSize: 16.sp, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20.h),
             _backupOption(Icons.share_outlined, Colors.orange, '공유하기', '카카오톡·메일 등 앱으로 전송',
                 textColor, subColor, panelColor, () async {
               Navigator.pop(ctx);
@@ -401,7 +402,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               catch (e) { _showError('공유 실패: $e'); }
               finally { if (mounted) setState(() => _isSharingExport = false); }
             }),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _backupOption(Icons.upload_file, Colors.teal, '파일로 저장', '기기 내 원하는 위치에 JSON 저장',
                 textColor, subColor, panelColor, () async {
               Navigator.pop(ctx);
@@ -417,7 +418,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               catch (e) { _showError('내보내기 실패: $e'); }
               finally { if (mounted) setState(() => _isExporting = false); }
             }),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _backupOption(Icons.download, Colors.lightBlue, '가져오기', '백업 파일에서 기록 복원 (중복 제외)',
                 textColor, subColor, panelColor, () async {
               Navigator.pop(ctx);
@@ -439,7 +440,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               catch (e) { _showError('가져오기 실패: $e'); }
               finally { if (mounted) setState(() => _isImporting = false); }
             }),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _backupOption(Icons.route, Colors.deepPurple, 'GPX 내보내기', '전체 기록을 GPX 파일로 공유 (Strava 등 호환)',
                 textColor, subColor, panelColor, () async {
               Navigator.pop(ctx);
@@ -461,27 +462,27 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     return GestureDetector(
       onTap: () { SystemSound.play(SystemSoundType.click); onTap(); },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12)),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12.r)),
         child: Row(
           children: [
             Container(
-              width: 36, height: 36,
-              decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
-              child: Icon(icon, color: color, size: 20),
+              width: 36.r, height: 36.r,
+              decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10.r)),
+              child: Icon(icon, color: color, size: 20.r),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(color: subColor, fontSize: 12)),
+                  Text(title, style: TextStyle(color: textColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 2.h),
+                  Text(subtitle, style: TextStyle(color: subColor, fontSize: 12.sp)),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.grey, size: 20),
+            Icon(Icons.chevron_right, color: Colors.grey, size: 20.r),
           ],
         ),
       ),

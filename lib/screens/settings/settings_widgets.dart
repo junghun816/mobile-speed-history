@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Widget settingsIconBox(IconData icon) {
   return Container(
-    width: 36,
-    height: 36,
+    width: 36.r,
+    height: 36.r,
     decoration: BoxDecoration(
       color: Colors.lightBlue.withOpacity(0.15),
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(10.r),
     ),
-    child: Icon(icon, color: Colors.lightBlue, size: 20),
+    child: Icon(icon, color: Colors.lightBlue, size: 20.r),
   );
 }
 
@@ -19,8 +20,8 @@ Widget settingsPanelContainer({
   EdgeInsets? padding,
 }) {
   return Container(
-    padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12)),
+    padding: padding ?? EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+    decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12.r)),
     child: child,
   );
 }
@@ -42,10 +43,10 @@ Widget settingsOptionButton(
     },
     child: Container(
       margin: margin,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.symmetric(vertical: 8.h),
       decoration: BoxDecoration(
         color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: isSelected ? Colors.lightBlue : btnBorderOff),
       ),
       child: Text(
@@ -53,7 +54,7 @@ Widget settingsOptionButton(
         textAlign: TextAlign.center,
         style: TextStyle(
           color: isSelected ? Colors.lightBlue : btnTextOff,
-          fontSize: fontSize,
+          fontSize: fontSize.sp,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),

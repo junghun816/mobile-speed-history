@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../widgets/number_input_dialog.dart';
@@ -24,7 +25,7 @@ class SettingsAlertScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           children: [
             _alertTile(
               context: context,
@@ -53,7 +54,7 @@ class SettingsAlertScreen extends StatelessWidget {
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _alertTile(
               context: context,
               icon: Icons.speed_outlined,
@@ -81,7 +82,7 @@ class SettingsAlertScreen extends StatelessWidget {
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _alertTile(
               context: context,
               icon: Icons.social_distance_outlined,
@@ -138,15 +139,15 @@ class SettingsAlertScreen extends StatelessWidget {
           Row(
             children: [
               settingsIconBox(icon),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
+                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
@@ -163,37 +164,37 @@ class SettingsAlertScreen extends StatelessWidget {
             ],
           ),
           if (isOn) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GestureDetector(
                   onTap: onDecrement,
                   child: Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8)),
-                    child: Icon(Icons.remove, color: titleColor, size: 20),
+                    width: 40.r, height: 40.r,
+                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Icon(Icons.remove, color: titleColor, size: 20.r),
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20.w),
                 GestureDetector(
                   onTap: onTapValue,
                   child: Container(
-                    width: 90,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8)),
+                    width: 90.w,
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
                     child: Text(stepperValue,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.bold)),
+                        style: TextStyle(color: titleColor, fontSize: 15.sp, fontWeight: FontWeight.bold)),
                   ),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20.w),
                 GestureDetector(
                   onTap: onIncrement,
                   child: Container(
-                    width: 40, height: 40,
-                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8)),
-                    child: Icon(Icons.add, color: titleColor, size: 20),
+                    width: 40.r, height: 40.r,
+                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Icon(Icons.add, color: titleColor, size: 20.r),
                   ),
                 ),
               ],

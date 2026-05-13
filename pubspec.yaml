@@ -65,6 +65,9 @@ dependencies:
   # 설정 저장
   shared_preferences: ^2.3.0
 
+  # 반응형 UI
+  flutter_screenutil: ^5.9.3
+
   # 앱 버전 정보
   package_info_plus: ^8.0.0
 

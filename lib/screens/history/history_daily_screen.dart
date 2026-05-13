@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../models/ride_record.dart';
 import '../../providers/ride_provider.dart';
@@ -70,13 +71,13 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
         });
       },
       child: Container(
-        height: 32,
+        height: 32.h,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected
               ? Colors.orange.withOpacity(0.2)
               : (isDark ? Colors.grey[850]! : Colors.grey[200]!),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isSelected
                 ? Colors.orange
@@ -89,7 +90,7 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
             color: isSelected
                 ? Colors.orange
                 : (isDark ? Colors.grey : Colors.grey[600]!),
-            fontSize: 12,
+            fontSize: 12.sp,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -201,7 +202,7 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
         // 연도 네비게이션
         Container(
           color: panelColor,
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -215,15 +216,15 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                   });
                 } : null,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
                   child: Icon(Icons.chevron_left,
-                      color: hasPrev ? textColor : dividerColor, size: 24),
+                      color: hasPrev ? textColor : dividerColor, size: 24.r),
                 ),
               ),
               Text(
                 '$_selectedYear년',
                 style: TextStyle(
-                    color: textColor, fontSize: 15, fontWeight: FontWeight.bold),
+                    color: textColor, fontSize: 15.sp, fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 onTap: hasNext ? () {
@@ -235,9 +236,9 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                   });
                 } : null,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
                   child: Icon(Icons.chevron_right,
-                      color: hasNext ? textColor : dividerColor, size: 24),
+                      color: hasNext ? textColor : dividerColor, size: 24.r),
                 ),
               ),
             ],
@@ -247,24 +248,24 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
         // 기간 필터
         Container(
           color: panelColor,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           child: Row(
             children: [
               Expanded(child: _recentButton('7일', 7, isDark)),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Expanded(child: _recentButton('30일', 30, isDark)),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Expanded(child: _recentButton('90일', 90, isDark)),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Expanded(child: _recentButton('180일', 180, isDark)),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Expanded(child: _recentButton('365일', 365, isDark)),
             ],
           ),
         ),
 
         SizedBox(
-          height: 300,
+          height: 300.h,
           child: BarChartWidget(
             key: ValueKey(_recentDays),
             labels: labels,
@@ -292,7 +293,7 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
         // 요일별 통계
         Container(
           color: panelColor,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -304,11 +305,11 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       '요일별 평균 거리',
                       style: TextStyle(
                         color: Colors.orange,
-                        fontSize: 13,
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -317,13 +318,13 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                           ? Icons.keyboard_arrow_up
                           : Icons.keyboard_arrow_down,
                       color: Colors.orange,
-                      size: 20,
+                      size: 20.r,
                     ),
                   ],
                 ),
               ),
               if (_showWeekdayStats) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(7, (i) {
@@ -340,14 +341,14 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                     return Column(
                       children: [
                         Container(
-                          width: 28,
-                          height: 60,
+                          width: 28.w,
+                          height: 60.h,
                           alignment: Alignment.bottomCenter,
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 400),
                             curve: Curves.easeOut,
-                            width: 28,
-                            height: (60 * ratio).clamp(2.0, 60.0),
+                            width: 28.w,
+                            height: (60.h * ratio).clamp(2.0, 60.h),
                             decoration: BoxDecoration(
                               color: isWeekend ? Colors.orange : Colors.blue,
                               borderRadius: const BorderRadius.only(
@@ -357,32 +358,32 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4.h),
                         Text(
                           avgDist > 0
                               ? formatDistance(avgDist, useKmh, decimals: 1)
                               : '-',
                           style: TextStyle(
                             color: textColor,
-                            fontSize: 10,
+                            fontSize: 10.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2.h),
                         Text(
                           dayLabels[i],
                           style: TextStyle(
                             color: isWeekend
                                 ? Colors.orange
                                 : (isDark ? Colors.grey : Colors.grey[600]!),
-                            fontSize: 11,
+                            fontSize: 11.sp,
                           ),
                         ),
                         Text(
                           '${count}회',
                           style: TextStyle(
                             color: isDark ? Colors.grey : Colors.grey[500]!,
-                            fontSize: 9,
+                            fontSize: 9.sp,
                           ),
                         ),
                       ],
@@ -398,11 +399,11 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
 
         if (_selectedIndex < 0)
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.r),
             child: Text(
               '막대를 탭하면 상세 정보를 볼 수 있어요',
               style: TextStyle(
-                  color: isDark ? Colors.grey : Colors.grey[600], fontSize: 14),
+                  color: isDark ? Colors.grey : Colors.grey[600], fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
           ),
@@ -415,29 +416,29 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                 '해당 날짜에 기록이 없어요',
                 style: TextStyle(
                     color: isDark ? Colors.grey : Colors.grey[600],
-                    fontSize: 14),
+                    fontSize: 14.sp),
               ),
             )
                 : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     selectedLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.blue,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
 
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(color: Colors.blue.withOpacity(0.4)),
                     ),
                     child: Column(
@@ -464,16 +465,16 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                                   isBlue: true, textColor: textColor),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         Text(
                           '총 ${formatNumber(selectedRecords.length)}회 주행',
-                          style: const TextStyle(color: Colors.blue, fontSize: 12),
+                          style: TextStyle(color: Colors.blue, fontSize: 12.sp),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
 
                   ...selectedRecords.asMap().entries.map((e) {
                     final idx = e.key;
@@ -493,11 +494,11 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                         );
                       },
                       child: Container(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        padding: const EdgeInsets.all(14),
+                        margin: EdgeInsets.only(bottom: 10.h),
+                        padding: EdgeInsets.all(14.r),
                         decoration: BoxDecoration(
                           color: cardColor,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                           border: Border.all(color: borderColor),
                         ),
                         child: Column(
@@ -510,22 +511,22 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                                   '${idx + 1}회차  $timeStr 출발',
                                   style: TextStyle(
                                     color: textColor,
-                                    fontSize: 13,
+                                    fontSize: 13.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const Row(
+                                Row(
                                   children: [
                                     Text('경로 보기',
-                                        style: TextStyle(color: Colors.blue, fontSize: 12)),
-                                    Icon(Icons.chevron_right, color: Colors.blue, size: 16),
+                                        style: TextStyle(color: Colors.blue, fontSize: 12.sp)),
+                                    Icon(Icons.chevron_right, color: Colors.blue, size: 16.r),
                                   ],
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 6),
+                            SizedBox(height: 6.h),
                             RecordBadges(recordId: record.id, bestIds: bestIds),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -545,26 +546,26 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                             ),
                             if (weightKg != null ||
                                 (record.memo != null && record.memo!.isNotEmpty)) ...[
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8.h),
                               Row(
                                 children: [
                                   if (weightKg != null)
                                     Text(
                                       '🔥 ${formatNumber(calcCalories(record.totalDistance, weightKg)!)} kcal',
-                                      style: const TextStyle(
-                                          color: Colors.orange, fontSize: 12),
+                                      style: TextStyle(
+                                          color: Colors.orange, fontSize: 12.sp),
                                     ),
                                   if (weightKg != null &&
                                       record.memo != null &&
                                       record.memo!.isNotEmpty)
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: 12.w),
                                   if (record.memo != null && record.memo!.isNotEmpty)
                                     Expanded(
                                       child: Text(
                                         '📝 ${record.memo}',
                                         style: TextStyle(
                                             color: isDark ? Colors.grey[400]! : Colors.grey[600]!,
-                                            fontSize: 12),
+                                            fontSize: 12.sp),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
@@ -592,16 +593,16 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
           value,
           style: TextStyle(
             color: textColor,
-            fontSize: 13,
+            fontSize: 13.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Text(
           label,
           style: TextStyle(
             color: isBlue ? Colors.blue : Colors.grey,
-            fontSize: 11,
+            fontSize: 11.sp,
           ),
         ),
       ],

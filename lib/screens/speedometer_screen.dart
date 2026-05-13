@@ -1,6 +1,7 @@
-﻿import 'dart:math';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../providers/ride_provider.dart';
@@ -113,12 +114,12 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     ? (now.hour < 12 ? 'AM ' : 'PM ')
                     : '';
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
+                  padding: EdgeInsets.only(bottom: 6.h),
                   child: Text(
                     '$prefix$h:$m:$s',
                     style: TextStyle(
                       color: cs.onSurfaceVariant,
-                      fontSize: 52,
+                      fontSize: 52.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
                       height: 1.0,
@@ -145,12 +146,12 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 150),
+                        SizedBox(height: 150.h),
                         Text(
                           formatSpeed(ride.currentSpeed, useKmh),
                           style: TextStyle(
                             color: speedTextColor,
-                            fontSize: 64,
+                            fontSize: 64.sp,
                             fontWeight: FontWeight.bold,
                             height: 1.0,
                           ),
@@ -159,7 +160,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                           speedUnit(useKmh),
                           style: TextStyle(
                             color: unitTextColor,
-                            fontSize: 18,
+                            fontSize: 18.sp,
                             height: 1.0,
                           ),
                         ),
@@ -170,7 +171,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
               ),
           ),
 
-          const SizedBox(height: 2),
+          SizedBox(height: 2.h),
 
           // 통계 카드 (표시 항목 설정 반영)
           _buildStatsRow(ride, settings, useKmh,
@@ -180,31 +181,31 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
               valueColor: cs.onSurface,
               isDark: isDark),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
           // 일시정지 표시 — 항상 공간 차지, 내용만 페이드
           AnimatedOpacity(
             opacity: isPaused ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 200),
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24),
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              margin: EdgeInsets.symmetric(horizontal: 24.w),
+              padding: EdgeInsets.symmetric(vertical: 8.h),
               decoration: BoxDecoration(
                 color: Colors.orange.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(color: Colors.orange.withOpacity(0.6)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.pause_circle_outline,
-                      color: Colors.orange, size: 16),
-                  const SizedBox(width: 6),
+                  Icon(Icons.pause_circle_outline,
+                      color: Colors.orange, size: 16.r),
+                  SizedBox(width: 6.w),
                   Text(
                     ride.isManuallyPaused ? '일시정지 중' : '자동 일시정지 중',
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: Colors.orange,
-                        fontSize: 13,
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -212,11 +213,11 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             ),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
           // 시작/정지 버튼 (중앙) + 속도 모드 (좌) + 일시정지 (우)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
               children: [
                 // 왼쪽: 속도 모드 배지 (탭으로 순환)
@@ -300,10 +301,10 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     }
                   },
                   child: Container(
-                    width: 140,
-                    height: 60,
+                    width: 140.w,
+                    height: 60.h,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       color: ride.isRiding ? Colors.red : Colors.green,
                       boxShadow: [
                         BoxShadow(
@@ -317,9 +318,9 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     child: Center(
                       child: Text(
                         ride.isRiding ? '정지' : '시작',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 22.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -336,15 +337,15 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             ),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
         ],
         ),
       ),
       if (!_locationGranted)
         Positioned(
           top: MediaQuery.of(context).padding.top + 8,
-          left: 16,
-          right: 16,
+          left: 16.w,
+          right: 16.w,
           child: _permissionBanner(cs),
         ),
       ],
@@ -368,11 +369,11 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
         child: StatefulBuilder(
         builder: (ctx, setDialogState) => Dialog(
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),
+              borderRadius: BorderRadius.circular(20.r)),
           insetPadding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.r),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -380,15 +381,15 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                   '주행 완료',
                   style: TextStyle(
                       color: cs.onSurface,
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(color: Colors.blue.withOpacity(0.3)),
                   ),
                   child: Row(
@@ -404,7 +405,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 GestureDetector(
                   onTap: () async {
                     await showMemoBottomSheet(ctx, controller: ctrl);
@@ -412,28 +413,28 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                   },
                   child: Container(
                     width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: 70),
-                    padding: const EdgeInsets.all(12),
+                    constraints: BoxConstraints(minHeight: 70.h),
+                    padding: EdgeInsets.all(12.r),
                     decoration: BoxDecoration(
                       color: cs.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: ctrl.text.isEmpty
                         ? Text('메모를 남겨보세요 (탭하여 입력)',
-                            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14))
+                            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14.sp))
                         : Text(ctrl.text,
-                            style: TextStyle(color: cs.onSurface, fontSize: 14)),
+                            style: TextStyle(color: cs.onSurface, fontSize: 14.sp)),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 14.h),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12.r)),
                     ),
                     onPressed: () async {
                       final memo = ctrl.text.trim();
@@ -442,10 +443,10 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                       }
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
-                    child: const Text('확인',
+                    child: Text('확인',
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.bold)),
                   ),
                 ),
@@ -462,19 +463,19 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     return GestureDetector(
       onTap: () => Geolocator.openAppSettings(),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
         decoration: BoxDecoration(
           color: Colors.orange.withValues(alpha: 0.95),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.location_off, color: Colors.white, size: 18),
-            SizedBox(width: 8),
+            Icon(Icons.location_off, color: Colors.white, size: 18.r),
+            SizedBox(width: 8.w),
             Expanded(
               child: Text(
                 '위치 권한이 없습니다. 탭하여 설정에서 허용해주세요.',
-                style: TextStyle(color: Colors.white, fontSize: 13),
+                style: TextStyle(color: Colors.white, fontSize: 13.sp),
               ),
             ),
           ],
@@ -489,23 +490,23 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
       SpeedMode.lowSpeed => (Icons.directions_run, Colors.deepOrange, '런닝'),
     };
     return Container(
-      width: 60,
-      height: 60,
+      width: 60.r,
+      height: 60.r,
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: color.withOpacity(0.35)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: 3),
+          Icon(icon, color: color, size: 22.r),
+          SizedBox(height: 3.h),
           Text(
             label,
             style: TextStyle(
               color: color,
-              fontSize: 11,
+              fontSize: 11.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -527,10 +528,10 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
         }
       },
       child: Container(
-        width: 60,
-        height: 60,
+        width: 60.r,
+        height: 60.r,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           color: color,
           boxShadow: [
             BoxShadow(
@@ -543,7 +544,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
         child: Icon(
           isManuallyPaused ? Icons.play_arrow : Icons.pause,
           color: Colors.white,
-          size: 28,
+          size: 28.r,
         ),
       ),
     );
@@ -577,12 +578,12 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.symmetric(vertical: 20.h),
         decoration: BoxDecoration(
           color: panelColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           boxShadow: !isDark
               ? [const BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2))]
               : null,
@@ -606,14 +607,14 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
           value,
           style: TextStyle(
             color: valueColor,
-            fontSize: 16,
+            fontSize: 16.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Text(
           label,
-          style: TextStyle(color: labelColor, fontSize: 13),
+          style: TextStyle(color: labelColor, fontSize: 13.sp),
         ),
       ],
     );
@@ -621,8 +622,8 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
 
   Widget _divider(Color color) {
     return Container(
-      height: 36,
-      width: 1,
+      height: 36.h,
+      width: 1.w,
       color: color,
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../models/speed_mode.dart';
@@ -24,10 +25,10 @@ class SettingsRideScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           children: [
             _speedModeTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _switchTile(
               context: context,
               icon: Icons.pause_circle_outline,
@@ -39,7 +40,7 @@ class SettingsRideScreen extends StatelessWidget {
               titleColor: titleColor,
               subtitleColor: subtitleColor,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _multiOptionTile(
               icon: Icons.straighten,
               title: '최소 기록 거리',
@@ -54,7 +55,7 @@ class SettingsRideScreen extends StatelessWidget {
               btnBorderOff: btnBorderOff,
               btnTextOff: btnTextOff,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _multiOptionTile(
               icon: Icons.timer_outlined,
               title: '최소 기록 시간',
@@ -70,7 +71,7 @@ class SettingsRideScreen extends StatelessWidget {
               btnTextOff: btnTextOff,
               fontSize: 11,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _toggleTile(
               icon: Icons.speed,
               title: '단위',
@@ -86,7 +87,7 @@ class SettingsRideScreen extends StatelessWidget {
               btnBorderOff: btnBorderOff,
               btnTextOff: btnTextOff,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _toggleTile(
               icon: Icons.gps_fixed,
               title: 'GPS 정확도',
@@ -132,28 +133,28 @@ class SettingsRideScreen extends StatelessWidget {
           Row(
             children: [
               settingsIconBox(modeIcons[selected]!),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('속도 측정 모드',
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
                     Text(selected.description,
-                        style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: modes.map((mode) {
               final isSelected = mode == selected;
               return Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(right: mode != modes.last ? 6 : 0),
+                  padding: EdgeInsets.only(right: mode != modes.last ? 6.w : 0),
                   child: GestureDetector(
                     onTap: () {
                       SystemSound.play(SystemSoundType.click);
@@ -161,20 +162,20 @@ class SettingsRideScreen extends StatelessWidget {
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(8.r),
                         border: Border.all(color: isSelected ? Colors.lightBlue : btnBorderOff),
                       ),
                       child: Column(
                         children: [
-                          Icon(modeIcons[mode], size: 18,
+                          Icon(modeIcons[mode], size: 18.r,
                               color: isSelected ? Colors.lightBlue : btnTextOff),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4.h),
                           Text(mode.label,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 12.sp,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                 color: isSelected ? Colors.lightBlue : btnTextOff,
                               )),
@@ -214,21 +215,21 @@ class SettingsRideScreen extends StatelessWidget {
           Row(
             children: [
               settingsIconBox(icon),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
+                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: List.generate(labels.length, (i) {
               return Expanded(
@@ -240,7 +241,7 @@ class SettingsRideScreen extends StatelessWidget {
                   btnBorderOff: btnBorderOff,
                   btnTextOff: btnTextOff,
                   fontSize: fontSize,
-                  margin: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
+                  margin: EdgeInsets.only(right: i < labels.length - 1 ? 6.w : 0),
                 ),
               );
             }),
@@ -273,21 +274,21 @@ class SettingsRideScreen extends StatelessWidget {
           Row(
             children: [
               settingsIconBox(icon),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12)),
+                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 2.h),
+                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Row(
             children: [
               Expanded(
@@ -295,7 +296,7 @@ class SettingsRideScreen extends StatelessWidget {
                     btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
                     fontSize: 13),
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Expanded(
                 child: settingsOptionButton(rightLabel, !isLeft, () => onToggle(false),
                     btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
@@ -325,15 +326,15 @@ class SettingsRideScreen extends StatelessWidget {
       child: Row(
         children: [
           settingsIconBox(icon),
-          const SizedBox(width: 14),
+          SizedBox(width: 14.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 2),
-                Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12)),
+                    style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                SizedBox(height: 2.h),
+                Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
               ],
             ),
           ),

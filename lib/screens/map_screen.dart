@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../providers/ride_provider.dart';
@@ -36,7 +37,7 @@ class _MapScreenState extends State<MapScreen> {
   // 마커 보간용
   NLatLng? _prevLatLng;
   NLatLng? _targetLatLng;
-  NLatLng? _lastGpsLatLng;   // GPS 변경 감지
+  NLatLng? _lastGpsLatLng;
   DateTime? _lastGpsUpdateAt;
 
   NMapType _toNMapType(String type) {
@@ -71,7 +72,6 @@ class _MapScreenState extends State<MapScreen> {
       final last = ride.pathPoints.last;
       final latLng = NLatLng(last.latitude, last.longitude);
 
-      // 새 GPS 좌표가 왔을 때만 보간 목표 갱신
       if (_lastGpsLatLng == null ||
           _lastGpsLatLng!.latitude != latLng.latitude ||
           _lastGpsLatLng!.longitude != latLng.longitude) {
@@ -81,7 +81,6 @@ class _MapScreenState extends State<MapScreen> {
         _lastGpsUpdateAt = DateTime.now();
       }
 
-      // 경과 시간 기반 보간 (1초에 걸쳐 이동)
       if (_prevLatLng != null && _targetLatLng != null && _lastGpsUpdateAt != null) {
         final t = (DateTime.now().difference(_lastGpsUpdateAt!).inMilliseconds / 1000.0).clamp(0.0, 1.0);
         final interpLat = _prevLatLng!.latitude + (_targetLatLng!.latitude - _prevLatLng!.latitude) * t;
@@ -128,7 +127,6 @@ class _MapScreenState extends State<MapScreen> {
                     NLatLng(position.latitude, position.longitude),
                   );
 
-                  // 애니메이션 없이 바로 이동 (reason: 멀미 방지)
                   await controller.updateCamera(
                     NCameraUpdate.scrollAndZoomTo(
                       target: NLatLng(position.latitude, position.longitude),
@@ -161,7 +159,7 @@ class _MapScreenState extends State<MapScreen> {
           // 하단 통계
           Container(
             color: cardColor,
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: EdgeInsets.symmetric(vertical: 12.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -281,10 +279,10 @@ class _MapScreenState extends State<MapScreen> {
     final s = _badgeScale;
     return Container(
       key: _badgeWidgetKey,
-      padding: EdgeInsets.symmetric(horizontal: 14 * s, vertical: 8 * s),
+      padding: EdgeInsets.symmetric(horizontal: 14.w * s, vertical: 8.h * s),
       decoration: BoxDecoration(
         color: (isDark ? Colors.black : Colors.white).withOpacity(0.82),
-        borderRadius: BorderRadius.circular(14 * s),
+        borderRadius: BorderRadius.circular(14.r * s),
         border: _isResizeMode
             ? Border.all(color: Colors.blue.withOpacity(0.7), width: 1.5)
             : null,
@@ -297,14 +295,14 @@ class _MapScreenState extends State<MapScreen> {
             formatSpeed(ride.currentSpeed, settings.useKmh),
             style: TextStyle(
               color: isDark ? Colors.white : Colors.black87,
-              fontSize: 36 * s,
+              fontSize: 36.sp * s,
               fontWeight: FontWeight.bold,
               height: 1.0,
             ),
           ),
           Text(
             speedUnit(settings.useKmh),
-            style: TextStyle(color: Colors.grey, fontSize: 13 * s),
+            style: TextStyle(color: Colors.grey, fontSize: 13.sp * s),
           ),
         ],
       ),
@@ -320,16 +318,15 @@ class _MapScreenState extends State<MapScreen> {
           final naturalH = (badgeBox?.size.height ?? 60.0) / _badgeScale;
 
           final double delta = switch (corner) {
-            0 => (-d.delta.dx - d.delta.dy) / 80, // TL
-            1 => (d.delta.dx - d.delta.dy) / 80,  // TR
-            2 => (-d.delta.dx + d.delta.dy) / 80, // BL
-            _ => (d.delta.dx + d.delta.dy) / 80,  // BR
+            0 => (-d.delta.dx - d.delta.dy) / 80,
+            1 => (d.delta.dx - d.delta.dy) / 80,
+            2 => (-d.delta.dx + d.delta.dy) / 80,
+            _ => (d.delta.dx + d.delta.dy) / 80,
           };
           final oldScale = _badgeScale;
           _badgeScale = (_badgeScale + delta).clamp(0.5, 3.0);
           final diff = _badgeScale - oldScale;
 
-          // 반대편 코너를 고정점으로 — 좌측 핸들은 우측 고정, 상단 핸들은 하단 고정
           if (corner == 0 || corner == 2) _badgeLeft -= naturalW * diff;
           if (corner == 0 || corner == 1) _badgeTop -= naturalH * diff;
         });
@@ -360,23 +357,23 @@ class _MapScreenState extends State<MapScreen> {
               value,
               style: TextStyle(
                 color: textColor,
-                fontSize: 14,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
             if (unit.isNotEmpty) ...[
-              const SizedBox(width: 2),
-              Text(unit, style: const TextStyle(color: Colors.blue, fontSize: 11)),
+              SizedBox(width: 2.w),
+              Text(unit, style: TextStyle(color: Colors.blue, fontSize: 11.sp)),
             ],
           ],
         ),
-        const SizedBox(height: 2),
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+        SizedBox(height: 2.h),
+        Text(label, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
       ],
     );
   }
 
   Widget _divider(Color color) {
-    return Container(height: 40, width: 1, color: color);
+    return Container(height: 40.h, width: 1.w, color: color);
   }
 }

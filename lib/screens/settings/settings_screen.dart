@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'settings_ride.dart';
 import 'settings_display.dart';
 import 'settings_alert.dart';
@@ -21,23 +22,23 @@ class SettingsScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           children: [
             _menuTile(context, Icons.directions_bike_outlined, '주행', '속도 모드 · 자동정지 · GPS · 단위',
                 const SettingsRideScreen(), panelColor, titleColor, subtitleColor),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _menuTile(context, Icons.dashboard_outlined, '화면', '표시 항목 · 속도계 시계',
                 const SettingsDisplayScreen(), panelColor, titleColor, subtitleColor),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _menuTile(context, Icons.notifications_outlined, '알림', '속도 초과 · 미달 · 거리',
                 const SettingsAlertScreen(), panelColor, titleColor, subtitleColor),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _menuTile(context, Icons.map_outlined, '지도', '지도 스타일 · 경로 색상 · 두께 · 추적',
                 const SettingsMapScreen(), panelColor, titleColor, subtitleColor),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _menuTile(context, Icons.person_outline, '사용자', '체중',
                 const SettingsUserScreen(), panelColor, titleColor, subtitleColor),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _menuTile(context, Icons.settings_outlined, '시스템', '테마 · 시작 탭 · 백업 · 앱 정보',
                 const SettingsSystemScreen(), panelColor, titleColor, subtitleColor),
           ],
@@ -62,23 +63,23 @@ class SettingsScreen extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
           color: panelColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 36.r,
+              height: 36.r,
               decoration: BoxDecoration(
                 color: Colors.lightBlue.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.r),
               ),
-              child: Icon(icon, color: Colors.lightBlue, size: 20),
+              child: Icon(icon, color: Colors.lightBlue, size: 20.r),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,15 +87,15 @@ class SettingsScreen extends StatelessWidget {
                   Text(title,
                       style: TextStyle(
                           color: titleColor,
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(subtitle,
-                      style: TextStyle(color: subtitleColor, fontSize: 12)),
+                      style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: subtitleColor, size: 20),
+            Icon(Icons.chevron_right, color: subtitleColor, size: 20.r),
           ],
         ),
       ),

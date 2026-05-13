@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
 import 'settings_widgets.dart';
@@ -36,7 +36,7 @@ class SettingsDisplayScreen extends StatelessWidget {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           children: [
             settingsPanelContainer(
               panelColor: panelColor,
@@ -46,22 +46,22 @@ class SettingsDisplayScreen extends StatelessWidget {
                   Row(
                     children: [
                       settingsIconBox(Icons.dashboard_outlined),
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14.w),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('주행 중 표시 항목',
-                                style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 2),
+                                style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 2.h),
                             Text('속도계 하단에 표시할 통계 선택',
-                                style: TextStyle(color: subtitleColor, fontSize: 12)),
+                                style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   Row(
                     children: displayItems.asMap().entries.map((e) {
                       final i = e.key;
@@ -72,7 +72,7 @@ class SettingsDisplayScreen extends StatelessWidget {
                           btnBgOff: btnBgOff,
                           btnBorderOff: btnBorderOff,
                           btnTextOff: btnTextOff,
-                          margin: EdgeInsets.only(right: i < displayItems.length - 1 ? 6 : 0),
+                          margin: EdgeInsets.only(right: i < displayItems.length - 1 ? 6.w : 0),
                         ),
                       );
                     }).toList(),
@@ -80,7 +80,7 @@ class SettingsDisplayScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             settingsPanelContainer(
               panelColor: panelColor,
               child: Column(
@@ -89,22 +89,22 @@ class SettingsDisplayScreen extends StatelessWidget {
                   Row(
                     children: [
                       settingsIconBox(Icons.access_time),
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14.w),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('속도계 시계',
-                                style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 2),
+                                style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 2.h),
                             Text('속도계 화면 상단에 현재 시각 표시',
-                                style: TextStyle(color: subtitleColor, fontSize: 12)),
+                                style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   Row(
                     children: clockOptions.asMap().entries.map((e) {
                       final (val, label) = e.value;
@@ -116,7 +116,7 @@ class SettingsDisplayScreen extends StatelessWidget {
                           btnBgOff: btnBgOff,
                           btnBorderOff: btnBorderOff,
                           btnTextOff: btnTextOff,
-                          margin: EdgeInsets.only(right: isLast ? 0 : 6),
+                          margin: EdgeInsets.only(right: isLast ? 0 : 6.w),
                         ),
                       );
                     }).toList(),

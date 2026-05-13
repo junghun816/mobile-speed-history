@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../models/ride_record.dart';
 import '../providers/ride_provider.dart';
@@ -57,7 +58,7 @@ class _GoalScreenState extends State<GoalScreen> {
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.r),
           children: [
             _sectionTitle('거리 목표', sectionColor),
             _distanceGoalCard(
@@ -76,7 +77,7 @@ class _GoalScreenState extends State<GoalScreen> {
                 onSet: settings.setYearlyGoalKm,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _distanceGoalCard(
               label: '이번 달',
               current: mtdDist,
@@ -94,7 +95,7 @@ class _GoalScreenState extends State<GoalScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             _sectionTitle('도전 목표', sectionColor),
             _challengeCard(
               label: '최고속도',
@@ -112,7 +113,7 @@ class _GoalScreenState extends State<GoalScreen> {
               subColor: subColor,
               onTap: () => _setSpeedGoal(settings, useKmh),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _challengeCard(
               label: '최장거리 (1회)',
               icon: Icons.straighten,
@@ -134,7 +135,7 @@ class _GoalScreenState extends State<GoalScreen> {
                 onSet: settings.setGoalMaxDistanceKm,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             _challengeCard(
               label: '최장시간 (1회)',
               icon: Icons.timer_outlined,
@@ -152,7 +153,7 @@ class _GoalScreenState extends State<GoalScreen> {
               onTap: () => _setDurationGoal(settings),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             _sectionTitle('주행 스트릭', sectionColor),
             _streakCard(
               streak.current,
@@ -163,7 +164,7 @@ class _GoalScreenState extends State<GoalScreen> {
               dividerColor: cs.outlineVariant,
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
           ],
         ),
       ),
@@ -279,12 +280,12 @@ class _GoalScreenState extends State<GoalScreen> {
 
   Widget _sectionTitle(String title, Color color) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8, left: 4),
+      padding: EdgeInsets.only(bottom: 8.h, left: 4.w),
       child: Text(
         title,
         style: TextStyle(
           color: color,
-          fontSize: 12,
+          fontSize: 12.sp,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.0,
         ),
@@ -314,10 +315,10 @@ class _GoalScreenState extends State<GoalScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.r),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,39 +326,39 @@ class _GoalScreenState extends State<GoalScreen> {
             Row(
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 36.r,
+                  height: 36.r,
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  child: Icon(Icons.flag_outlined, color: color, size: 20),
+                  child: Icon(Icons.flag_outlined, color: color, size: 20.r),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
                     '$label 거리 목표',
                     style: TextStyle(
                       color: textColor,
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 if (achieved)
-                  const Icon(Icons.check_circle, color: Colors.green, size: 20)
+                  Icon(Icons.check_circle, color: Colors.green, size: 20.r)
                 else
-                  Icon(Icons.edit_outlined, color: subColor, size: 16),
+                  Icon(Icons.edit_outlined, color: subColor, size: 16.r),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14.h),
             if (goalKm == null)
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: EdgeInsets.symmetric(vertical: 4.h),
                   child: Text(
                     '탭하여 목표 설정',
-                    style: TextStyle(color: subColor, fontSize: 13),
+                    style: TextStyle(color: subColor, fontSize: 13.sp),
                   ),
                 ),
               )
@@ -369,33 +370,33 @@ class _GoalScreenState extends State<GoalScreen> {
                     '${formatDouble(displayCurrent, 1)} $unit',
                     style: TextStyle(
                       color: achieved ? Colors.green : color,
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     '목표 ${formatDouble(displayGoal!, 0)} $unit',
-                    style: TextStyle(color: subColor, fontSize: 13),
+                    style: TextStyle(color: subColor, fontSize: 13.sp),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               ClipRRect(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(4.r),
                 child: LinearProgressIndicator(
                   value: progress,
                   backgroundColor: color.withOpacity(0.15),
                   valueColor: AlwaysStoppedAnimation(
                       achieved ? Colors.green : color),
-                  minHeight: 8,
+                  minHeight: 8.h,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6.h),
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
                   '${(progress * 100).toStringAsFixed(1)}%',
-                  style: TextStyle(color: subColor, fontSize: 12),
+                  style: TextStyle(color: subColor, fontSize: 12.sp),
                 ),
               ),
             ],
@@ -421,23 +422,23 @@ class _GoalScreenState extends State<GoalScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         decoration: BoxDecoration(
           color: cardColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 36.r,
+              height: 36.r,
               decoration: BoxDecoration(
                 color: color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.r),
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: Icon(icon, color: color, size: 20.r),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,28 +446,28 @@ class _GoalScreenState extends State<GoalScreen> {
                   Text(label,
                       style: TextStyle(
                           color: textColor,
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(
                     '현재 $currentValue${unit.isNotEmpty ? ' $unit' : ''}',
-                    style: TextStyle(color: subColor, fontSize: 12),
+                    style: TextStyle(color: subColor, fontSize: 12.sp),
                   ),
                 ],
               ),
             ),
             if (goalValue == null)
-              Text('미설정', style: TextStyle(color: subColor, fontSize: 13))
+              Text('미설정', style: TextStyle(color: subColor, fontSize: 13.sp))
             else if (achieved)
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     '목표 $goalValue${unit.isNotEmpty ? ' $unit' : ''}',
-                    style: TextStyle(color: subColor, fontSize: 12),
+                    style: TextStyle(color: subColor, fontSize: 12.sp),
                   ),
-                  const SizedBox(width: 6),
-                  const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                  SizedBox(width: 6.w),
+                  Icon(Icons.check_circle, color: Colors.green, size: 18.r),
                 ],
               )
             else
@@ -477,14 +478,14 @@ class _GoalScreenState extends State<GoalScreen> {
                     '$goalValue${unit.isNotEmpty ? ' $unit' : ''}',
                     style: TextStyle(
                         color: color,
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.bold),
                   ),
-                  Text('목표', style: TextStyle(color: subColor, fontSize: 11)),
+                  Text('목표', style: TextStyle(color: subColor, fontSize: 11.sp)),
                 ],
               ),
-            const SizedBox(width: 8),
-            Icon(Icons.edit_outlined, color: subColor, size: 16),
+            SizedBox(width: 8.w),
+            Icon(Icons.edit_outlined, color: subColor, size: 16.r),
           ],
         ),
       ),
@@ -500,10 +501,10 @@ class _GoalScreenState extends State<GoalScreen> {
     required Color dividerColor,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
         children: [
@@ -518,34 +519,33 @@ class _GoalScreenState extends State<GoalScreen> {
                       '$current',
                       style: TextStyle(
                         color: current > 0 ? Colors.amber : subColor,
-                        fontSize: 36,
+                        fontSize: 36.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child:
-                          Text('일', style: TextStyle(color: subColor, fontSize: 14)),
+                      padding: EdgeInsets.only(bottom: 4.h),
+                      child: Text('일', style: TextStyle(color: subColor, fontSize: 14.sp)),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.local_fire_department,
-                        color: current > 0 ? Colors.amber : subColor, size: 14),
-                    const SizedBox(width: 4),
+                        color: current > 0 ? Colors.amber : subColor, size: 14.r),
+                    SizedBox(width: 4.w),
                     Text('현재 스트릭',
-                        style: TextStyle(color: subColor, fontSize: 12)),
+                        style: TextStyle(color: subColor, fontSize: 12.sp)),
                   ],
                 ),
               ],
             ),
           ),
           Container(
-            width: 1,
-            height: 56,
+            width: 1.w,
+            height: 56.h,
             color: dividerColor,
           ),
           Expanded(
@@ -559,26 +559,25 @@ class _GoalScreenState extends State<GoalScreen> {
                       '$best',
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 36,
+                        fontSize: 36.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child:
-                          Text('일', style: TextStyle(color: subColor, fontSize: 14)),
+                      padding: EdgeInsets.only(bottom: 4.h),
+                      child: Text('일', style: TextStyle(color: subColor, fontSize: 14.sp)),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.emoji_events_outlined,
-                        color: Colors.amber, size: 14),
-                    const SizedBox(width: 4),
+                    Icon(Icons.emoji_events_outlined,
+                        color: Colors.amber, size: 14.r),
+                    SizedBox(width: 4.w),
                     Text('역대 최장',
-                        style: TextStyle(color: subColor, fontSize: 12)),
+                        style: TextStyle(color: subColor, fontSize: 12.sp)),
                   ],
                 ),
               ],
