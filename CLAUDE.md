@@ -64,9 +64,8 @@ LLM의 일반적인 코딩 실수를 줄이기 위한 행동 지침이다. 프�
 성공 기준이 명확해야 독립적인 작업이 가능하다. "작동하게 만들기"와 같은 모호한 기준은 불필요한 재질의를 야기한다.
 
 지침 작동 확인: Diff 내 불필요한 변경 감소, 복잡성으로 인한 재작성 빈도 감소, 구현 전 질문을 통한 명확한 의사결정 증대.
-출처: https://americanopeople.tistory.com/514 [복세편살:티스토리]
 
-이 파일은 Claude Code(claude.ai/code)가 이 저장소에서 작업할 때 참고하는 가이드입니다.
+---
 
 ## 작업 방침
 
@@ -74,7 +73,9 @@ LLM의 일반적인 코딩 실수를 줄이기 위한 행동 지침이다. 프�
 - **토큰 절약**: 파일은 필요한 부분만 읽고, 불필요한 전체 탐색은 피한다.
 - **컨벤션/리팩토링 금지**: 명시적으로 요청받기 전까지 전체 코드를 훑어 컨벤션 정리나 리팩토링을 하지 않는다.
 
-## 앱 개발 규칙
+---
+
+## Flutter 공통 규칙
 
 ### 클릭 이벤트 시스템 음
 모든 클릭/탭 이벤트에는 반드시 시스템 음을 출력한다.
@@ -83,32 +84,35 @@ SystemSound.play(SystemSoundType.click);
 ```
 Flutter의 일부 위젯(예: `Switch`, `Checkbox`, `Radio`, `DropdownButton`)은 자체적으로 시스템 음을 출력하므로 별도 처리가 필요 없다. 그 외 `GestureDetector`, `InkWell` 등 커스텀 탭 영역에는 반드시 명시적으로 추가한다.
 
-### 플랫폼 대응
-Android/iOS 양 플랫폼을 지원한다. 플랫폼 분기가 필요한 경우 `Platform.isAndroid` / `Platform.isIOS`로 처리한다. 플랫폼별 처리 예시:
-- `LocationService` — `AndroidSettings` / `AppleSettings` 분기
-- `ForegroundServiceHelper` — `AndroidNotificationDetails` / `DarwinNotificationDetails` 분기
-- `SystemNavigator.pop()` — Android 전용이므로 반드시 `if (Platform.isAndroid)` 조건 필요 (iOS는 앱 강제 종료 불가)
+### 반응형 UI (flutter_screenutil)
+`flutter_screenutil: ^5.9.3`을 사용해 기기별 크기 대응을 한다. 기준 해상도는 **360×780** (Galaxy S22+ dp 기준 — 실제 테스트 기기).
 
-iOS 권한은 `ios/Runner/Info.plist`에서 관리한다. 현재 설정: 위치(`NSLocationWhenInUseUsageDescription`, `NSLocationAlwaysAndWhenInUseUsageDescription`), 배경 모드(`location`, `fetch`).
+`main.dart`에서 `MaterialApp`을 `ScreenUtilInit`으로 감싼다:
+```dart
+ScreenUtilInit(
+  designSize: const Size(360, 780),
+  minTextAdapt: true,
+  builder: (context, child) => MaterialApp(...),
+)
+```
 
-### 공통화·유틸화
-억지로 묶지 않되, 동일한 로직이나 UI 패턴이 여러 곳에서 반복된다고 판단되면 `lib/utils/` 또는 `lib/widgets/`로 분리한다. 현재 공통 자산:
-- `lib/utils/format_utils.dart` — 속도·거리·시간·숫자 포맷, 단위 변환, 칼로리 계산
-- `lib/widgets/number_input_dialog.dart` — 숫자 키패드 입력 다이얼로그. `allowDecimal: true`로 소수점 입력 활성화 가능. 반환 타입 `double?`, 빈 확인 시 `clearValue(-1)` 반환
-- `lib/widgets/memo_bottom_sheet.dart` — 메모 입력 바텀시트. `showMemoBottomSheet(context, controller: ctrl)` 호출. 완료 시 `controller.text`에 값이 쓰여 반환되므로 호출 후 직접 읽으면 된다.
-- `lib/widgets/stat_item.dart` — 통계 표시 위젯 2종:
-  - `StatDetailItem(label, value, unit, textColor)` — 값(16px 굵게) + 단위(파란색, 선택) + 라벨(회색 11px). 주행 상세/요약 행에 사용.
-  - `StatItem(label, value, textColor, {labelBlue})` — 값(13px 굵게) + 라벨(기본 회색, `labelBlue: true`이면 파란색). 목록 카드 내 통계 행에 사용.
-- `lib/utils/backup_utils.dart` — 백업/복원 유틸. `shareBackup()` : 임시 파일 생성 후 공유 시트 표시. `exportBackup()` : `FilePicker.saveFile(bytes:)`로 저장 위치 선택 → `true`=저장완료/`false`=취소. `pickBackupFile()` : 파일 선택 다이얼로그만 표시 → 선택한 경로 반환 (`null`=취소). `importFromPath(path, {onProgress})` : 경로에서 파싱·삽입 → 새로 추가된 건수 반환. 진행률 콜백은 0.0~1.0 범위. 가져오기 후 반드시 `ride.loadRecords()` 호출로 Provider 갱신.
-- `lib/utils/gpx_utils.dart` — GPX 내보내기 유틸. `shareGpx(record)` : 단일 주행을 GPX 파일로 공유. `shareAllGpx()` : 전체 기록을 다중 트랙 GPX 파일 하나로 묶어 공유. 표준 GPX 1.1 포맷 (Strava 등 호환).
-- `lib/widgets/loading_overlay.dart` — 전화면 터치 차단 로딩 오버레이. `runWithLoading<T>(context, task: (setProgress) async { ... }, label: '...')` 호출. `setProgress(0.0~1.0)` 전달 시 진행률 바 표시, `null` 전달 시 무한 스피너. `AbsorbPointer`로 오버레이 뒤 모든 터치 차단.
+크기 단위 규칙:
+- `.sp` — 폰트 크기 (`fontSize: 14.sp`)
+- `.r` — 정사각형 크기, 아이콘, `BorderRadius` (`width: 36.r`, `size: 20.r`, `BorderRadius.circular(12.r)`)
+- `.w` — 수평 간격·패딩 (`SizedBox(width: 14.w)`, `horizontal: 16.w`)
+- `.h` — 수직 간격·패딩 (`SizedBox(height: 10.h)`, `vertical: 8.h`)
+
+주의:
+- `const EdgeInsets`는 `.w`/`.h`/`.sp`와 함께 쓸 수 없다. `const` 키워드를 제거한다.
+- `CustomPainter` 내부처럼 canvas 크기가 `MediaQuery`로 이미 적응하는 경우엔 적용하지 않는다.
+- 자체 스케일 배율이 있는 위젯(예: 드래그로 크기 조절되는 뱃지)은 `.sp`를 먼저 적용 후 배율 곱하기: `fontSize: 36.sp * scale`.
 
 ### 시스템 네비게이션 바 패딩
-Android 제스처 내비게이션 또는 버튼 내비게이션 바가 화면 하단을 가린다. `showModalBottomSheet`를 사용할 때는 반드시 아래 두 가지를 적용한다:
-1. `useSafeArea: true` — 네비게이션 바 영역을 자동으로 피함
-2. 컨텐츠 하단 패딩에 `MediaQuery.of(ctx).viewPadding.bottom` 추가 — 내부 여백도 네비게이션 바 높이만큼 확보
+Android 제스처/버튼 내비게이션 바가 화면 하단을 가린다. `showModalBottomSheet`에는 반드시 아래 두 가지를 적용한다:
+1. `useSafeArea: true` — 네비게이션 바 영역 자동 회피
+2. 컨텐츠 하단 패딩에 `MediaQuery.of(ctx).viewPadding.bottom` 추가
 
-키보드 대응(`viewInsets.bottom`)과 네비게이션 바 대응(`viewPadding.bottom`)은 별개다. 키보드가 올라올 때 잘리는 경우는 `viewInsets.bottom`, 네비게이션 바에 잘리는 경우는 `viewPadding.bottom`을 사용한다.
+키보드(`viewInsets.bottom`)와 네비게이션 바(`viewPadding.bottom`)는 별개다.
 
 ```dart
 showModalBottomSheet(
@@ -125,6 +129,14 @@ showModalBottomSheet(
 
 ### 색상 인덱스 주의
 `Colors.grey`의 유효 인덱스는 50·100·200·300·400·500·600·700·800·**850**·**900**까지다. `Colors.grey[950]` 등 존재하지 않는 인덱스는 `null`을 반환하므로 `!` 연산자와 함께 쓰면 런타임 에러가 발생한다.
+
+### 플랫폼 대응
+Android/iOS 양 플랫폼을 지원한다. 플랫폼 분기가 필요한 경우 `Platform.isAndroid` / `Platform.isIOS`로 처리한다.
+- `SystemNavigator.pop()` — Android 전용이므로 반드시 `if (Platform.isAndroid)` 조건 필요 (iOS는 앱 강제 종료 불가)
+
+iOS 권한은 `ios/Runner/Info.plist`에서 관리한다. 현재 설정: 위치(`NSLocationWhenInUseUsageDescription`, `NSLocationAlwaysAndWhenInUseUsageDescription`), 배경 모드(`location`, `fetch`).
+
+---
 
 ## 명령어
 
@@ -150,6 +162,8 @@ dart run flutter_launcher_icons
 # 스플래시 화면 재생성
 dart run flutter_native_splash:create
 ```
+
+---
 
 ## 아키텍처
 
@@ -207,6 +221,39 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 
 `flutter_naver_map`은 `main()`에서 클라이언트 ID `ua4rpblyze`로 초기화된다. 지도 타입(basic/satellite/hybrid)은 `SettingsProvider.mapType`에 저장된다.
 
+---
+
+## 화면별 설계
+
+### 공통 자산
+
+억지로 묶지 않되, 동일한 로직이나 UI 패턴이 여러 곳에서 반복된다고 판단되면 `lib/utils/` 또는 `lib/widgets/`로 분리한다.
+
+- `lib/utils/format_utils.dart` — 속도·거리·시간·숫자 포맷, 단위 변환, 칼로리 계산
+- `lib/widgets/number_input_dialog.dart` — 숫자 키패드 입력 다이얼로그. `allowDecimal: true`로 소수점 입력 활성화 가능. 반환 타입 `double?`, 빈 확인 시 `clearValue(-1)` 반환
+- `lib/widgets/memo_bottom_sheet.dart` — 메모 입력 바텀시트. `showMemoBottomSheet(context, controller: ctrl)` 호출. 완료 시 `controller.text`에 값이 쓰여 반환되므로 호출 후 직접 읽으면 된다.
+- `lib/widgets/stat_item.dart` — 통계 표시 위젯 2종:
+  - `StatDetailItem(label, value, unit, textColor)` — 값(16px 굵게) + 단위(파란색, 선택) + 라벨(회색 11px). 주행 상세/요약 행에 사용.
+  - `StatItem(label, value, textColor, {labelBlue})` — 값(13px 굵게) + 라벨(기본 회색, `labelBlue: true`이면 파란색). 목록 카드 내 통계 행에 사용.
+- `lib/utils/backup_utils.dart` — 백업/복원 유틸. `shareBackup()` : 공유 시트 표시. `exportBackup()` : 파일 저장 위치 선택 → `true`=저장완료/`false`=취소. `pickBackupFile()` : 파일 선택 → 경로 반환(`null`=취소). `importFromPath(path, {onProgress})` : 파싱·삽입 → 새로 추가된 건수 반환. 가져오기 후 반드시 `ride.loadRecords()` 호출로 Provider 갱신.
+- `lib/utils/gpx_utils.dart` — GPX 내보내기 유틸. `shareGpx(record)` : 단일 주행 GPX 공유. `shareAllGpx()` : 전체 기록 다중 트랙 GPX 공유. 표준 GPX 1.1 포맷 (Strava 등 호환).
+- `lib/widgets/loading_overlay.dart` — 전화면 터치 차단 로딩 오버레이. `runWithLoading<T>(context, task: (setProgress) async { ... }, label: '...')` 호출. `setProgress(0.0~1.0)` 전달 시 진행률 바, `null` 전달 시 무한 스피너.
+
+### 설정 화면 구조
+
+설정 화면은 2단계 네비게이션으로 구성된다. `lib/screens/settings/` 폴더:
+- `settings_screen.dart` — 대메뉴 목록 (주행·화면·알림·지도·사용자·시스템)
+- `settings_widgets.dart` — 공통 위젯: `settingsIconBox`, `settingsPanelContainer`, `settingsOptionButton`
+- `settings_ride.dart` — 속도 측정 모드·자동 일시정지·최소 기록 거리/시간·단위·GPS
+- `settings_display.dart` — 주행 중 표시 항목·속도계 시계
+- `settings_alert.dart` — 속도 초과/미달 알림·거리 알림
+- `settings_map.dart` — 지도 스타일·경로 색상/두께·추적 모드
+- `settings_user.dart` — 체중
+- `settings_system.dart` — 테마·시작 탭·백업/내보내기·앱 정보·(개발 섹션)
+
+모든 설정 아이콘 색상은 `Colors.lightBlue`로 통일. 알림 타일의 Switch 색(red/lightBlue/green)은 의미색이므로 제외.
+앱 정보 상수(`_kAppName` 등)는 `_SettingsSystemScreenState`에서 수기 관리.
+
 ### 목표 화면 (`GoalScreen`)
 
 `RideProvider.records`와 `SettingsProvider` 목표값만으로 동작하며 별도 DB 없음. 구성:
@@ -218,23 +265,9 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 
 설정에서 켜면 두 가지 피드백이 동작한다:
 - **진동** — 임계값 상향 돌파 시 1회 `HapticFeedback.heavyImpact()` (edge-trigger)
-- **시각** — `currentSpeed >= speedAlertKmh`인 동안 속도계 숫자·게이지 호·바늘이 빨간색으로 변경. 하단 통계 카드는 색 변화 없음. `SpeedometerPainter`의 `isOverAlert` 파라미터로 제어.
+- **시각** — `currentSpeed >= speedAlertKmh`인 동안 속도계 숫자·게이지 호·바늘이 빨간색으로 변경. `SpeedometerPainter`의 `isOverAlert` 파라미터로 제어.
 
 속도 알림 최솟값은 릴리즈 1 km/h, 디버그 0 km/h (`kDebugMode` 분기).
-
-### 설정 화면 구조
-
-설정 화면은 2단계 네비게이션으로 구성된다. `lib/screens/settings/` 폴더:
-- `settings_screen.dart` — 대메뉴 목록 (주행·화면·알림·지도·사용자·시스템)
-- `settings_ride.dart` — 속도 측정 모드·자동 일시정지·최소 기록 거리/시간·단위·GPS
-- `settings_display.dart` — 주행 중 표시 항목·속도계 시계
-- `settings_alert.dart` — 속도 초과/미달 알림·거리 알림
-- `settings_map.dart` — 지도 스타일·경로 색상/두께·추적 모드
-- `settings_user.dart` — 체중
-- `settings_system.dart` — 테마·시작 탭·백업/내보내기·앱 정보·(개발 섹션)
-
-모든 설정 아이콘 색상은 `Colors.lightBlue`로 통일. 알림 타일의 Switch 색(red/lightBlue/green)은 의미색이므로 제외.
-앱 정보 상수(`_kAppName` 등)는 `_SettingsSystemScreenState`에서 수기 관리.
 
 ### 주요 설계 제약
 
@@ -243,11 +276,8 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 - `개발` 섹션(데이터 제거 / 데이터 생성)은 `kDebugMode`일 때만 표시 — 릴리즈 빌드에서 자동 숨김.
 - `wakelock_plus`로 주행 중 화면이 꺼지지 않도록 한다. `startRide()`에서 활성화, `stopRide()`에서 비활성화.
 
+---
+
 ## 미결 TODO
 
 - [ ] 지도 or 기타에 추가할 설정 고민
-- [x] 설정에서 아이콘, 버튼 색 정리 필요 — Colors.lightBlue 통일 (알림 Switch 색 제외)
-- [x] 설정 화면 2단계 네비게이션 구조로 재편 (대메뉴 → 상세 화면)
-- [x] 지도에서 현재 속도 나타내는 팝업 드래그 이동 기능
-- [x] 지도에서 현재 속도 나타내는 팝업 크기 조절 기능
-- [ ] 이후 CLAUDE.md, README.md 정리
