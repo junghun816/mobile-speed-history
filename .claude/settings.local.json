@@ -16,7 +16,9 @@
       "Bash(grep -rn \"NLocationTrackingMode\\\\|locationTrackingMode\\\\|trackingMode\" \"c:\\\\flutter-workspace\\\\speed-mobile\" 2>/dev/null; grep -rn \"NLocationTrackingMode\" \"C:\\\\Users\\\\jungh\\\\AppData\\\\Local\\\\Pub\\\\Cache\\\\hosted\\\\pub.dev\" 2>/dev/null | head -20)",
       "Read(//c/Users/jungh/AppData/Local/Pub/Cache/hosted/pub.dev/**)",
       "PowerShell(cd \"c:\\\\flutter-workspace\\\\speed-mobile\"; flutter analyze --no-fatal-infos 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 20)",
-      "Bash(del \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\settings_screen.dart\")"
+      "Bash(del \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\settings_screen.dart\")",
+      "Bash(flutter devices *)",
+      "Bash(flutter run *)"
     ]
   }
 }

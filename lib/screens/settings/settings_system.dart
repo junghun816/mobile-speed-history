@@ -10,6 +10,7 @@ import '../../providers/settings_provider.dart';
 import '../../utils/backup_utils.dart';
 import '../../utils/gpx_utils.dart';
 import '../../widgets/loading_overlay.dart';
+import 'settings_widgets.dart';
 
 class SettingsSystemScreen extends StatefulWidget {
   const SettingsSystemScreen({super.key});
@@ -62,7 +63,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _themeSelector(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+            _themeTile(settings, panelColor, titleColor, subtitleColor, btnBorderOff),
             const SizedBox(height: 10),
             _startTabTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
             const SizedBox(height: 10),
@@ -92,11 +93,8 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8, left: 4),
                 child: Text('개발',
-                    style: TextStyle(
-                        color: sectionColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0)),
+                    style: TextStyle(color: sectionColor, fontSize: 12,
+                        fontWeight: FontWeight.bold, letterSpacing: 1.0)),
               ),
               _navTile(
                 icon: Icons.delete_outline,
@@ -127,24 +125,21 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     );
   }
 
-  Widget _themeSelector(
+  Widget _themeTile(
     SettingsProvider settings,
     Color panelColor,
     Color titleColor,
     Color subtitleColor,
-    Color btnBgOff,
     Color btnBorderOff,
-    Color btnTextOff,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12)),
+    return settingsPanelContainer(
+      panelColor: panelColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              _iconBox(Icons.palette_outlined),
+              settingsIconBox(Icons.palette_outlined),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -163,15 +158,11 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(
-                child: _themeButton(settings, 'dark', Icons.dark_mode_outlined, 'Dark',
-                    fixedBg: Colors.grey[900]!, fixedFg: Colors.white, btnBorderOff: btnBorderOff),
-              ),
+              Expanded(child: _themeButton(settings, 'dark', Icons.dark_mode_outlined, 'Dark',
+                  fixedBg: Colors.grey[900]!, fixedFg: Colors.white, btnBorderOff: btnBorderOff)),
               const SizedBox(width: 6),
-              Expanded(
-                child: _themeButton(settings, 'light', Icons.light_mode_outlined, 'Light',
-                    fixedBg: Colors.white, fixedFg: Colors.black87, btnBorderOff: btnBorderOff),
-              ),
+              Expanded(child: _themeButton(settings, 'light', Icons.light_mode_outlined, 'Light',
+                  fixedBg: Colors.white, fixedFg: Colors.black87, btnBorderOff: btnBorderOff)),
             ],
           ),
         ],
@@ -179,11 +170,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     );
   }
 
-  Widget _themeButton(
-    SettingsProvider settings,
-    String theme,
-    IconData icon,
-    String label, {
+  Widget _themeButton(SettingsProvider settings, String theme, IconData icon, String label, {
     required Color fixedBg,
     required Color fixedFg,
     required Color btnBorderOff,
@@ -210,11 +197,8 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
             Icon(icon, color: fixedFg, size: 16),
             const SizedBox(width: 6),
             Text(label,
-                style: TextStyle(
-                  color: fixedFg,
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                )),
+                style: TextStyle(color: fixedFg, fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
           ],
         ),
       ),
@@ -231,16 +215,14 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     Color btnTextOff,
   ) {
     const labels = ['속도계', '지도', '기록', '목표', '설정'];
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12)),
+    return settingsPanelContainer(
+      panelColor: panelColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              _iconBox(Icons.home_outlined),
+              settingsIconBox(Icons.home_outlined),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -258,32 +240,14 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           ),
           const SizedBox(height: 12),
           Row(
-            children: List.generate(labels.length, (i) {
-              final isSelected = settings.startTab == i;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    SystemSound.play(SystemSoundType.click);
-                    settings.setStartTab(i);
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: isSelected ? Colors.lightBlue : btnBorderOff),
-                    ),
-                    child: Text(labels[i],
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: isSelected ? Colors.lightBlue : btnTextOff,
-                          fontSize: 11,
-                        )),
-                  ),
-                ),
-              );
-            }),
+            children: List.generate(labels.length, (i) => Expanded(
+              child: settingsOptionButton(
+                labels[i], settings.startTab == i, () => settings.setStartTab(i),
+                btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
+                fontSize: 11,
+                margin: EdgeInsets.only(right: i < labels.length - 1 ? 6 : 0),
+              ),
+            )),
           ),
         ],
       ),
@@ -308,14 +272,12 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
       },
       child: Opacity(
         opacity: onTap == null ? 0.5 : 1.0,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12)),
+        child: settingsPanelContainer(
+          panelColor: panelColor,
           child: Row(
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 36, height: 36,
                 decoration: BoxDecoration(
                   color: iconColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
@@ -328,36 +290,20 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: TextStyle(
-                            color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                        style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 2),
                     Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12)),
                   ],
                 ),
               ),
               isLoading
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: iconColor),
-                    )
+                  ? SizedBox(width: 20, height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: iconColor))
                   : Icon(Icons.chevron_right, color: subtitleColor, size: 20),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _iconBox(IconData icon) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: Colors.lightBlue.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Icon(icon, color: Colors.lightBlue, size: 20),
     );
   }
 
@@ -378,8 +324,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: 56, height: 56,
                 decoration: BoxDecoration(
                   color: Colors.lightBlue.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(16),
@@ -388,13 +333,10 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               ),
               const SizedBox(height: 14),
               Text(_kAppName,
-                  style: TextStyle(
-                      color: textColor, fontSize: 20, fontWeight: FontWeight.bold)),
+                  style: TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text(
-                _appVersion.isEmpty ? '-' : 'v$_appVersion',
-                style: const TextStyle(color: Colors.lightBlue, fontSize: 14),
-              ),
+              Text(_appVersion.isEmpty ? '-' : 'v$_appVersion',
+                  style: const TextStyle(color: Colors.lightBlue, fontSize: 14)),
               const SizedBox(height: 20),
               Divider(color: divColor, height: 1),
               const SizedBox(height: 16),
@@ -425,9 +367,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: TextStyle(color: subColor, fontSize: 13)),
-        Text(value,
-            style: TextStyle(
-                color: textColor, fontSize: 13, fontWeight: FontWeight.w500)),
+        Text(value, style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w500)),
       ],
     );
   }
@@ -451,169 +391,83 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('백업 / 내보내기',
-                style: TextStyle(
-                    color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
-            _backupOptionTile(
-              icon: Icons.share_outlined,
-              color: Colors.orange,
-              title: '공유하기',
-              subtitle: '카카오톡·메일 등 앱으로 전송',
-              textColor: textColor,
-              subColor: subColor,
-              panelColor: panelColor,
-              onTap: () async {
-                Navigator.pop(ctx);
-                setState(() => _isSharingExport = true);
-                try {
-                  await shareBackup();
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('공유 실패: $e'), backgroundColor: Colors.red),
-                    );
-                  }
-                } finally {
-                  if (mounted) setState(() => _isSharingExport = false);
-                }
-              },
-            ),
+            _backupOption(Icons.share_outlined, Colors.orange, '공유하기', '카카오톡·메일 등 앱으로 전송',
+                textColor, subColor, panelColor, () async {
+              Navigator.pop(ctx);
+              setState(() => _isSharingExport = true);
+              try { await shareBackup(); }
+              catch (e) { _showError('공유 실패: $e'); }
+              finally { if (mounted) setState(() => _isSharingExport = false); }
+            }),
             const SizedBox(height: 10),
-            _backupOptionTile(
-              icon: Icons.upload_file,
-              color: Colors.teal,
-              title: '파일로 저장',
-              subtitle: '기기 내 원하는 위치에 JSON 저장',
-              textColor: textColor,
-              subColor: subColor,
-              panelColor: panelColor,
-              onTap: () async {
-                Navigator.pop(ctx);
-                setState(() => _isExporting = true);
-                try {
-                  final saved = await exportBackup();
-                  if (mounted && saved) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('백업 파일이 저장되었습니다'),
-                        backgroundColor: Colors.teal,
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('내보내기 실패: $e'), backgroundColor: Colors.red),
-                    );
-                  }
-                } finally {
-                  if (mounted) setState(() => _isExporting = false);
+            _backupOption(Icons.upload_file, Colors.teal, '파일로 저장', '기기 내 원하는 위치에 JSON 저장',
+                textColor, subColor, panelColor, () async {
+              Navigator.pop(ctx);
+              setState(() => _isExporting = true);
+              try {
+                final saved = await exportBackup();
+                if (mounted && saved) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('백업 파일이 저장되었습니다'),
+                      backgroundColor: Colors.teal, duration: Duration(seconds: 2)));
                 }
-              },
-            ),
+              }
+              catch (e) { _showError('내보내기 실패: $e'); }
+              finally { if (mounted) setState(() => _isExporting = false); }
+            }),
             const SizedBox(height: 10),
-            _backupOptionTile(
-              icon: Icons.download,
-              color: Colors.lightBlue,
-              title: '가져오기',
-              subtitle: '백업 파일에서 기록 복원 (중복 제외)',
-              textColor: textColor,
-              subColor: subColor,
-              panelColor: panelColor,
-              onTap: () async {
-                Navigator.pop(ctx);
-                setState(() => _isImporting = true);
-                try {
-                  final path = await pickBackupFile();
-                  if (path == null) return;
-                  if (!mounted) return;
-
-                  final count = await runWithLoading<int>(
-                    context,
-                    label: '불러오는 중...',
-                    task: (setProgress) => importFromPath(path, onProgress: setProgress),
-                  );
-
-                  if (!mounted) return;
-                  await context.read<RideProvider>().loadRecords();
-                  if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(count > 0 ? '$count건 복원되었습니다' : '새로 추가된 기록이 없습니다'),
-                      backgroundColor: count > 0 ? Colors.teal : Colors.grey,
-                      duration: const Duration(seconds: 3),
-                    ),
-                  );
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('가져오기 실패: $e'), backgroundColor: Colors.red),
-                    );
-                  }
-                } finally {
-                  if (mounted) setState(() => _isImporting = false);
-                }
-              },
-            ),
+            _backupOption(Icons.download, Colors.lightBlue, '가져오기', '백업 파일에서 기록 복원 (중복 제외)',
+                textColor, subColor, panelColor, () async {
+              Navigator.pop(ctx);
+              setState(() => _isImporting = true);
+              try {
+                final path = await pickBackupFile();
+                if (path == null) return;
+                if (!mounted) return;
+                final count = await runWithLoading<int>(context, label: '불러오는 중...',
+                    task: (setProgress) => importFromPath(path, onProgress: setProgress));
+                if (!mounted) return;
+                await context.read<RideProvider>().loadRecords();
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(count > 0 ? '$count건 복원되었습니다' : '새로 추가된 기록이 없습니다'),
+                    backgroundColor: count > 0 ? Colors.teal : Colors.grey,
+                    duration: const Duration(seconds: 3)));
+              }
+              catch (e) { _showError('가져오기 실패: $e'); }
+              finally { if (mounted) setState(() => _isImporting = false); }
+            }),
             const SizedBox(height: 10),
-            _backupOptionTile(
-              icon: Icons.route,
-              color: Colors.deepPurple,
-              title: 'GPX 내보내기',
-              subtitle: '전체 기록을 GPX 파일로 공유 (Strava 등 호환)',
-              textColor: textColor,
-              subColor: subColor,
-              panelColor: panelColor,
-              onTap: () async {
-                Navigator.pop(ctx);
-                setState(() => _isExportingGpx = true);
-                try {
-                  await shareAllGpx();
-                } catch (e) {
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('GPX 내보내기 실패: $e'), backgroundColor: Colors.red),
-                    );
-                  }
-                } finally {
-                  if (mounted) setState(() => _isExportingGpx = false);
-                }
-              },
-            ),
+            _backupOption(Icons.route, Colors.deepPurple, 'GPX 내보내기', '전체 기록을 GPX 파일로 공유 (Strava 등 호환)',
+                textColor, subColor, panelColor, () async {
+              Navigator.pop(ctx);
+              setState(() => _isExportingGpx = true);
+              try { await shareAllGpx(); }
+              catch (e) { _showError('GPX 내보내기 실패: $e'); }
+              finally { if (mounted) setState(() => _isExportingGpx = false); }
+            }),
           ],
         ),
       ),
     );
   }
 
-  Widget _backupOptionTile({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required Color textColor,
-    required Color subColor,
-    required Color panelColor,
-    required VoidCallback onTap,
-  }) {
+  Widget _backupOption(
+    IconData icon, Color color, String title, String subtitle,
+    Color textColor, Color subColor, Color panelColor, VoidCallback onTap,
+  ) {
     return GestureDetector(
-      onTap: () {
-        SystemSound.play(SystemSoundType.click);
-        onTap();
-      },
+      onTap: () { SystemSound.play(SystemSoundType.click); onTap(); },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(12)),
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
-              ),
+              width: 36, height: 36,
+              decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(10)),
               child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(width: 14),
@@ -621,9 +475,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: TextStyle(
-                          color: textColor, fontSize: 14, fontWeight: FontWeight.bold)),
+                  Text(title, style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 2),
                   Text(subtitle, style: TextStyle(color: subColor, fontSize: 12)),
                 ],
@@ -636,6 +488,12 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     );
   }
 
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red));
+  }
+
   Future<void> _deleteAllData() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -643,14 +501,9 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         title: const Text('데이터 제거 확인'),
         content: const Text('모든 기록을 삭제합니다.\n되돌릴 수 없어요.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('삭제', style: TextStyle(color: Colors.red)),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('삭제', style: TextStyle(color: Colors.red))),
         ],
       ),
     );
@@ -661,13 +514,9 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     if (mounted) {
       await context.read<RideProvider>().loadRecords();
       setState(() => _isDeleting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('모든 기록이 삭제되었습니다'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
+          backgroundColor: Colors.red, duration: Duration(seconds: 2)));
     }
   }
 
@@ -678,14 +527,9 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         title: const Text('데이터 생성 확인'),
         content: const Text('기존 기록을 모두 지우고 임시 데이터를 생성합니다.\n되돌릴 수 없어요.'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('생성', style: TextStyle(color: Colors.lightBlue)),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('생성', style: TextStyle(color: Colors.lightBlue))),
         ],
       ),
     );
@@ -696,13 +540,9 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     if (mounted) {
       await context.read<RideProvider>().loadRecords();
       setState(() => _isGenerating = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('임시 데이터 생성 완료'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+          backgroundColor: Colors.green, duration: Duration(seconds: 2)));
     }
   }
 }
