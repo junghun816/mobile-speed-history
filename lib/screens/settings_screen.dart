@@ -603,8 +603,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // 화면
                   SizedBox(key: _sectionKeys[2]),
                   _sectionTitle('화면', sectionColor),
-                  _gaugeSpeedTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-                  const SizedBox(height: 10),
                   _displayItemsTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
                   const SizedBox(height: 10),
                   _clockDisplayTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
@@ -788,86 +786,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _gaugeSpeedTile(SettingsProvider settings, Color panelColor,
-      Color titleColor, Color subtitleColor, Color btnBgOff, Color btnBorderOff, Color btnTextOff) {
-    const speeds = [60, 120, 180, 240];
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: panelColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.indigo.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.speed, color: Colors.indigo, size: 20),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('게이지 최대속도 기본값',
-                        style: TextStyle(
-                            color: titleColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 2),
-                    Text('속도계 실행 시 기본 최대 눈금',
-                        style: TextStyle(color: subtitleColor, fontSize: 12)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: speeds.map((s) {
-              final isSelected = settings.defaultGaugeSpeed == s;
-              final isLast = s == speeds.last;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    SystemSound.play(SystemSoundType.click);
-                    settings.setDefaultGaugeSpeed(s);
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(right: isLast ? 0 : 6),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue.withOpacity(0.15) : btnBgOff,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected ? Colors.blue : btnBorderOff,
-                      ),
-                    ),
-                    child: Text(
-                      '$s',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: isSelected ? Colors.blue : btnTextOff,
-                        fontSize: 13,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _displayItemsTile(SettingsProvider settings, Color panelColor,
       Color titleColor, Color subtitleColor, Color btnBgOff, Color btnBorderOff, Color btnTextOff) {
@@ -2206,7 +2124,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final modeIcons = {
       SpeedMode.normal: Icons.directions_bike,
       SpeedMode.lowSpeed: Icons.directions_run,
-      SpeedMode.highSpeed: Icons.train,
     };
 
     return Container(

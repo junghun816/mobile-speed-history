@@ -174,9 +174,6 @@ class RideProvider extends ChangeNotifier {
       case SpeedMode.lowSpeed:
         _maxAccuracyMeters = 25.0;
         _minMovementMeters = 2.0;
-      case SpeedMode.highSpeed:
-        _maxAccuracyMeters = 50.0;
-        _minMovementMeters = 30.0;
       case SpeedMode.normal:
         _maxAccuracyMeters = 15.0;
         _minMovementMeters = 5.0;

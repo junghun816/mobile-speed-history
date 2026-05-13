@@ -8,7 +8,6 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyGpsHighAccuracy = 'gps_high_accuracy';
   static const _keyMinRecordDistance = 'min_record_distance';
   static const _keyAutoPause = 'auto_pause';
-  static const _keyDefaultGaugeSpeed = 'default_gauge_speed';
   static const _keyWeightKg = 'weight_kg';
   static const _keyShowDistance = 'show_distance';
   static const _keyShowDuration = 'show_duration';
@@ -38,7 +37,6 @@ class SettingsProvider extends ChangeNotifier {
   bool _gpsHighAccuracy = true;
   double _minRecordDistanceKm = 0.1;
   bool _autoPause = false;
-  int _defaultGaugeSpeed = 60;
   double? _weightKg;
   bool _showDistance = true;
   bool _showDuration = true;
@@ -68,7 +66,6 @@ class SettingsProvider extends ChangeNotifier {
   bool get gpsHighAccuracy => _gpsHighAccuracy;
   double get minRecordDistanceKm => _minRecordDistanceKm;
   bool get autoPause => _autoPause;
-  int get defaultGaugeSpeed => _defaultGaugeSpeed;
   double? get weightKg => _weightKg;
   bool get showDistance => _showDistance;
   bool get showDuration => _showDuration;
@@ -101,7 +98,6 @@ class SettingsProvider extends ChangeNotifier {
     _gpsHighAccuracy = prefs.getBool(_keyGpsHighAccuracy) ?? true;
     _minRecordDistanceKm = prefs.getDouble(_keyMinRecordDistance) ?? 0.1;
     _autoPause = prefs.getBool(_keyAutoPause) ?? false;
-    _defaultGaugeSpeed = prefs.getInt(_keyDefaultGaugeSpeed) ?? 60;
     _weightKg = prefs.getDouble(_keyWeightKg);
     _showDistance = prefs.getBool(_keyShowDistance) ?? true;
     _showDuration = prefs.getBool(_keyShowDuration) ?? true;
@@ -172,13 +168,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyAutoPause, value);
-  }
-
-  Future<void> setDefaultGaugeSpeed(int value) async {
-    _defaultGaugeSpeed = value;
-    notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyDefaultGaugeSpeed, value);
   }
 
   Future<void> setWeightKg(double? value) async {

@@ -20,8 +20,7 @@ class SpeedometerScreen extends StatefulWidget {
 
 class _SpeedometerScreenState extends State<SpeedometerScreen>
     with WidgetsBindingObserver {
-  double _maxSpeed = 60;
-  bool _initialized = false;
+  static const double _maxSpeed = 60;
   bool _locationGranted = true;
 
   @override
@@ -50,18 +49,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
         permission == LocationPermission.whileInUse;
     if (mounted && granted != _locationGranted) {
       setState(() => _locationGranted = granted);
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_initialized) {
-      _maxSpeed = context
-          .read<SettingsProvider>()
-          .defaultGaugeSpeed
-          .toDouble();
-      _initialized = true;
     }
   }
 
@@ -141,15 +128,8 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
               },
             ),
 
-          // 속도계 게이지 (탭으로 최대속도 순환)
-          GestureDetector(
-            onTap: () {
-              SystemSound.play(SystemSoundType.click);
-              const steps = [60.0, 120.0, 180.0, 240.0];
-              final nextIdx = (steps.indexOf(_maxSpeed) + 1) % steps.length;
-              setState(() => _maxSpeed = steps[nextIdx]);
-            },
-            child: Center(
+          // 속도계 게이지
+          Center(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.75,
                 height: MediaQuery.of(context).size.width * 0.75,
@@ -188,7 +168,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                   ),
                 ),
               ),
-            ),
           ),
 
           const SizedBox(height: 2),
@@ -506,9 +485,8 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
 
   Widget _speedModeBadge(SpeedMode mode) {
     final (icon, color, label) = switch (mode) {
-      SpeedMode.normal => (Icons.directions_bike, Colors.blue, '일반'),
-      SpeedMode.lowSpeed => (Icons.directions_run, Colors.deepOrange, '저속'),
-      SpeedMode.highSpeed => (Icons.train, Colors.purple, '고속'),
+      SpeedMode.normal => (Icons.directions_bike, Colors.blue, '자전거'),
+      SpeedMode.lowSpeed => (Icons.directions_run, Colors.deepOrange, '런닝'),
     };
     return Container(
       width: 60,

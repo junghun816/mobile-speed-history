@@ -1,16 +1,13 @@
 enum SpeedMode {
   normal,
-  lowSpeed,
-  highSpeed;
+  lowSpeed;
 
   String get label {
     switch (this) {
       case SpeedMode.normal:
-        return '일반';
+        return '자전거';
       case SpeedMode.lowSpeed:
-        return '저속';
-      case SpeedMode.highSpeed:
-        return '고속';
+        return '런닝';
     }
   }
 
@@ -20,8 +17,6 @@ enum SpeedMode {
         return '자전거·킥보드 등 일반 주행';
       case SpeedMode.lowSpeed:
         return '런닝·워킹 등 느린 이동';
-      case SpeedMode.highSpeed:
-        return 'KTX·고속도로 등 빠른 이동';
     }
   }
 
