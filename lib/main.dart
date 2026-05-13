@@ -12,7 +12,7 @@ import 'screens/speedometer_screen.dart';
 import 'screens/map_screen.dart';
 import 'screens/history/history_screen.dart';
 import 'screens/goal_screen.dart';
-import 'screens/settings_screen.dart';
+import 'screens/settings/settings_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/foreground_service.dart';
 
