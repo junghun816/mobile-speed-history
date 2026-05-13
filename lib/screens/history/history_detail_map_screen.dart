@@ -57,12 +57,12 @@ class _HistoryDetailMapScreenState extends State<HistoryDetailMapScreen> {
     final points = _parsePathPoints();
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    final bgColor = isDark ? Colors.black : Colors.white;
-    final cardColor = isDark ? Colors.grey[900]! : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final dividerColor = isDark ? Colors.grey[700]! : Colors.grey[300]!;
+    final bgColor = cs.surface;
+    final cardColor = cs.surfaceContainer;
+    final textColor = cs.onSurface;
+    final dividerColor = cs.outlineVariant;
 
     NLatLng initialPosition = const NLatLng(37.5665, 126.9780);
     if (points.isNotEmpty) {

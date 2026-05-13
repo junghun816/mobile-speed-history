@@ -275,13 +275,13 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _speedBadgeWidget(RideProvider ride, SettingsProvider settings) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
     final s = _badgeScale;
     return Container(
       key: _badgeWidgetKey,
       padding: EdgeInsets.symmetric(horizontal: 14.w * s, vertical: 8.h * s),
       decoration: BoxDecoration(
-        color: (isDark ? Colors.black : Colors.white).withOpacity(0.82),
+        color: cs.surface.withOpacity(0.82),
         borderRadius: BorderRadius.circular(14.r * s),
         border: _isResizeMode
             ? Border.all(color: Colors.blue.withOpacity(0.7), width: 1.5)
@@ -294,7 +294,7 @@ class _MapScreenState extends State<MapScreen> {
           Text(
             formatSpeed(ride.currentSpeed, settings.useKmh),
             style: TextStyle(
-              color: isDark ? Colors.white : Colors.black87,
+              color: cs.onSurface,
               fontSize: 36.sp * s,
               fontWeight: FontWeight.bold,
               height: 1.0,

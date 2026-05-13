@@ -56,13 +56,13 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
     final records = context.watch<RideProvider>().records;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    final cardColor = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final panelColor = isDark ? Colors.grey[900]! : const Color(0xFFEEF0F3);
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final dividerColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
-    final borderColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
+    final cardColor = cs.surfaceContainer;
+    final panelColor = cs.surfaceContainerHighest;
+    final textColor = cs.onSurface;
+    final dividerColor = cs.outlineVariant;
+    final borderColor = cs.outlineVariant;
 
     final Map<int, List<RideRecord>> grouped = {};
     for (final r in records) {
@@ -142,7 +142,7 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
             child: Text(
               '막대를 탭하면 상세 정보를 볼 수 있어요',
               style: TextStyle(
-                  color: isDark ? Colors.grey : Colors.grey[600],
+                  color: cs.onSurfaceVariant,
                   fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),

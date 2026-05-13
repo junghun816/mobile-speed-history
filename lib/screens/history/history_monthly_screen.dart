@@ -25,8 +25,8 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
   bool _showHeatmap = true;
   int _selectedYear = DateTime.now().year;
 
-  Color _heatmapColor(double value, double maxValue, bool isDark) {
-    if (value <= 0) return isDark ? Colors.grey[850]! : Colors.grey[200]!;
+  Color _heatmapColor(double value, double maxValue, ColorScheme cs) {
+    if (value <= 0) return cs.surfaceContainerHighest;;
     final ratio = (value / maxValue).clamp(0.0, 1.0);
     return Color.lerp(
       Colors.blue.withOpacity(0.2),
@@ -41,13 +41,13 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
     final records = context.watch<RideProvider>().records;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    final cardColor = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final panelColor = isDark ? Colors.grey[900]! : const Color(0xFFEEF0F3);
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final dividerColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
-    final borderColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
+    final cardColor = cs.surfaceContainer;
+    final panelColor = cs.surfaceContainerHighest;
+    final textColor = cs.onSurface;
+    final dividerColor = cs.outlineVariant;
+    final borderColor = cs.outlineVariant;
 
     final allYears = records.map((r) => r.year).toSet().toList()..sort();
     if (allYears.isNotEmpty && !allYears.contains(_selectedYear)) {
@@ -190,7 +190,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
             child: Text(
               '막대를 탭하면 상세 정보를 볼 수 있어요',
               style: TextStyle(
-                  color: isDark ? Colors.grey : Colors.grey[600], fontSize: 14.sp),
+                  color: cs.onSurfaceVariant, fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
           ),
@@ -295,7 +295,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                                 style: TextStyle(
                                   color: d == '토' || d == '일'
                                       ? Colors.orange
-                                      : (isDark ? Colors.grey : Colors.grey[600]!),
+                                      : cs.onSurfaceVariant,
                                   fontSize: 11.sp,
                                 ),
                               ),
@@ -308,7 +308,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                             selectedMonth,
                             dailyDistance,
                             maxDailyDist,
-                            isDark,
+                            cs,
                           ),
                         ],
                       ],
@@ -320,7 +320,6 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                     selectedMonth,
                     selectedRecords,
                     useKmh,
-                    isDark,
                     cardColor,
                     panelColor,
                     textColor,
@@ -362,7 +361,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
 
   Widget _buildWeeklyBreakdown(
       int year, int month, List<RideRecord> records, bool useKmh,
-      bool isDark, Color cardColor, Color panelColor, Color textColor, Color borderColor) {
+      Color cardColor, Color panelColor, Color textColor, Color borderColor) {
     if (records.isEmpty) return const SizedBox();
 
     final weeklyStats = _getWeeklyStats(year, month, records);
@@ -454,7 +453,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
       int month,
       Map<int, double> dailyDistance,
       double maxDist,
-      bool isDark,
+      ColorScheme cs,
       ) {
     final firstDay = DateTime(year, month, 1);
     final startOffset = (firstDay.weekday - 1) % 7;
@@ -475,7 +474,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
             }
 
             final dist = dailyDistance[day] ?? 0.0;
-            final color = _heatmapColor(dist, maxDist, isDark);
+            final color = _heatmapColor(dist, maxDist, cs);
             final isToday = DateTime.now().year == year &&
                 DateTime.now().month == month &&
                 DateTime.now().day == day;
@@ -499,7 +498,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                     style: TextStyle(
                       color: dist > 0
                           ? Colors.white
-                          : (isDark ? Colors.grey[600]! : Colors.grey[500]!),
+                          : cs.onSurfaceVariant,
                       fontSize: 11.sp,
                       fontWeight: dist > 0 ? FontWeight.bold : FontWeight.normal,
                     ),

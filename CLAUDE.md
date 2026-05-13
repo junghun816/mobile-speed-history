@@ -85,12 +85,14 @@ SystemSound.play(SystemSoundType.click);
 Flutter의 일부 위젯(예: `Switch`, `Checkbox`, `Radio`, `DropdownButton`)은 자체적으로 시스템 음을 출력하므로 별도 처리가 필요 없다. 그 외 `GestureDetector`, `InkWell` 등 커스텀 탭 영역에는 반드시 명시적으로 추가한다.
 
 ### 반응형 UI (flutter_screenutil)
-`flutter_screenutil: ^5.9.3`을 사용해 기기별 크기 대응을 한다. 기준 해상도는 **360×780** (Galaxy S22+ dp 기준 — 실제 테스트 기기).
+`flutter_screenutil: ^5.9.3`을 사용해 기기별 크기 대응을 한다. 기준 해상도는 **390×844**.
+
+> 테스트 기기는 Galaxy S22+(dp 360×780)지만, screenutil 적용 후 이 값을 기준으로 UI 크기를 보정해왔으므로 designSize는 390×844를 유지한다. 기준 해상도를 바꾸면 S22+에서 scale이 1.0이 되어 기존 값들이 8% 더 크게 보인다.
 
 `main.dart`에서 `MaterialApp`을 `ScreenUtilInit`으로 감싼다:
 ```dart
 ScreenUtilInit(
-  designSize: const Size(360, 780),
+  designSize: const Size(390, 844),
   minTextAdapt: true,
   builder: (context, child) => MaterialApp(...),
 )

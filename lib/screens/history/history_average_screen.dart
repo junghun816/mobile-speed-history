@@ -16,17 +16,18 @@ class HistoryAverageScreen extends StatelessWidget {
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    final cardColor = isDark ? Colors.grey[900]! : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final subTextColor = isDark ? Colors.grey : Colors.grey[600]!;
+    final cardColor = cs.surfaceContainer;
+    final textColor = cs.onSurface;
+    final subTextColor = cs.onSurfaceVariant;
 
     if (records.isEmpty) {
       return Center(
         child: Text(
           '아직 주행기록이 없어요',
           style: TextStyle(
-            color: isDark ? Colors.grey : Colors.grey[600],
+            color: cs.onSurfaceVariant,
             fontSize: 16.sp,
           ),
         ),

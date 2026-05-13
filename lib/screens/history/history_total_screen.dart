@@ -65,13 +65,11 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
   }
 
   void _showSortOptions() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
+    final cs = Theme.of(context).colorScheme;
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: sheetBg,
+      backgroundColor: cs.surfaceContainer,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -85,7 +83,7 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
                 child: Text(
                   '정렬 기준',
                   style: TextStyle(
-                    color: textColor,
+                    color: cs.onSurface,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -118,7 +116,7 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
                   title: Text(
                     label,
                     style: TextStyle(
-                      color: isSelected ? Colors.blue : textColor,
+                      color: isSelected ? Colors.blue : cs.onSurface,
                       fontSize: 14.sp,
                     ),
                   ),
@@ -140,9 +138,10 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
     }).toList();
   }
 
-  void _confirmDelete(BuildContext context, bool isDark) {
-    final dialogBg = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
+  void _confirmDelete(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final dialogBg = cs.surfaceContainer;
+    final textColor = cs.onSurface;
 
     showDialog(
       context: context,
@@ -231,17 +230,17 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    final cardColor = isDark ? Colors.grey[900]! : Colors.white;
-    final panelColor = isDark ? Colors.grey[900]! : Colors.white;
-    final dropdownBg = isDark ? const Color(0xFF2a2a2a) : Colors.grey[100]!;
-    final deleteBg = isDark ? Colors.black : const Color(0xFFF2F4F7);
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final subTextColor = isDark ? Colors.grey : Colors.grey[600]!;
-    final borderColor = isDark ? Colors.grey[700]! : Colors.grey[300]!;
-    final resetBtnColor = isDark ? Colors.grey[800]! : Colors.grey[200]!;
-    final sortBtnColor = isDark ? Colors.grey[800]! : Colors.grey[200]!;
+    final cardColor = cs.surfaceContainer;
+    final panelColor = cs.surfaceContainer;
+    final dropdownBg = cs.surfaceContainerHighest;
+    final deleteBg = cs.surface;
+    final textColor = cs.onSurface;
+    final subTextColor = cs.onSurfaceVariant;
+    final borderColor = cs.outlineVariant;
+    final resetBtnColor = cs.surfaceContainerHighest;
+    final sortBtnColor = cs.surfaceContainerHighest;
 
     final filtered = _sortedRecords(_filteredRecords(records));
     final years = records.map((r) => r.year).toSet().toList()..sort();
@@ -408,7 +407,7 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
                                   ? null
                                   : () {
                                       SystemSound.play(SystemSoundType.click);
-                                      _showRecordDetail(context, record, useKmh, weightKg, isDark);
+                                      _showRecordDetail(context, record, useKmh, weightKg);
                                     },
                               child: AnimatedOpacity(
                                 duration: const Duration(milliseconds: 200),
@@ -527,7 +526,7 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 14.h),
                           decoration: BoxDecoration(
-                            color: isDark ? Colors.grey[800]! : Colors.grey[300]!,
+                            color: cs.outlineVariant,
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Text(
@@ -547,7 +546,7 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
                       child: GestureDetector(
                         onTap: () {
                           SystemSound.play(SystemSoundType.click);
-                          _confirmDelete(context, isDark);
+                          _confirmDelete(context);
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -577,7 +576,8 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
   }
 
   void _showRecordDetail(BuildContext context, RideRecord record,
-      bool useKmh, double? weightKg, bool isDark) {
+      bool useKmh, double? weightKg) {
+    final cs = Theme.of(context).colorScheme;
     final ride = context.read<RideProvider>();
     final int? calories = calcCalories(record.totalDistance, weightKg);
     final ctrl = TextEditingController(text: record.memo ?? '');
@@ -585,10 +585,10 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
     final timeStr = '${time.hour.toString().padLeft(2, '0')}:'
         '${time.minute.toString().padLeft(2, '0')}';
 
-    final dialogBg = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final memoBoxColor = isDark ? Colors.grey[900]! : Colors.grey[100]!;
-    final btnBg = isDark ? Colors.grey[800]! : Colors.grey[200]!;
-    final textColor = isDark ? Colors.white : Colors.black87;
+    final dialogBg = cs.surfaceContainer;
+    final memoBoxColor = cs.surfaceContainerHighest;
+    final btnBg = cs.surfaceContainerHighest;
+    final textColor = cs.onSurface;
     bool isSharing = false;
 
     showDialog(

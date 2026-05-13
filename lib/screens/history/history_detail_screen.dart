@@ -29,11 +29,11 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
 
   Future<void> _pickDateFromCalendar() async {
     final records = context.read<RideProvider>().records;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final dialogBg = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final dropdownBg = isDark ? const Color(0xFF2a2a2a) : Colors.grey[100]!;
-    final textColor = isDark ? Colors.white : Colors.black87;
+    final cs = Theme.of(context).colorScheme;
+    final sheetBg = cs.surfaceContainer;
+    final dialogBg = cs.surfaceContainer;
+    final dropdownBg = cs.surfaceContainerHighest;
+    final textColor = cs.onSurface;
 
     final recordedDays = records
         .map((r) => DateTime(r.year, r.month, r.day))
@@ -199,7 +199,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                         defaultTextStyle: TextStyle(color: textColor),
                         weekendTextStyle: TextStyle(color: textColor),
                         outsideTextStyle:
-                            TextStyle(color: isDark ? Colors.grey[700] : Colors.grey[400]),
+                            TextStyle(color: cs.outlineVariant),
                         selectedDecoration: const BoxDecoration(
                           color: Colors.blue,
                           shape: BoxShape.circle,
@@ -222,10 +222,8 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                         rightChevronIcon: Icon(Icons.chevron_right, color: textColor),
                       ),
                       daysOfWeekStyle: DaysOfWeekStyle(
-                        weekdayStyle: TextStyle(
-                            color: isDark ? Colors.grey : Colors.grey[600]!),
-                        weekendStyle: TextStyle(
-                            color: isDark ? Colors.grey : Colors.grey[600]!),
+                        weekdayStyle: TextStyle(color: cs.onSurfaceVariant),
+                        weekendStyle: TextStyle(color: cs.onSurfaceVariant),
                       ),
                       eventLoader: (day) {
                         final key = DateTime(day.year, day.month, day.day);
@@ -243,12 +241,12 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
   }
 
   void _showSelectPicker() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final dropdownBg = isDark ? const Color(0xFF2a2a2a) : Colors.grey[100]!;
-    final boxColor = isDark ? Colors.grey[900]! : Colors.grey[200]!;
-    final borderColor = isDark ? Colors.grey[700]! : Colors.grey[300]!;
+    final cs = Theme.of(context).colorScheme;
+    final sheetBg = cs.surfaceContainer;
+    final textColor = cs.onSurface;
+    final dropdownBg = cs.surfaceContainerHighest;
+    final boxColor = cs.surfaceContainerHighest;
+    final borderColor = cs.outlineVariant;
 
     int tempYear = _selectedDate.year;
     int tempMonth = _selectedDate.month;
@@ -408,14 +406,14 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    final bgColor = isDark ? Colors.black : const Color(0xFFF2F4F7);
-    final cardColor = isDark ? Colors.grey[900]! : Colors.white;
-    final navBtnColor = isDark ? Colors.grey[800]! : Colors.grey[200]!;
-    final navBtnDisabledColor = isDark ? Colors.grey[850]! : Colors.grey[300]!;
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final subTextColor = isDark ? Colors.grey : Colors.grey[600]!;
+    final bgColor = cs.surface;
+    final cardColor = cs.surfaceContainer;
+    final navBtnColor = cs.surfaceContainerHighest;
+    final navBtnDisabledColor = cs.surfaceContainer;
+    final textColor = cs.onSurface;
+    final subTextColor = cs.onSurfaceVariant;
 
     final dayRecords = records.where((r) =>
     r.year == _selectedDate.year &&
@@ -611,7 +609,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                   return GestureDetector(
                     onTap: () {
                       SystemSound.play(SystemSoundType.click);
-                      _showRecordDetail(context, record, useKmh, weightKg, isDark);
+                      _showRecordDetail(context, record, useKmh, weightKg);
                     },
                     child: Container(
                       margin: EdgeInsets.only(bottom: 12.h),
@@ -663,7 +661,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                                     child: Text(
                                       '📝 ${record.memo}',
                                       style: TextStyle(
-                                          color: isDark ? Colors.grey[400]! : Colors.grey[600]!,
+                                          color: cs.onSurfaceVariant,
                                           fontSize: 12.sp),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -685,7 +683,8 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
   }
 
   void _showRecordDetail(BuildContext context, RideRecord record,
-      bool useKmh, double? weightKg, bool isDark) {
+      bool useKmh, double? weightKg) {
+    final cs = Theme.of(context).colorScheme;
     final ride = context.read<RideProvider>();
     final int? calories = calcCalories(record.totalDistance, weightKg);
     final ctrl = TextEditingController(text: record.memo ?? '');
@@ -693,10 +692,10 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
     final timeStr = '${time.hour.toString().padLeft(2, '0')}:'
         '${time.minute.toString().padLeft(2, '0')}';
 
-    final dialogBg = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final memoBoxColor = isDark ? Colors.grey[900]! : Colors.grey[100]!;
-    final btnBg = isDark ? Colors.grey[800]! : Colors.grey[200]!;
-    final textColor = isDark ? Colors.white : Colors.black87;
+    final dialogBg = cs.surfaceContainer;
+    final memoBoxColor = cs.surfaceContainerHighest;
+    final btnBg = cs.surfaceContainerHighest;
+    final textColor = cs.onSurface;
     bool isSharing = false;
 
     showDialog(

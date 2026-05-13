@@ -60,8 +60,9 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
     return result;
   }
 
-  Widget _recentButton(String label, int days, bool isDark) {
+  Widget _recentButton(String label, int days) {
     final isSelected = _recentDays == days;
+    final cs = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () {
         SystemSound.play(SystemSoundType.click);
@@ -76,12 +77,12 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
         decoration: BoxDecoration(
           color: isSelected
               ? Colors.orange.withOpacity(0.2)
-              : (isDark ? Colors.grey[850]! : Colors.grey[200]!),
+              : cs.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
             color: isSelected
                 ? Colors.orange
-                : (isDark ? Colors.grey[700]! : Colors.grey[400]!),
+                : cs.outlineVariant,
           ),
         ),
         child: Text(
@@ -89,7 +90,7 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
           style: TextStyle(
             color: isSelected
                 ? Colors.orange
-                : (isDark ? Colors.grey : Colors.grey[600]!),
+                : cs.onSurfaceVariant,
             fontSize: 12.sp,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
@@ -106,13 +107,13 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
-    final cardColor = isDark ? const Color(0xFF1e1e1e) : Colors.white;
-    final panelColor = isDark ? Colors.grey[900]! : const Color(0xFFEEF0F3);
-    final textColor = isDark ? Colors.white : Colors.black87;
-    final dividerColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
-    final borderColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
+    final cardColor = cs.surfaceContainer;
+    final panelColor = cs.surfaceContainerHighest;
+    final textColor = cs.onSurface;
+    final dividerColor = cs.outlineVariant;
+    final borderColor = cs.outlineVariant;
 
     final allYears = records.map((r) => r.year).toSet().toList()..sort();
     if (allYears.isNotEmpty && !allYears.contains(_selectedYear)) {
@@ -251,15 +252,15 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
           child: Row(
             children: [
-              Expanded(child: _recentButton('7일', 7, isDark)),
+              Expanded(child: _recentButton('7일', 7)),
               SizedBox(width: 6.w),
-              Expanded(child: _recentButton('30일', 30, isDark)),
+              Expanded(child: _recentButton('30일', 30)),
               SizedBox(width: 6.w),
-              Expanded(child: _recentButton('90일', 90, isDark)),
+              Expanded(child: _recentButton('90일', 90)),
               SizedBox(width: 6.w),
-              Expanded(child: _recentButton('180일', 180, isDark)),
+              Expanded(child: _recentButton('180일', 180)),
               SizedBox(width: 6.w),
-              Expanded(child: _recentButton('365일', 365, isDark)),
+              Expanded(child: _recentButton('365일', 365)),
             ],
           ),
         ),
@@ -375,14 +376,14 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                           style: TextStyle(
                             color: isWeekend
                                 ? Colors.orange
-                                : (isDark ? Colors.grey : Colors.grey[600]!),
+                                : cs.onSurfaceVariant,
                             fontSize: 11.sp,
                           ),
                         ),
                         Text(
                           '${count}회',
                           style: TextStyle(
-                            color: isDark ? Colors.grey : Colors.grey[500]!,
+                            color: cs.onSurfaceVariant,
                             fontSize: 9.sp,
                           ),
                         ),
@@ -403,7 +404,7 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
             child: Text(
               '막대를 탭하면 상세 정보를 볼 수 있어요',
               style: TextStyle(
-                  color: isDark ? Colors.grey : Colors.grey[600], fontSize: 14.sp),
+                  color: cs.onSurfaceVariant, fontSize: 14.sp),
               textAlign: TextAlign.center,
             ),
           ),
@@ -415,7 +416,7 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
               child: Text(
                 '해당 날짜에 기록이 없어요',
                 style: TextStyle(
-                    color: isDark ? Colors.grey : Colors.grey[600],
+                    color: cs.onSurfaceVariant,
                     fontSize: 14.sp),
               ),
             )
@@ -564,7 +565,7 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                                       child: Text(
                                         '📝 ${record.memo}',
                                         style: TextStyle(
-                                            color: isDark ? Colors.grey[400]! : Colors.grey[600]!,
+                                            color: cs.onSurfaceVariant,
                                             fontSize: 12.sp),
                                         overflow: TextOverflow.ellipsis,
                                       ),
