@@ -33,7 +33,8 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyMapTrackingMode = 'map_tracking_mode';
   static const _keyStartTab = 'start_tab';
   static const _keyRunningVoiceGuidance = 'running_voice_guidance';
-  static const _keyCadenceFeedbackType = 'cadence_feedback_type';
+  static const _keyCadenceVibration = 'cadence_vibration';
+  static const _keyCadenceSound = 'cadence_sound';
   static const _keyDefaultCadenceBpm = 'default_cadence_bpm';
   static const _keyDefaultTargetPaceSecPerKm = 'default_target_pace_sec_per_km';
 
@@ -68,7 +69,8 @@ class SettingsProvider extends ChangeNotifier {
   String _mapTrackingMode = 'none';
   int _startTab = 0;
   bool _runningVoiceGuidance = true;
-  String _cadenceFeedbackType = 'vibration'; // 'vibration' | 'sound'
+  bool _cadenceVibration = true;
+  bool _cadenceSound = false;
   int? _defaultCadenceBpm;
   int? _defaultTargetPaceSecPerKm;
 
@@ -102,7 +104,8 @@ class SettingsProvider extends ChangeNotifier {
   String get mapTrackingMode => _mapTrackingMode;
   int get startTab => _startTab;
   bool get runningVoiceGuidance => _runningVoiceGuidance;
-  String get cadenceFeedbackType => _cadenceFeedbackType;
+  bool get cadenceVibration => _cadenceVibration;
+  bool get cadenceSound => _cadenceSound;
   int? get defaultCadenceBpm => _defaultCadenceBpm;
   int? get defaultTargetPaceSecPerKm => _defaultTargetPaceSecPerKm;
 
@@ -144,7 +147,8 @@ class SettingsProvider extends ChangeNotifier {
     _mapTrackingMode = _prefs.getString(_keyMapTrackingMode) ?? 'none';
     _startTab = _prefs.getInt(_keyStartTab) ?? 0;
     _runningVoiceGuidance = _prefs.getBool(_keyRunningVoiceGuidance) ?? true;
-    _cadenceFeedbackType = _prefs.getString(_keyCadenceFeedbackType) ?? 'vibration';
+    _cadenceVibration = _prefs.getBool(_keyCadenceVibration) ?? true;
+    _cadenceSound = _prefs.getBool(_keyCadenceSound) ?? false;
     _defaultCadenceBpm = _prefs.getInt(_keyDefaultCadenceBpm);
     _defaultTargetPaceSecPerKm = _prefs.getInt(_keyDefaultTargetPaceSecPerKm);
     notifyListeners();
@@ -357,10 +361,16 @@ class SettingsProvider extends ChangeNotifier {
     await _prefs.setBool(_keyRunningVoiceGuidance, value);
   }
 
-  Future<void> setCadenceFeedbackType(String value) async {
-    _cadenceFeedbackType = value;
+  Future<void> setCadenceVibration(bool value) async {
+    _cadenceVibration = value;
     notifyListeners();
-    await _prefs.setString(_keyCadenceFeedbackType, value);
+    await _prefs.setBool(_keyCadenceVibration, value);
+  }
+
+  Future<void> setCadenceSound(bool value) async {
+    _cadenceSound = value;
+    notifyListeners();
+    await _prefs.setBool(_keyCadenceSound, value);
   }
 
   Future<void> setDefaultCadenceBpm(int? value) async {
@@ -372,7 +382,7 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   Future<void> setDefaultTargetPaceSecPerKm(int? value) async {
-    _defaultTargetPaceSecPerKm = value != null ? value.clamp(60, 1800) : null;
+    _defaultTargetPaceSecPerKm = value != null ? value.clamp(60, 600) : null;
     notifyListeners();
     _defaultTargetPaceSecPerKm != null
         ? await _prefs.setInt(_keyDefaultTargetPaceSecPerKm, _defaultTargetPaceSecPerKm!)

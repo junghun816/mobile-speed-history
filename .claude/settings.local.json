@@ -18,7 +18,8 @@
       "PowerShell(cd \"c:\\\\flutter-workspace\\\\speed-mobile\"; flutter analyze --no-fatal-infos 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 20)",
       "Bash(del \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\settings_screen.dart\")",
       "Bash(flutter devices *)",
-      "Bash(flutter run *)"
+      "Bash(flutter run *)",
+      "Bash(findstr -i \"audioplayers\\\\|vibration\\\\|just_audio\")"
     ]
   }
 }

@@ -17,10 +17,6 @@ class SettingsRunningScreen extends StatelessWidget {
     final panelColor = cs.surfaceContainer;
     final titleColor = cs.onSurface;
     final subtitleColor = cs.onSurfaceVariant;
-    final btnBgOff = cs.surfaceContainerHighest;
-    final btnBorderOff = cs.outlineVariant;
-    final btnTextOff = cs.onSurfaceVariant;
-
     return Scaffold(
       appBar: AppBar(title: const Text('런닝')),
       body: SafeArea(
@@ -39,27 +35,35 @@ class SettingsRunningScreen extends StatelessWidget {
               subtitleColor: subtitleColor,
             ),
             SizedBox(height: 10.h),
-            _toggleTile(
+            _switchTile(
+              context: context,
               icon: Icons.vibration,
-              title: '케이던스 피드백',
-              subtitle: 'BPM 박자 알림 방식',
-              leftLabel: '진동',
-              rightLabel: '소리',
-              isLeft: settings.cadenceFeedbackType == 'vibration',
-              onToggle: (v) => settings.setCadenceFeedbackType(v ? 'vibration' : 'sound'),
+              title: '케이던스 진동',
+              subtitle: 'BPM 박자에 맞춰 진동',
+              value: settings.cadenceVibration,
+              onChanged: (v) => settings.setCadenceVibration(v),
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
-              btnBgOff: btnBgOff,
-              btnBorderOff: btnBorderOff,
-              btnTextOff: btnTextOff,
+            ),
+            SizedBox(height: 10.h),
+            _switchTile(
+              context: context,
+              icon: Icons.volume_up_outlined,
+              title: '케이던스 소리',
+              subtitle: 'BPM 박자에 맞춰 미디어 음 출력',
+              value: settings.cadenceSound,
+              onChanged: (v) => settings.setCadenceSound(v),
+              panelColor: panelColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
             ),
             SizedBox(height: 10.h),
             _inputTile(
               context: context,
               icon: Icons.music_note_outlined,
               title: '케이던스 BPM',
-              subtitle: '0이면 비활성. 주행 시작 시 적용',
+              subtitle: '40~240 BPM. 설정 안 하면 비활성',
               value: settings.defaultCadenceBpm != null
                   ? '${settings.defaultCadenceBpm} bpm'
                   : '비활성',
@@ -83,7 +87,7 @@ class SettingsRunningScreen extends StatelessWidget {
               context: context,
               icon: Icons.directions_run,
               title: '목표 페이스',
-              subtitle: '초과 시 진동 경고. 설정 안 하면 비활성',
+              subtitle: '1:00~10:00 min/km. 초과 시 진동 경고',
               value: settings.defaultTargetPaceSecPerKm != null
                   ? '${formatPace(settings.defaultTargetPaceSecPerKm!)} min/km'
                   : '비활성',
@@ -145,54 +149,6 @@ class SettingsRunningScreen extends StatelessWidget {
             Icon(Icons.chevron_right, color: cs.onSurfaceVariant, size: 18.r),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _toggleTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String leftLabel,
-    required String rightLabel,
-    required bool isLeft,
-    required void Function(bool) onToggle,
-    required Color panelColor,
-    required Color titleColor,
-    required Color subtitleColor,
-    required Color btnBgOff,
-    required Color btnBorderOff,
-    required Color btnTextOff,
-  }) {
-    return settingsPanelContainer(
-      panelColor: panelColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              settingsIconBox(icon),
-              SizedBox(width: 14.w),
-              Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Row(
-            children: [
-              Expanded(
-                child: settingsOptionButton(leftLabel, isLeft, () => onToggle(true),
-                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
-                    fontSize: 13),
-              ),
-              SizedBox(width: 6.w),
-              Expanded(
-                child: settingsOptionButton(rightLabel, !isLeft, () => onToggle(false),
-                    btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
-                    fontSize: 13),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

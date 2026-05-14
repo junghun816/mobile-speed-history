@@ -149,7 +149,8 @@ class RideProvider extends ChangeNotifier {
     int? cadenceBpm,
     int? targetPaceSecPerKm,
     bool voiceGuidance = false,
-    bool cadenceUseSound = false,
+    bool cadenceVibration = true,
+    bool cadenceSound = false,
   }) async {
     final hasPermission = await LocationService.requestPermission();
     if (!hasPermission) return;
@@ -210,7 +211,7 @@ class RideProvider extends ChangeNotifier {
         });
 
     if (cadenceBpm != null) {
-      _cadenceService.start(cadenceBpm, useSound: cadenceUseSound);
+      _cadenceService.start(cadenceBpm, useVibration: cadenceVibration, useSound: cadenceSound);
     }
     if (voiceGuidance) {
       await VoiceGuidanceService.instance.init();

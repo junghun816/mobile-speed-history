@@ -340,8 +340,8 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                             : null,
                         voiceGuidance: _selectedActivityType == 'run' &&
                             settings.runningVoiceGuidance,
-                        cadenceUseSound:
-                            settings.cadenceFeedbackType == 'sound',
+                        cadenceVibration: settings.cadenceVibration,
+                        cadenceSound: settings.cadenceSound,
                       );
                     }
                   },
