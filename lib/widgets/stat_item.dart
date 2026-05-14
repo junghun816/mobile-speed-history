@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StatDetailItem extends StatelessWidget {
   final String label;
@@ -20,11 +21,11 @@ class StatDetailItem extends StatelessWidget {
       children: [
         Text(value,
             style: TextStyle(
-                color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                color: textColor, fontSize: 16.sp, fontWeight: FontWeight.bold)),
         if (unit.isNotEmpty)
-          Text(unit, style: const TextStyle(color: Colors.blue, fontSize: 11)),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+          Text(unit, style: TextStyle(color: Colors.blue, fontSize: 11.sp)),
+        SizedBox(height: 4.h),
+        Text(label, style: TextStyle(color: Colors.grey, fontSize: 11.sp)),
       ],
     );
   }
@@ -52,16 +53,16 @@ class StatItem extends StatelessWidget {
           value,
           style: TextStyle(
             color: textColor,
-            fontSize: 13,
+            fontSize: 13.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         Text(
           label,
           style: TextStyle(
             color: labelBlue ? Colors.blue : Colors.grey,
-            fontSize: 11,
+            fontSize: 11.sp,
           ),
         ),
       ],

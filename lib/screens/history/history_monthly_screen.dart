@@ -7,6 +7,7 @@ import '../../providers/ride_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../widgets/bar_chart_widget.dart';
 import '../../utils/format_utils.dart';
+import '../../widgets/stat_item.dart';
 
 class HistoryMonthlyScreen extends StatefulWidget {
   const HistoryMonthlyScreen({super.key});
@@ -224,18 +225,10 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _statItem('총 거리',
-                                '${formatDistance(totalDistance, useKmh)} ${distanceUnit(useKmh)}',
-                                isBlue: true, textColor: textColor),
-                            _statItem('총 시간',
-                                formatDuration(totalDuration),
-                                isBlue: true, textColor: textColor),
-                            _statItem('최고속도',
-                                '${formatSpeed(maxSpeed, useKmh)} ${speedUnit(useKmh)}',
-                                isBlue: true, textColor: textColor),
-                            _statItem('평균속도',
-                                '${formatSpeed(avgSpeed, useKmh)} ${speedUnit(useKmh)}',
-                                isBlue: true, textColor: textColor),
+                            StatItem(label: '총 거리', value: '${formatDistance(totalDistance, useKmh)} ${distanceUnit(useKmh)}', textColor: textColor, labelBlue: true),
+                            StatItem(label: '총 시간', value: formatDuration(totalDuration), textColor: textColor, labelBlue: true),
+                            StatItem(label: '최고속도', value: '${formatSpeed(maxSpeed, useKmh)} ${speedUnit(useKmh)}', textColor: textColor, labelBlue: true),
+                            StatItem(label: '평균속도', value: '${formatSpeed(avgSpeed, useKmh)} ${speedUnit(useKmh)}', textColor: textColor, labelBlue: true),
                           ],
                         ),
                         SizedBox(height: 8.h),
@@ -427,16 +420,10 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _statItem('거리',
-                          '${formatDistance(distance, useKmh)} ${distanceUnit(useKmh)}',
-                          textColor: textColor),
-                      _statItem('시간', formatDuration(duration), textColor: textColor),
-                      _statItem('최고속도',
-                          '${formatSpeed(maxSpeed, useKmh)} ${speedUnit(useKmh)}',
-                          textColor: textColor),
-                      _statItem('평균속도',
-                          '${formatSpeed(avgSpeed, useKmh)} ${speedUnit(useKmh)}',
-                          textColor: textColor),
+                      StatItem(label: '거리', value: '${formatDistance(distance, useKmh)} ${distanceUnit(useKmh)}', textColor: textColor),
+                      StatItem(label: '시간', value: formatDuration(duration), textColor: textColor),
+                      StatItem(label: '최고속도', value: '${formatSpeed(maxSpeed, useKmh)} ${speedUnit(useKmh)}', textColor: textColor),
+                      StatItem(label: '평균속도', value: '${formatSpeed(avgSpeed, useKmh)} ${speedUnit(useKmh)}', textColor: textColor),
                     ],
                   ),
                 ],
@@ -520,27 +507,4 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
     );
   }
 
-  Widget _statItem(String label, String value,
-      {bool isBlue = false, required Color textColor}) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 13.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          label,
-          style: TextStyle(
-            color: isBlue ? Colors.blue : Colors.grey,
-            fontSize: 11.sp,
-          ),
-        ),
-      ],
-    );
-  }
 }

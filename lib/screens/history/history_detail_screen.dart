@@ -55,84 +55,15 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
         return StatefulBuilder(
           builder: (context, setModalState) {
             void showYearMonthPicker() {
-              int tempYear = focusedDay.year;
-              int tempMonth = focusedDay.month;
-
-              showDialog(
-                context: ctx,
-                builder: (dialogCtx) => StatefulBuilder(
-                  builder: (dialogCtx, setDialogState) {
-                    return AlertDialog(
-                      backgroundColor: dialogBg,
-                      title: Text(
-                        '연도 / 월 선택',
-                        style: TextStyle(color: textColor, fontSize: 15.sp),
-                      ),
-                      content: Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButton<int>(
-                              value: tempYear,
-                              isExpanded: true,
-                              dropdownColor: dropdownBg,
-                              style: TextStyle(color: textColor),
-                              underline: const SizedBox(),
-                              items: recordYears
-                                  .map((y) => DropdownMenuItem(
-                                        value: y,
-                                        child: Text('$y년'),
-                                      ))
-                                  .toList(),
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setDialogState(() => tempYear = v);
-                                }
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-                          Expanded(
-                            child: DropdownButton<int>(
-                              value: tempMonth,
-                              isExpanded: true,
-                              dropdownColor: dropdownBg,
-                              style: TextStyle(color: textColor),
-                              underline: const SizedBox(),
-                              items: List.generate(12, (i) => i + 1)
-                                  .map((m) => DropdownMenuItem(
-                                        value: m,
-                                        child: Text('$m월'),
-                                      ))
-                                  .toList(),
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setDialogState(() => tempMonth = v);
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(dialogCtx),
-                          child: const Text('취소',
-                              style: TextStyle(color: Colors.grey)),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setModalState(() {
-                              focusedDay = DateTime(tempYear, tempMonth, 1);
-                            });
-                            Navigator.pop(dialogCtx);
-                          },
-                          child: const Text('이동',
-                              style: TextStyle(color: Colors.blue)),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+              _showYearMonthPickerDialog(
+                ctx: ctx,
+                initialYear: focusedDay.year,
+                initialMonth: focusedDay.month,
+                recordYears: recordYears,
+                dialogBg: dialogBg,
+                dropdownBg: dropdownBg,
+                textColor: textColor,
+                onConfirm: (date) => setModalState(() => focusedDay = date),
               );
             }
 
@@ -234,6 +165,79 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
           },
         );
       },
+    );
+  }
+
+  void _showYearMonthPickerDialog({
+    required BuildContext ctx,
+    required int initialYear,
+    required int initialMonth,
+    required List<int> recordYears,
+    required Color dialogBg,
+    required Color dropdownBg,
+    required Color textColor,
+    required void Function(DateTime) onConfirm,
+  }) {
+    int tempYear = initialYear;
+    int tempMonth = initialMonth;
+
+    showDialog(
+      context: ctx,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (dialogCtx, setDialogState) => AlertDialog(
+          backgroundColor: dialogBg,
+          title: Text('연도 / 월 선택',
+              style: TextStyle(color: textColor, fontSize: 15.sp)),
+          content: Row(
+            children: [
+              Expanded(
+                child: DropdownButton<int>(
+                  value: tempYear,
+                  isExpanded: true,
+                  dropdownColor: dropdownBg,
+                  style: TextStyle(color: textColor),
+                  underline: const SizedBox(),
+                  items: recordYears
+                      .map((y) => DropdownMenuItem(value: y, child: Text('$y년')))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setDialogState(() => tempYear = v);
+                  },
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: DropdownButton<int>(
+                  value: tempMonth,
+                  isExpanded: true,
+                  dropdownColor: dropdownBg,
+                  style: TextStyle(color: textColor),
+                  underline: const SizedBox(),
+                  items: List.generate(12, (i) => i + 1)
+                      .map((m) => DropdownMenuItem(value: m, child: Text('$m월')))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setDialogState(() => tempMonth = v);
+                  },
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('취소', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                onConfirm(DateTime(tempYear, tempMonth, 1));
+                Navigator.pop(dialogCtx);
+              },
+              child: const Text('이동', style: TextStyle(color: Colors.blue)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
