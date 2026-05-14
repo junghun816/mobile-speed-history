@@ -279,6 +279,20 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 - `개발` 섹션(데이터 제거 / 데이터 생성)은 `kDebugMode`일 때만 표시 — 릴리즈 빌드에서 자동 숨김.
 - `wakelock_plus`로 주행 중 화면이 꺼지지 않도록 한다. `startRide()`에서 활성화, `stopRide()`에서 비활성화.
 
+### 활동 종목별 설정 적용 규칙 (중요)
+
+설정은 적용 범위에 따라 세 가지로 구분된다. 코드 수정 시 반드시 이 규칙을 따른다.
+
+| 구분 | 설정 항목 | 적용 조건 |
+|---|---|---|
+| **공통** | 자동정지, GPS 정확도, 단위, 최소 기록 거리/시간, 화면 표시 항목, 지도, 사용자, 시스템 | 자전거·런닝 모두 |
+| **자전거 전용** | 속도 초과 알림, 속도 미달 알림, 거리 알림 | `activityType == 'bike'`일 때만 |
+| **런닝 전용** | 음성 안내, 케이던스 BPM, 목표 페이스 알림 | `activityType == 'run'`일 때만 |
+
+구현 위치 (`speedometer_screen.dart`):
+- `startRide()` 호출 시 자전거 전용 파라미터(`speedAlertKmh`, `speedMinAlertKmh`, `distanceAlertKm`)는 `isBike ? value : null`로 전달한다.
+- 시각 경고(`isOverAlert`, `isUnderAlert`) 계산 시 `ride.isRiding && ride.activityType == 'bike'` 조건을 반드시 포함한다. `ride.isRiding`만으로 체크하면 런닝 중에도 자전거 알림이 활성화되는 버그가 발생한다.
+
 ---
 
 ## 미결 TODO
