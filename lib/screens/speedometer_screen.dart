@@ -10,7 +10,6 @@ import '../models/ride_record.dart';
 import '../utils/format_utils.dart';
 import '../widgets/memo_bottom_sheet.dart';
 import '../widgets/stat_item.dart';
-import '../models/speed_mode.dart';
 
 class SpeedometerScreen extends StatefulWidget {
   const SpeedometerScreen({super.key});
@@ -261,21 +260,13 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
               children: [
-                // 왼쪽: 주행 중 - 속도 모드 배지 / 비주행 시 - 활동 종목 선택
+                // 왼쪽: 주행 중 - 활동 종목 표시 (잠금) / 비주행 시 - 활동 종목 선택
                 Expanded(
-                  child: ride.isRiding
-                      ? Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              SystemSound.play(SystemSoundType.click);
-                              final modes = SpeedMode.values;
-                              final next = modes[(ride.currentSpeedMode.index + 1) % modes.length];
-                              ride.changeSpeedMode(next);
-                            },
-                            child: _speedModeBadge(ride.currentSpeedMode),
-                          ),
-                        )
-                      : Center(child: _activityTypeBadge()),
+                  child: Center(
+                    child: ride.isRiding
+                        ? _activityTypeLockedBadge(ride.activityType)
+                        : _activityTypeBadge(),
+                  ),
                 ),
                 // 중앙: 시작/정지 버튼
                 GestureDetector(
@@ -536,6 +527,39 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     );
   }
 
+  Widget _activityTypeLockedBadge(String activityType) {
+    final isBike = activityType == 'bike';
+    final color = isBike ? Colors.blue : Colors.deepOrange;
+    return Container(
+      width: 60.r,
+      height: 60.r,
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: color.withOpacity(0.25)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isBike ? Icons.directions_bike : Icons.directions_run,
+            color: color.withOpacity(0.7),
+            size: 22.r,
+          ),
+          SizedBox(height: 3.h),
+          Text(
+            isBike ? '자전거' : '런닝',
+            style: TextStyle(
+              color: color.withOpacity(0.7),
+              fontSize: 11.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _activityTypeBadge() {
     final isBike = _selectedActivityType == 'bike';
     return GestureDetector(
@@ -574,37 +598,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _speedModeBadge(SpeedMode mode) {
-    final (icon, color, label) = switch (mode) {
-      SpeedMode.normal => (Icons.directions_bike, Colors.blue, '자전거'),
-      SpeedMode.lowSpeed => (Icons.directions_run, Colors.deepOrange, '런닝'),
-    };
-    return Container(
-      width: 60.r,
-      height: 60.r,
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: color.withOpacity(0.35)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 22.r),
-          SizedBox(height: 3.h),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 11.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }

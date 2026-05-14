@@ -21,7 +21,7 @@ class SettingsAlertScreen extends StatelessWidget {
     final inactiveTrackColor = cs.outlineVariant;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('알림')),
+      appBar: AppBar(title: const Text('자전거')),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.all(16.r),

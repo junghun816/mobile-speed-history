@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'settings_ride.dart';
+import 'settings_running.dart';
 import 'settings_display.dart';
 import 'settings_alert.dart';
 import 'settings_map.dart';
@@ -25,13 +26,33 @@ class SettingsScreen extends StatelessWidget {
           padding: EdgeInsets.all(16.r),
           children: [
             settingsTile(
-              icon: Icons.directions_bike_outlined,
-              title: '주행',
-              subtitle: '속도 모드 · 자동정지 · GPS · 단위',
+              icon: Icons.tune,
+              title: '일반',
+              subtitle: '자동정지 · GPS · 단위',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsRideScreen())),
+            ),
+            SizedBox(height: 10.h),
+            settingsTile(
+              icon: Icons.directions_bike,
+              title: '자전거',
+              subtitle: '속도 초과 · 미달 · 거리 알림',
+              panelColor: panelColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsAlertScreen())),
+            ),
+            SizedBox(height: 10.h),
+            settingsTile(
+              icon: Icons.directions_run,
+              title: '런닝',
+              subtitle: '음성 안내 · 케이던스 · 목표 페이스',
+              panelColor: panelColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsRunningScreen())),
             ),
             SizedBox(height: 10.h),
             settingsTile(
@@ -42,16 +63,6 @@ class SettingsScreen extends StatelessWidget {
               titleColor: titleColor,
               subtitleColor: subtitleColor,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsDisplayScreen())),
-            ),
-            SizedBox(height: 10.h),
-            settingsTile(
-              icon: Icons.notifications_outlined,
-              title: '알림',
-              subtitle: '속도 초과 · 미달 · 거리',
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsAlertScreen())),
             ),
             SizedBox(height: 10.h),
             settingsTile(
