@@ -175,7 +175,7 @@ Android/iOS를 지원하는 자전거 속도계 앱. 상태관리는 **Provider*
 
 **`RideProvider`** (`lib/providers/ride_provider.dart`) — 앱의 핵심 런타임 상태 머신. GPS 스트림 구독, 200ms 보간 타이머, 거리 누적, 자동 일시정지 로직, 속도 알림 진동을 담당한다. `startRide()`로 스트림을 열고, `stopRide()`로 취소하고 DB에 기록을 저장한다. 최소 거리/시간 조건 미달 시 `null`을 반환하며 `stopFailReason`에 원인(`'distance'` 또는 `'duration'`)을 설정한다.
 
-**`SettingsProvider`** (`lib/providers/settings_provider.dart`) — 모든 사용자 설정을 `SharedPreferences`로 영속화하는 래퍼. 앱 시작 시 `main()`에서 `settings.load()`를 호출한다. 각 setter는 `notifyListeners()` 후 즉시 `await prefs.set*()`으로 기록한다. 목표 관련 설정(`yearlyGoalKm`, `monthlyGoalKm`, `goalMaxSpeedKmh`, `goalMaxDistanceKm`, `goalMaxDurationMin`)도 이 Provider에서 관리한다.
+**`SettingsProvider`** (`lib/providers/settings_provider.dart`) — 모든 사용자 설정을 `SharedPreferences`로 영속화하는 래퍼. 앱 시작 시 `main()`에서 `settings.load()`를 호출하며, 이때 `SharedPreferences` 인스턴스를 `_prefs` 필드에 캐싱한다. 각 setter는 `notifyListeners()` 후 즉시 `await _prefs.set*()`으로 기록한다. 목표 관련 설정(`yearlyGoalKm`, `monthlyGoalKm`, `goalMaxSpeedKmh`, `goalMaxDistanceKm`, `goalMaxDurationMin`)도 이 Provider에서 관리한다.
 
 두 Provider는 `main.dart`의 루트 `MultiProvider`에서 제공된다.
 
@@ -240,6 +240,7 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 - `lib/utils/backup_utils.dart` — 백업/복원 유틸. `shareBackup()` : 공유 시트 표시. `exportBackup()` : 파일 저장 위치 선택 → `true`=저장완료/`false`=취소. `pickBackupFile()` : 파일 선택 → 경로 반환(`null`=취소). `importFromPath(path, {onProgress})` : 파싱·삽입 → 새로 추가된 건수 반환. 가져오기 후 반드시 `ride.loadRecords()` 호출로 Provider 갱신.
 - `lib/utils/gpx_utils.dart` — GPX 내보내기 유틸. `shareGpx(record)` : 단일 주행 GPX 공유. `shareAllGpx()` : 전체 기록 다중 트랙 GPX 공유. 표준 GPX 1.1 포맷 (Strava 등 호환).
 - `lib/widgets/loading_overlay.dart` — 전화면 터치 차단 로딩 오버레이. `runWithLoading<T>(context, task: (setProgress) async { ... }, label: '...')` 호출. `setProgress(0.0~1.0)` 전달 시 진행률 바, `null` 전달 시 무한 스피너.
+- `lib/widgets/record_detail_dialog.dart` — 주행 기록 상세 팝업. `showRecordDetailDialog(context, record, useKmh, weightKg)` 호출. 날짜/시간·통계 4종·칼로리·메모 입력·경로 보기·GPX 공유 버튼 포함. `history_total_screen`, `history_detail_screen` 양쪽에서 공용.
 
 ### 설정 화면 구조
 

@@ -33,6 +33,8 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyMapTrackingMode = 'map_tracking_mode';
   static const _keyStartTab = 'start_tab';
 
+  late SharedPreferences _prefs;
+
   bool _useKmh = true;
   bool _gpsHighAccuracy = true;
   double _minRecordDistanceKm = 0.1;
@@ -93,42 +95,42 @@ class SettingsProvider extends ChangeNotifier {
   int get startTab => _startTab;
 
   Future<void> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    _useKmh = prefs.getBool(_keyUseKmh) ?? true;
-    _gpsHighAccuracy = prefs.getBool(_keyGpsHighAccuracy) ?? true;
-    _minRecordDistanceKm = prefs.getDouble(_keyMinRecordDistance) ?? 0.1;
-    _autoPause = prefs.getBool(_keyAutoPause) ?? false;
-    _weightKg = prefs.getDouble(_keyWeightKg);
-    _showDistance = prefs.getBool(_keyShowDistance) ?? true;
-    _showDuration = prefs.getBool(_keyShowDuration) ?? true;
-    _showMaxSpeed = prefs.getBool(_keyShowMaxSpeed) ?? true;
-    _showAvgSpeed = prefs.getBool(_keyShowAvgSpeed) ?? true;
-    _appTheme = prefs.getString(_keyAppTheme) ?? 'dark';
-    _minRecordDurationSec = prefs.getInt(_keyMinRecordDuration) ?? 0;
-    _speedAlertKmh = prefs.getDouble(_keySpeedAlertKmh);
-    _speedMinAlertKmh = prefs.getDouble(_keySpeedMinAlertKmh);
-    _mapType = prefs.getString(_keyMapType) ?? 'basic';
-    _yearlyGoalKm = prefs.getDouble(_keyYearlyGoalKm);
-    _monthlyGoalKm = prefs.getDouble(_keyMonthlyGoalKm);
-    _goalMaxSpeedKmh = prefs.getDouble(_keyGoalMaxSpeedKmh);
-    _goalMaxDistanceKm = prefs.getDouble(_keyGoalMaxDistanceKm);
-    _goalMaxDurationMin = prefs.getInt(_keyGoalMaxDurationMin);
-    _onboardingDone = prefs.getBool(_keyOnboardingDone) ?? false;
-    final speedModeStr = prefs.getString(_keySpeedMode);
+    _prefs = await SharedPreferences.getInstance();
+    _useKmh = _prefs.getBool(_keyUseKmh) ?? true;
+    _gpsHighAccuracy = _prefs.getBool(_keyGpsHighAccuracy) ?? true;
+    _minRecordDistanceKm = _prefs.getDouble(_keyMinRecordDistance) ?? 0.1;
+    _autoPause = _prefs.getBool(_keyAutoPause) ?? false;
+    _weightKg = _prefs.getDouble(_keyWeightKg);
+    _showDistance = _prefs.getBool(_keyShowDistance) ?? true;
+    _showDuration = _prefs.getBool(_keyShowDuration) ?? true;
+    _showMaxSpeed = _prefs.getBool(_keyShowMaxSpeed) ?? true;
+    _showAvgSpeed = _prefs.getBool(_keyShowAvgSpeed) ?? true;
+    _appTheme = _prefs.getString(_keyAppTheme) ?? 'dark';
+    _minRecordDurationSec = _prefs.getInt(_keyMinRecordDuration) ?? 0;
+    _speedAlertKmh = _prefs.getDouble(_keySpeedAlertKmh);
+    _speedMinAlertKmh = _prefs.getDouble(_keySpeedMinAlertKmh);
+    _mapType = _prefs.getString(_keyMapType) ?? 'basic';
+    _yearlyGoalKm = _prefs.getDouble(_keyYearlyGoalKm);
+    _monthlyGoalKm = _prefs.getDouble(_keyMonthlyGoalKm);
+    _goalMaxSpeedKmh = _prefs.getDouble(_keyGoalMaxSpeedKmh);
+    _goalMaxDistanceKm = _prefs.getDouble(_keyGoalMaxDistanceKm);
+    _goalMaxDurationMin = _prefs.getInt(_keyGoalMaxDurationMin);
+    _onboardingDone = _prefs.getBool(_keyOnboardingDone) ?? false;
+    final speedModeStr = _prefs.getString(_keySpeedMode);
     if (speedModeStr != null) {
       _speedMode = SpeedMode.fromString(speedModeStr);
     } else {
       // 구버전 low_speed_mode bool 마이그레이션
-      _speedMode = (prefs.getBool(_keyLowSpeedMode) ?? false)
+      _speedMode = (_prefs.getBool(_keyLowSpeedMode) ?? false)
           ? SpeedMode.lowSpeed
           : SpeedMode.normal;
     }
-    _distanceAlertKm = prefs.getInt(_keyDistanceAlertKm);
-    _clockDisplay = prefs.getString(_keyClockDisplay) ?? 'none';
-    _pathColor = prefs.getString(_keyPathColor) ?? 'blue';
-    _pathThickness = prefs.getInt(_keyPathThickness) ?? 5;
-    _mapTrackingMode = prefs.getString(_keyMapTrackingMode) ?? 'none';
-    _startTab = prefs.getInt(_keyStartTab) ?? 0;
+    _distanceAlertKm = _prefs.getInt(_keyDistanceAlertKm);
+    _clockDisplay = _prefs.getString(_keyClockDisplay) ?? 'none';
+    _pathColor = _prefs.getString(_keyPathColor) ?? 'blue';
+    _pathThickness = _prefs.getInt(_keyPathThickness) ?? 5;
+    _mapTrackingMode = _prefs.getString(_keyMapTrackingMode) ?? 'none';
+    _startTab = _prefs.getInt(_keyStartTab) ?? 0;
     notifyListeners();
   }
 
@@ -136,8 +138,7 @@ class SettingsProvider extends ChangeNotifier {
     _onboardingSkippedThisSession = true;
     if (neverShowAgain) {
       _onboardingDone = true;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_keyOnboardingDone, true);
+      await _prefs.setBool(_keyOnboardingDone, true);
     }
     notifyListeners();
   }
@@ -145,82 +146,71 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setUseKmh(bool value) async {
     _useKmh = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyUseKmh, value);
+    await _prefs.setBool(_keyUseKmh, value);
   }
 
   Future<void> setGpsHighAccuracy(bool value) async {
     _gpsHighAccuracy = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyGpsHighAccuracy, value);
+    await _prefs.setBool(_keyGpsHighAccuracy, value);
   }
 
   Future<void> setMinRecordDistanceKm(double value) async {
     _minRecordDistanceKm = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_keyMinRecordDistance, value);
+    await _prefs.setDouble(_keyMinRecordDistance, value);
   }
 
   Future<void> setAutoPause(bool value) async {
     _autoPause = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyAutoPause, value);
+    await _prefs.setBool(_keyAutoPause, value);
   }
 
   Future<void> setWeightKg(double? value) async {
     _weightKg = value != null ? value.clamp(1.0, 999.0) : null;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     if (_weightKg != null) {
-      await prefs.setDouble(_keyWeightKg, _weightKg!);
+      await _prefs.setDouble(_keyWeightKg, _weightKg!);
     } else {
-      await prefs.remove(_keyWeightKg);
+      await _prefs.remove(_keyWeightKg);
     }
   }
 
   Future<void> setShowDistance(bool value) async {
     _showDistance = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyShowDistance, value);
+    await _prefs.setBool(_keyShowDistance, value);
   }
 
   Future<void> setShowDuration(bool value) async {
     _showDuration = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyShowDuration, value);
+    await _prefs.setBool(_keyShowDuration, value);
   }
 
   Future<void> setShowMaxSpeed(bool value) async {
     _showMaxSpeed = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyShowMaxSpeed, value);
+    await _prefs.setBool(_keyShowMaxSpeed, value);
   }
 
   Future<void> setShowAvgSpeed(bool value) async {
     _showAvgSpeed = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyShowAvgSpeed, value);
+    await _prefs.setBool(_keyShowAvgSpeed, value);
   }
 
   Future<void> setAppTheme(String value) async {
     _appTheme = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyAppTheme, value);
+    await _prefs.setString(_keyAppTheme, value);
   }
 
   Future<void> setMinRecordDurationSec(int value) async {
     _minRecordDurationSec = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyMinRecordDuration, value);
+    await _prefs.setInt(_keyMinRecordDuration, value);
   }
 
   Future<void> setSpeedAlertKmh(double? value) async {
@@ -229,15 +219,13 @@ class SettingsProvider extends ChangeNotifier {
     if (_speedAlertKmh != null && _speedMinAlertKmh != null &&
         _speedAlertKmh! <= _speedMinAlertKmh!) {
       _speedMinAlertKmh = null;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_keySpeedMinAlertKmh);
+      await _prefs.remove(_keySpeedMinAlertKmh);
     }
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     if (_speedAlertKmh != null) {
-      await prefs.setDouble(_keySpeedAlertKmh, _speedAlertKmh!);
+      await _prefs.setDouble(_keySpeedAlertKmh, _speedAlertKmh!);
     } else {
-      await prefs.remove(_keySpeedAlertKmh);
+      await _prefs.remove(_keySpeedAlertKmh);
     }
   }
 
@@ -247,118 +235,103 @@ class SettingsProvider extends ChangeNotifier {
     if (_speedMinAlertKmh != null && _speedAlertKmh != null &&
         _speedMinAlertKmh! >= _speedAlertKmh!) {
       _speedAlertKmh = null;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_keySpeedAlertKmh);
+      await _prefs.remove(_keySpeedAlertKmh);
     }
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     if (_speedMinAlertKmh != null) {
-      await prefs.setDouble(_keySpeedMinAlertKmh, _speedMinAlertKmh!);
+      await _prefs.setDouble(_keySpeedMinAlertKmh, _speedMinAlertKmh!);
     } else {
-      await prefs.remove(_keySpeedMinAlertKmh);
+      await _prefs.remove(_keySpeedMinAlertKmh);
     }
   }
 
   Future<void> setMapType(String value) async {
     _mapType = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyMapType, value);
+    await _prefs.setString(_keyMapType, value);
   }
 
   Future<void> setYearlyGoalKm(double? value) async {
     _yearlyGoalKm = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     value != null
-        ? await prefs.setDouble(_keyYearlyGoalKm, value)
-        : await prefs.remove(_keyYearlyGoalKm);
+        ? await _prefs.setDouble(_keyYearlyGoalKm, value)
+        : await _prefs.remove(_keyYearlyGoalKm);
   }
 
   Future<void> setMonthlyGoalKm(double? value) async {
     _monthlyGoalKm = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     value != null
-        ? await prefs.setDouble(_keyMonthlyGoalKm, value)
-        : await prefs.remove(_keyMonthlyGoalKm);
+        ? await _prefs.setDouble(_keyMonthlyGoalKm, value)
+        : await _prefs.remove(_keyMonthlyGoalKm);
   }
 
   Future<void> setGoalMaxSpeedKmh(double? value) async {
     _goalMaxSpeedKmh = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     value != null
-        ? await prefs.setDouble(_keyGoalMaxSpeedKmh, value)
-        : await prefs.remove(_keyGoalMaxSpeedKmh);
+        ? await _prefs.setDouble(_keyGoalMaxSpeedKmh, value)
+        : await _prefs.remove(_keyGoalMaxSpeedKmh);
   }
 
   Future<void> setGoalMaxDistanceKm(double? value) async {
     _goalMaxDistanceKm = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     value != null
-        ? await prefs.setDouble(_keyGoalMaxDistanceKm, value)
-        : await prefs.remove(_keyGoalMaxDistanceKm);
+        ? await _prefs.setDouble(_keyGoalMaxDistanceKm, value)
+        : await _prefs.remove(_keyGoalMaxDistanceKm);
   }
 
   Future<void> setDistanceAlertKm(int? value) async {
     _distanceAlertKm = value != null ? value.clamp(1, 999) : null;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     _distanceAlertKm != null
-        ? await prefs.setInt(_keyDistanceAlertKm, _distanceAlertKm!)
-        : await prefs.remove(_keyDistanceAlertKm);
+        ? await _prefs.setInt(_keyDistanceAlertKm, _distanceAlertKm!)
+        : await _prefs.remove(_keyDistanceAlertKm);
   }
 
   Future<void> setClockDisplay(String value) async {
     _clockDisplay = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyClockDisplay, value);
+    await _prefs.setString(_keyClockDisplay, value);
   }
 
   Future<void> setSpeedMode(SpeedMode value) async {
     _speedMode = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keySpeedMode, value.name);
+    await _prefs.setString(_keySpeedMode, value.name);
   }
 
   Future<void> setPathColor(String value) async {
     _pathColor = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyPathColor, value);
+    await _prefs.setString(_keyPathColor, value);
   }
 
   Future<void> setPathThickness(int value) async {
     _pathThickness = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyPathThickness, value);
+    await _prefs.setInt(_keyPathThickness, value);
   }
 
   Future<void> setStartTab(int value) async {
     _startTab = value.clamp(0, 4);
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_keyStartTab, _startTab);
+    await _prefs.setInt(_keyStartTab, _startTab);
   }
 
   Future<void> setMapTrackingMode(String value) async {
     _mapTrackingMode = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyMapTrackingMode, value);
+    await _prefs.setString(_keyMapTrackingMode, value);
   }
 
   Future<void> setGoalMaxDurationMin(int? value) async {
     _goalMaxDurationMin = value;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
     value != null
-        ? await prefs.setInt(_keyGoalMaxDurationMin, value)
-        : await prefs.remove(_keyGoalMaxDurationMin);
+        ? await _prefs.setInt(_keyGoalMaxDurationMin, value)
+        : await _prefs.remove(_keyGoalMaxDurationMin);
   }
 }
