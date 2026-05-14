@@ -61,12 +61,13 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final isBikeRide = ride.isRiding && ride.activityType == 'bike';
     final alertKmh = settings.speedAlertKmh;
-    final isOverAlert = alertKmh != null && ride.isRiding && ride.currentSpeed >= alertKmh;
+    final isOverAlert = alertKmh != null && isBikeRide && ride.currentSpeed >= alertKmh;
 
     final minAlertKmh = settings.speedMinAlertKmh;
     final isUnderAlert = minAlertKmh != null &&
-        ride.isRiding &&
+        isBikeRide &&
         !ride.isPaused &&
         ride.currentSpeed > 0 &&
         ride.currentSpeed < minAlertKmh;
@@ -321,13 +322,14 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                         );
                         return;
                       }
+                      final isBike = _selectedActivityType == 'bike';
                       ride.startRide(
                         gpsHighAccuracy: settings.gpsHighAccuracy,
                         autoPause: settings.autoPause,
-                        speedAlertKmh: settings.speedAlertKmh,
-                        speedMinAlertKmh: settings.speedMinAlertKmh,
+                        speedAlertKmh: isBike ? settings.speedAlertKmh : null,
+                        speedMinAlertKmh: isBike ? settings.speedMinAlertKmh : null,
                         speedMode: settings.speedMode,
-                        distanceAlertKm: settings.distanceAlertKm,
+                        distanceAlertKm: isBike ? settings.distanceAlertKm : null,
                         useKmh: settings.useKmh,
                         activityType: _selectedActivityType,
                         cadenceBpm: _selectedActivityType == 'run'
