@@ -57,3 +57,16 @@ String formatDistance(double km, bool useKmh, {int decimals = 2}) =>
 // 단위 변환 + 콤마 포맷 (속도)
 String formatSpeed(double kmh, bool useKmh, {int decimals = 1}) =>
     formatDouble(convertSpeed(kmh, useKmh), decimals);
+
+// 페이스 포맷: 초/km → "5:30"
+String formatPace(int secPerKm) {
+  final m = secPerKm ~/ 60;
+  final s = secPerKm % 60;
+  return '$m:${s.toString().padLeft(2, '0')}';
+}
+
+// 페이스 계산: km/h → 초/km (0이면 null)
+int? paceFromSpeed(double kmh) {
+  if (kmh < 0.5) return null;
+  return (3600 / kmh).round();
+}

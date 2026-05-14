@@ -10,6 +10,10 @@ class RideRecord {
   final String pathPoints;
   final int createdAt;
   final String? memo;
+  final String activityType; // 'bike' | 'run'
+  final String? lapSplits;   // JSON: [{lap, timeMs, paceSecPerKm, maxSpeedKmh}, ...]
+  final int? targetPace;     // 목표 페이스 (초/km), null이면 미설정
+  final int? cadenceBpm;     // 케이던스 메트로놈 BPM, null이면 미사용
 
   RideRecord({
     this.id,
@@ -23,6 +27,10 @@ class RideRecord {
     required this.pathPoints,
     required this.createdAt,
     this.memo,
+    this.activityType = 'bike',
+    this.lapSplits,
+    this.targetPace,
+    this.cadenceBpm,
   });
 
   Map<String, dynamic> toMap() {
@@ -38,6 +46,10 @@ class RideRecord {
       'pathPoints': pathPoints,
       'createdAt': createdAt,
       'memo': memo,
+      'activityType': activityType,
+      'lapSplits': lapSplits,
+      'targetPace': targetPace,
+      'cadenceBpm': cadenceBpm,
     };
   }
 
@@ -54,6 +66,10 @@ class RideRecord {
       pathPoints: map['pathPoints'],
       createdAt: map['createdAt'],
       memo: map['memo'] as String?,
+      activityType: map['activityType'] as String? ?? 'bike',
+      lapSplits: map['lapSplits'] as String?,
+      targetPace: map['targetPace'] as int?,
+      cadenceBpm: map['cadenceBpm'] as int?,
     );
   }
 }

@@ -9,6 +9,8 @@ import '../models/speed_mode.dart';
 import '../db/database_helper.dart';
 import '../services/location_service.dart';
 import '../services/foreground_service.dart';
+import '../services/cadence_service.dart';
+import '../services/voice_guidance_service.dart';
 import '../utils/format_utils.dart';
 
 class RideProvider extends ChangeNotifier {
@@ -51,6 +53,22 @@ class RideProvider extends ChangeNotifier {
   bool _useKmh = true;
   int _notificationTick = 0;
 
+  // 런닝 모드
+  String _activityType = 'bike';
+  int? _cadenceBpm;
+  int? _targetPaceSecPerKm;
+  bool _voiceGuidanceEnabled = false;
+  final CadenceService _cadenceService = CadenceService();
+
+  // 랩 기록
+  List<Map<String, dynamic>> _lapData = [];
+  int _completedLaps = 0;
+  int _lapStartDurationSec = 0;
+  double _lapMaxSpeed = 0.0;
+
+  // 목표 페이스 알림 상태
+  bool _wasOverTargetPace = false;
+
   List<Position> pathPoints = [];
   List<RideRecord> records = [];
   Position? _lastPosition;
@@ -63,6 +81,18 @@ class RideProvider extends ChangeNotifier {
   bool get isAutoPaused => _isAutoPaused;
   bool get isManuallyPaused => _isManuallyPaused;
   bool get isPaused => _isManuallyPaused || _isAutoPaused;
+  String get activityType => _activityType;
+  int get completedLaps => _completedLaps;
+
+  // 현재 페이스 (초/km). 속도가 너무 낮으면 null
+  int? get currentPaceSecPerKm => paceFromSpeed(_currentSpeed);
+
+  // 목표 페이스보다 느린 상태 (페이스 값이 클수록 느림)
+  bool get isOverTargetPace {
+    if (_targetPaceSecPerKm == null || _activityType != 'run') return false;
+    final pace = currentPaceSecPerKm;
+    return pace != null && pace > _targetPaceSecPerKm!;
+  }
 
   // stopRide가 null을 반환할 때의 실패 이유 ('distance' or 'duration')
   String? _stopFailReason;
@@ -115,6 +145,11 @@ class RideProvider extends ChangeNotifier {
     SpeedMode speedMode = SpeedMode.normal,
     int? distanceAlertKm,
     bool useKmh = true,
+    String activityType = 'bike',
+    int? cadenceBpm,
+    int? targetPaceSecPerKm,
+    bool voiceGuidance = false,
+    bool cadenceUseSound = false,
   }) async {
     final hasPermission = await LocationService.requestPermission();
     if (!hasPermission) return;
@@ -147,6 +182,16 @@ class RideProvider extends ChangeNotifier {
     _useKmh = useKmh;
     _notificationTick = 0;
 
+    _activityType = activityType;
+    _cadenceBpm = cadenceBpm;
+    _targetPaceSecPerKm = targetPaceSecPerKm;
+    _voiceGuidanceEnabled = voiceGuidance;
+    _lapData = [];
+    _completedLaps = 0;
+    _lapStartDurationSec = 0;
+    _lapMaxSpeed = 0.0;
+    _wasOverTargetPace = false;
+
     _currentSpeedMode = speedMode;
     _applySpeedMode(speedMode);
 
@@ -163,6 +208,13 @@ class RideProvider extends ChangeNotifier {
           _interpolateSpeed();
           notifyListeners();
         });
+
+    if (cadenceBpm != null) {
+      _cadenceService.start(cadenceBpm, useSound: cadenceUseSound);
+    }
+    if (voiceGuidance) {
+      await VoiceGuidanceService.instance.init();
+    }
 
     await WakelockPlus.enable();
     await ForegroundServiceHelper.start();
@@ -259,7 +311,43 @@ class RideProvider extends ChangeNotifier {
             ForegroundServiceHelper.showDistanceAlert(reached);
           }
         }
+
+        // 랩 기록: 1km 단위 자동 랩
+        final newLap = _totalDistance.floor();
+        if (newLap > _completedLaps) {
+          final currentDurationSec = duration;
+          final lapTimeSec = currentDurationSec - _lapStartDurationSec;
+          _lapData.add({
+            'lap': newLap,
+            'timeMs': lapTimeSec * 1000,
+            'paceSecPerKm': lapTimeSec,
+            'maxSpeedKmh': _lapMaxSpeed,
+          });
+          _completedLaps = newLap;
+          _lapStartDurationSec = currentDurationSec;
+          _lapMaxSpeed = 0.0;
+
+          if (_voiceGuidanceEnabled) {
+            VoiceGuidanceService.instance.speak(
+              '$newLap킬로미터 완주, 페이스 ${lapTimeSec ~/ 60}분 ${lapTimeSec % 60}초',
+            );
+          }
+        }
+
+        // 랩 내 최고속도 추적
+        if (rawSpeed > _lapMaxSpeed) _lapMaxSpeed = rawSpeed;
       }
+    }
+
+    // 목표 페이스 알림: 목표보다 느려질 때 1회 진동
+    final targetPace = _targetPaceSecPerKm;
+    if (targetPace != null && _activityType == 'run' && rawSpeed > 0) {
+      final curPace = paceFromSpeed(rawSpeed);
+      final isOver = curPace != null && curPace > targetPace;
+      if (isOver && !_wasOverTargetPace) {
+        HapticFeedback.heavyImpact();
+      }
+      _wasOverTargetPace = isOver;
     }
 
     pathPoints.add(position);
@@ -321,6 +409,8 @@ class RideProvider extends ChangeNotifier {
     notifyListeners(); // 버튼 UI 즉시 갱신
 
     final startedAt = _startTime?.millisecondsSinceEpoch;
+    _cadenceService.stop();
+    await VoiceGuidanceService.instance.stop();
     await WakelockPlus.disable();
     await ForegroundServiceHelper.stop();
     _lastDuration = durationSeconds;
@@ -347,6 +437,7 @@ class RideProvider extends ChangeNotifier {
         'lng': p.longitude,
       }).toList(),
     );
+    final lapSplitsJson = _lapData.isNotEmpty ? jsonEncode(_lapData) : null;
     final durationHours = durationSeconds / 3600.0;
     final avgSpeed = durationHours > 0
         ? _totalDistance / durationHours
@@ -363,6 +454,10 @@ class RideProvider extends ChangeNotifier {
       duration: durationSeconds,
       pathPoints: pathJson,
       createdAt: startedAt ?? now.millisecondsSinceEpoch,
+      activityType: _activityType,
+      lapSplits: lapSplitsJson,
+      targetPace: _targetPaceSecPerKm,
+      cadenceBpm: _cadenceBpm,
     );
 
     final id = await DatabaseHelper.instance.insertRecord(record);
@@ -379,6 +474,10 @@ class RideProvider extends ChangeNotifier {
       duration: record.duration,
       pathPoints: record.pathPoints,
       createdAt: record.createdAt,
+      activityType: record.activityType,
+      lapSplits: record.lapSplits,
+      targetPace: record.targetPace,
+      cadenceBpm: record.cadenceBpm,
     );
   }
 

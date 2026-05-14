@@ -23,6 +23,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     with WidgetsBindingObserver {
   static const double _maxSpeed = 60;
   bool _locationGranted = true;
+  String _selectedActivityType = 'bike'; // 주행 전 선택 상태
 
   @override
   void initState() {
@@ -71,11 +72,19 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
         ride.currentSpeed > 0 &&
         ride.currentSpeed < minAlertKmh;
 
+    final isRunning = ride.isRiding
+        ? ride.activityType == 'run'
+        : _selectedActivityType == 'run';
+
+    final isOverTargetPace = ride.isRiding && ride.isOverTargetPace;
+
     final speedTextColor = isOverAlert
         ? Colors.red
         : isUnderAlert
             ? Colors.blue
-            : cs.onSurface;
+            : isOverTargetPace
+                ? Colors.orange
+                : cs.onSurface;
     final panelColor = cs.surfaceContainer;
     final unitTextColor = cs.onSurfaceVariant;
     final dividerColor = cs.outlineVariant;
@@ -147,23 +156,55 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(height: 150.h),
-                        Text(
-                          formatSpeed(ride.currentSpeed, useKmh),
-                          style: TextStyle(
-                            color: speedTextColor,
-                            fontSize: 64.sp,
-                            fontWeight: FontWeight.bold,
-                            height: 1.0,
+                        if (isRunning) ...[
+                          Text(
+                            ride.currentPaceSecPerKm != null
+                                ? formatPace(ride.currentPaceSecPerKm!)
+                                : '--:--',
+                            style: TextStyle(
+                              color: speedTextColor,
+                              fontSize: 64.sp,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
+                            ),
                           ),
-                        ),
-                        Text(
-                          speedUnit(useKmh),
-                          style: TextStyle(
-                            color: unitTextColor,
-                            fontSize: 18.sp,
-                            height: 1.0,
+                          Text(
+                            'min/km',
+                            style: TextStyle(
+                              color: unitTextColor,
+                              fontSize: 18.sp,
+                              height: 1.0,
+                            ),
                           ),
-                        ),
+                          if (ride.isRiding) ...[
+                            SizedBox(height: 4.h),
+                            Text(
+                              '${ride.completedLaps} km 완주',
+                              style: TextStyle(
+                                color: cs.onSurfaceVariant,
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ],
+                        ] else ...[
+                          Text(
+                            formatSpeed(ride.currentSpeed, useKmh),
+                            style: TextStyle(
+                              color: speedTextColor,
+                              fontSize: 64.sp,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
+                            ),
+                          ),
+                          Text(
+                            speedUnit(useKmh),
+                            style: TextStyle(
+                              color: unitTextColor,
+                              fontSize: 18.sp,
+                              height: 1.0,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -220,7 +261,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
               children: [
-                // 왼쪽: 속도 모드 배지 (탭으로 순환)
+                // 왼쪽: 주행 중 - 속도 모드 배지 / 비주행 시 - 활동 종목 선택
                 Expanded(
                   child: ride.isRiding
                       ? Center(
@@ -234,7 +275,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                             child: _speedModeBadge(ride.currentSpeedMode),
                           ),
                         )
-                      : const SizedBox(),
+                      : Center(child: _activityTypeBadge()),
                 ),
                 // 중앙: 시작/정지 버튼
                 GestureDetector(
@@ -297,6 +338,17 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                         speedMode: settings.speedMode,
                         distanceAlertKm: settings.distanceAlertKm,
                         useKmh: settings.useKmh,
+                        activityType: _selectedActivityType,
+                        cadenceBpm: _selectedActivityType == 'run'
+                            ? settings.defaultCadenceBpm
+                            : null,
+                        targetPaceSecPerKm: _selectedActivityType == 'run'
+                            ? settings.defaultTargetPaceSecPerKm
+                            : null,
+                        voiceGuidance: _selectedActivityType == 'run' &&
+                            settings.runningVoiceGuidance,
+                        cadenceUseSound:
+                            settings.cadenceFeedbackType == 'sound',
                       );
                     }
                   },
@@ -484,6 +536,48 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     );
   }
 
+  Widget _activityTypeBadge() {
+    final isBike = _selectedActivityType == 'bike';
+    return GestureDetector(
+      onTap: () {
+        SystemSound.play(SystemSoundType.click);
+        setState(() {
+          _selectedActivityType = isBike ? 'run' : 'bike';
+        });
+      },
+      child: Container(
+        width: 60.r,
+        height: 60.r,
+        decoration: BoxDecoration(
+          color: (isBike ? Colors.blue : Colors.deepOrange).withOpacity(0.12),
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: (isBike ? Colors.blue : Colors.deepOrange).withOpacity(0.35),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isBike ? Icons.directions_bike : Icons.directions_run,
+              color: isBike ? Colors.blue : Colors.deepOrange,
+              size: 22.r,
+            ),
+            SizedBox(height: 3.h),
+            Text(
+              isBike ? '자전거' : '런닝',
+              style: TextStyle(
+                color: isBike ? Colors.blue : Colors.deepOrange,
+                fontSize: 11.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _speedModeBadge(SpeedMode mode) {
     final (icon, color, label) = switch (mode) {
       SpeedMode.normal => (Icons.directions_bike, Colors.blue, '자전거'),
@@ -561,6 +655,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     final currentAvgSpeed = ride.duration > 0
         ? ride.totalDistance / (ride.duration / 3600.0)
         : 0.0;
+    final isRunMode = ride.isRiding && ride.activityType == 'run';
 
     final items = <(String, String)>[
       if (settings.showDistance)
@@ -568,11 +663,21 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             '${formatDistance(ride.totalDistance, useKmh)} ${distanceUnit(useKmh)}'),
       if (settings.showDuration) ('시간', ride.formattedDuration),
       if (settings.showMaxSpeed)
-        ('최고속도',
-            '${formatSpeed(ride.maxSpeed, useKmh)} ${speedUnit(useKmh)}'),
+        isRunMode
+            ? ('최고페이스',
+                ride.maxSpeed > 0
+                    ? '${formatPace(paceFromSpeed(ride.maxSpeed)!)} min/km'
+                    : '--:--')
+            : ('최고속도',
+                '${formatSpeed(ride.maxSpeed, useKmh)} ${speedUnit(useKmh)}'),
       if (settings.showAvgSpeed)
-        ('평균속도',
-            '${formatSpeed(currentAvgSpeed, useKmh)} ${speedUnit(useKmh)}'),
+        isRunMode
+            ? ('평균페이스',
+                currentAvgSpeed > 0
+                    ? '${formatPace(paceFromSpeed(currentAvgSpeed)!)} min/km'
+                    : '--:--')
+            : ('평균속도',
+                '${formatSpeed(currentAvgSpeed, useKmh)} ${speedUnit(useKmh)}'),
     ];
 
     if (items.isEmpty) return const SizedBox.shrink();

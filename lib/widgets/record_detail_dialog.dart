@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +10,59 @@ import '../utils/format_utils.dart';
 import '../utils/gpx_utils.dart';
 import 'memo_bottom_sheet.dart';
 import 'stat_item.dart';
+
+Widget _buildLapTable(
+    List<Map<String, dynamic>> laps, Color textColor, ColorScheme cs) {
+  return Container(
+    decoration: BoxDecoration(
+      color: cs.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(12.r),
+    ),
+    child: Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          child: Row(
+            children: [
+              SizedBox(width: 32.w, child: Text('랩', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
+              Expanded(child: Text('페이스', textAlign: TextAlign.center, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
+              Expanded(child: Text('시간', textAlign: TextAlign.center, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
+              Expanded(child: Text('최고속도', textAlign: TextAlign.center, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
+            ],
+          ),
+        ),
+        Divider(color: cs.outlineVariant, height: 1),
+        ...laps.asMap().entries.map((entry) {
+          final i = entry.key;
+          final lap = entry.value;
+          final paceSecPerKm = (lap['paceSecPerKm'] as num).toInt();
+          final timeSec = (lap['timeMs'] as num).toInt() ~/ 1000;
+          final maxSpeed = (lap['maxSpeedKmh'] as num).toDouble();
+          return Container(
+            decoration: BoxDecoration(
+              color: i.isOdd ? cs.surfaceContainerHighest : cs.surfaceContainer,
+              borderRadius: i == laps.length - 1
+                  ? BorderRadius.vertical(bottom: Radius.circular(12.r))
+                  : null,
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 32.w,
+                  child: Text('${lap['lap']}', style: TextStyle(color: textColor, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+                ),
+                Expanded(child: Text(formatPace(paceSecPerKm), textAlign: TextAlign.center, style: TextStyle(color: Colors.lightBlue, fontSize: 13.sp, fontWeight: FontWeight.bold))),
+                Expanded(child: Text(formatDuration(timeSec), textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
+                Expanded(child: Text('${maxSpeed.toStringAsFixed(1)} km/h', textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
+              ],
+            ),
+          );
+        }),
+      ],
+    ),
+  );
+}
 
 void showRecordDetailDialog(
     BuildContext context, RideRecord record, bool useKmh, double? weightKg) {
@@ -25,6 +79,10 @@ void showRecordDetailDialog(
   final btnBg = cs.surfaceContainerHighest;
   final textColor = cs.onSurface;
   bool isSharing = false;
+  final isRunning = record.activityType == 'run';
+  final List<Map<String, dynamic>> lapData = record.lapSplits != null
+      ? List<Map<String, dynamic>>.from(jsonDecode(record.lapSplits!))
+      : [];
 
   showDialog(
     context: context,
@@ -95,6 +153,10 @@ void showRecordDetailDialog(
                     ],
                   ),
                 ),
+                if (isRunning && lapData.isNotEmpty) ...[
+                  SizedBox(height: 12.h),
+                  _buildLapTable(lapData, textColor, cs),
+                ],
                 SizedBox(height: 16.h),
                 GestureDetector(
                   onTap: () async {

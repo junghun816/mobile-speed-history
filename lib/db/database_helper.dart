@@ -19,12 +19,17 @@ class DatabaseHelper {
     final path = join(dbPath, fileName);
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 4) {
-          await db.execute(
-              'ALTER TABLE ride_records ADD COLUMN memo TEXT');
+          await db.execute('ALTER TABLE ride_records ADD COLUMN memo TEXT');
+        }
+        if (oldVersion < 5) {
+          await db.execute('ALTER TABLE ride_records ADD COLUMN activityType TEXT');
+          await db.execute('ALTER TABLE ride_records ADD COLUMN lapSplits TEXT');
+          await db.execute('ALTER TABLE ride_records ADD COLUMN targetPace INTEGER');
+          await db.execute('ALTER TABLE ride_records ADD COLUMN cadenceBpm INTEGER');
         }
       },
     );
@@ -43,7 +48,11 @@ class DatabaseHelper {
                 duration INTEGER NOT NULL,
                 pathPoints TEXT NOT NULL,
                 createdAt INTEGER NOT NULL,
-                memo TEXT
+                memo TEXT,
+                activityType TEXT,
+                lapSplits TEXT,
+                targetPace INTEGER,
+                cadenceBpm INTEGER
             )
         ''');
   }
