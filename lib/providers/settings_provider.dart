@@ -37,6 +37,7 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyCadenceSound = 'cadence_sound';
   static const _keyDefaultCadenceBpm = 'default_cadence_bpm';
   static const _keyDefaultTargetPaceSecPerKm = 'default_target_pace_sec_per_km';
+  static const _keyLastActivityType = 'last_activity_type';
 
   late SharedPreferences _prefs;
 
@@ -72,6 +73,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _cadenceVibration = true;
   bool _cadenceSound = false;
   int? _defaultCadenceBpm;
+  String _lastActivityType = 'bike';
   int? _defaultTargetPaceSecPerKm;
 
   bool get useKmh => _useKmh;
@@ -107,6 +109,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get cadenceVibration => _cadenceVibration;
   bool get cadenceSound => _cadenceSound;
   int? get defaultCadenceBpm => _defaultCadenceBpm;
+  String get lastActivityType => _lastActivityType;
   int? get defaultTargetPaceSecPerKm => _defaultTargetPaceSecPerKm;
 
   Future<void> load() async {
@@ -150,6 +153,7 @@ class SettingsProvider extends ChangeNotifier {
     _cadenceVibration = _prefs.getBool(_keyCadenceVibration) ?? true;
     _cadenceSound = _prefs.getBool(_keyCadenceSound) ?? false;
     _defaultCadenceBpm = _prefs.getInt(_keyDefaultCadenceBpm);
+    _lastActivityType = _prefs.getString(_keyLastActivityType) ?? 'bike';
     _defaultTargetPaceSecPerKm = _prefs.getInt(_keyDefaultTargetPaceSecPerKm);
     notifyListeners();
   }
@@ -387,5 +391,11 @@ class SettingsProvider extends ChangeNotifier {
     _defaultTargetPaceSecPerKm != null
         ? await _prefs.setInt(_keyDefaultTargetPaceSecPerKm, _defaultTargetPaceSecPerKm!)
         : await _prefs.remove(_keyDefaultTargetPaceSecPerKm);
+  }
+
+  Future<void> setLastActivityType(String value) async {
+    _lastActivityType = value;
+    notifyListeners();
+    await _prefs.setString(_keyLastActivityType, value);
   }
 }

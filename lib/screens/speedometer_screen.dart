@@ -20,15 +20,21 @@ class SpeedometerScreen extends StatefulWidget {
 
 class _SpeedometerScreenState extends State<SpeedometerScreen>
     with WidgetsBindingObserver {
-  static const double _maxSpeed = 60;
   bool _locationGranted = true;
-  String _selectedActivityType = 'bike'; // 주행 전 선택 상태
+  String _selectedActivityType = 'bike';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _checkLocationPermission();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _selectedActivityType = context.read<SettingsProvider>().lastActivityType;
+        });
+      }
+    });
   }
 
   @override
@@ -75,6 +81,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     final isRunning = ride.isRiding
         ? ride.activityType == 'run'
         : _selectedActivityType == 'run';
+    final maxSpeed = isRunning ? 30.0 : 60.0;
 
     final isOverTargetPace = ride.isRiding && ride.isOverTargetPace;
 
@@ -146,7 +153,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                 child: CustomPaint(
                   painter: SpeedometerPainter(
                     speed: ride.currentSpeed,
-                    maxSpeed: _maxSpeed,
+                    maxSpeed: maxSpeed,
                     isDark: isDark,
                     isOverAlert: isOverAlert,
                     isUnderAlert: isUnderAlert,
@@ -567,9 +574,9 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     return GestureDetector(
       onTap: () {
         SystemSound.play(SystemSoundType.click);
-        setState(() {
-          _selectedActivityType = isBike ? 'run' : 'bike';
-        });
+        final next = isBike ? 'run' : 'bike';
+        setState(() => _selectedActivityType = next);
+        context.read<SettingsProvider>().setLastActivityType(next);
       },
       child: Container(
         width: 60.r,

@@ -211,7 +211,7 @@ class RideProvider extends ChangeNotifier {
         });
 
     if (cadenceBpm != null) {
-      _cadenceService.start(cadenceBpm, useVibration: cadenceVibration, useSound: cadenceSound);
+      await _cadenceService.start(cadenceBpm, useVibration: cadenceVibration, useSound: cadenceSound);
     }
     if (voiceGuidance) {
       await VoiceGuidanceService.instance.init();

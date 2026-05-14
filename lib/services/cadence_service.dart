@@ -43,12 +43,16 @@ class CadenceService {
     return data;
   }
 
-  void start(int bpm, {bool useVibration = true, bool useSound = false}) {
+  Future<void> start(int bpm, {bool useVibration = true, bool useSound = false}) async {
     stop();
+    if (useSound) {
+      await _audioPlayer.setSourceBytes(_beepWav);
+      await _audioPlayer.setReleaseMode(ReleaseMode.stop);
+    }
     final interval = Duration(milliseconds: (60000 / bpm).round());
     _timer = Timer.periodic(interval, (_) {
+      if (useSound) _audioPlayer.seek(Duration.zero).then((_) => _audioPlayer.resume());
       if (useVibration) Vibration.vibrate(duration: 50);
-      if (useSound) _audioPlayer.play(BytesSource(_beepWav));
     });
   }
 

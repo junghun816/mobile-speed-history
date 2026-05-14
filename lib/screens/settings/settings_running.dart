@@ -63,7 +63,7 @@ class SettingsRunningScreen extends StatelessWidget {
               context: context,
               icon: Icons.music_note_outlined,
               title: '케이던스 BPM',
-              subtitle: '40~240 BPM. 설정 안 하면 비활성',
+              subtitle: '40~240 BPM.\n설정 안 하면 비활성',
               value: settings.defaultCadenceBpm != null
                   ? '${settings.defaultCadenceBpm} bpm'
                   : '비활성',
@@ -87,7 +87,7 @@ class SettingsRunningScreen extends StatelessWidget {
               context: context,
               icon: Icons.directions_run,
               title: '목표 페이스',
-              subtitle: '1:00~10:00 min/km. 초과 시 진동 경고',
+              subtitle: '1:00~10:00 min/km.\n초과 시 진동 경고',
               value: settings.defaultTargetPaceSecPerKm != null
                   ? '${formatPace(settings.defaultTargetPaceSecPerKm!)} min/km'
                   : '비활성',
