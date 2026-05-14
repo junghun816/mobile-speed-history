@@ -22,7 +22,6 @@ class SettingsMapScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('지도')),
       body: SafeArea(
-        bottom: false,
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [

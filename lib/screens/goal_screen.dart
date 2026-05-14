@@ -7,6 +7,7 @@ import '../providers/ride_provider.dart';
 import '../providers/settings_provider.dart';
 import '../utils/format_utils.dart';
 import '../widgets/number_input_dialog.dart';
+import 'settings/settings_widgets.dart';
 
 class GoalScreen extends StatefulWidget {
   const GoalScreen({super.key});
@@ -325,15 +326,7 @@ class _GoalScreenState extends State<GoalScreen> {
           children: [
             Row(
               children: [
-                Container(
-                  width: 36.r,
-                  height: 36.r,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Icon(Icons.flag_outlined, color: color, size: 20.r),
-                ),
+                settingsIconBox(Icons.flag_outlined, color: color),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
@@ -429,15 +422,7 @@ class _GoalScreenState extends State<GoalScreen> {
         ),
         child: Row(
           children: [
-            Container(
-              width: 36.r,
-              height: 36.r,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(icon, color: color, size: 20.r),
-            ),
+            settingsIconBox(icon, color: color),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(

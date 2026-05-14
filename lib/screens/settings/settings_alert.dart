@@ -23,7 +23,6 @@ class SettingsAlertScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('알림')),
       body: SafeArea(
-        bottom: false,
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [
@@ -140,17 +139,7 @@ class SettingsAlertScreen extends StatelessWidget {
             children: [
               settingsIconBox(icon),
               SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
+              Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
               Switch(
                 value: isOn,
                 onChanged: (v) {

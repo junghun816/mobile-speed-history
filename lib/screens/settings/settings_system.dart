@@ -60,7 +60,6 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('시스템')),
       body: SafeArea(
-        bottom: false,
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [
@@ -277,26 +276,9 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           panelColor: panelColor,
           child: Row(
             children: [
-              Container(
-                width: 36.r, height: 36.r,
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-                child: Icon(icon, color: iconColor, size: 20.r),
-              ),
+              settingsIconBox(icon, color: iconColor),
               SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
+              Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
               isLoading
                   ? SizedBox(width: 20.r, height: 20.r,
                       child: CircularProgressIndicator(strokeWidth: 2, color: iconColor))

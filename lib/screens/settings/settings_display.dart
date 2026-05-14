@@ -34,7 +34,6 @@ class SettingsDisplayScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('화면')),
       body: SafeArea(
-        bottom: false,
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [

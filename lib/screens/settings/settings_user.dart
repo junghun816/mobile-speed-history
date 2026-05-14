@@ -21,7 +21,6 @@ class SettingsUserScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('사용자')),
       body: SafeArea(
-        bottom: false,
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [

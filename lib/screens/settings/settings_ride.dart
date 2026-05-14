@@ -23,7 +23,6 @@ class SettingsRideScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('주행')),
       body: SafeArea(
-        bottom: false,
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [
@@ -134,18 +133,7 @@ class SettingsRideScreen extends StatelessWidget {
             children: [
               settingsIconBox(modeIcons[selected]!),
               SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('속도 측정 모드',
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text(selected.description,
-                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
+              Expanded(child: settingsTileLabel('속도 측정 모드', selected.description, titleColor, subtitleColor)),
             ],
           ),
           SizedBox(height: 12.h),
@@ -216,17 +204,7 @@ class SettingsRideScreen extends StatelessWidget {
             children: [
               settingsIconBox(icon),
               SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
+              Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
             ],
           ),
           SizedBox(height: 12.h),
@@ -275,17 +253,7 @@ class SettingsRideScreen extends StatelessWidget {
             children: [
               settingsIconBox(icon),
               SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
+              Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
             ],
           ),
           SizedBox(height: 12.h),
@@ -327,17 +295,7 @@ class SettingsRideScreen extends StatelessWidget {
         children: [
           settingsIconBox(icon),
           SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                SizedBox(height: 2.h),
-                Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-              ],
-            ),
-          ),
+          Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
           Switch(
             value: value,
             onChanged: (v) {
