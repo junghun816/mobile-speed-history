@@ -84,6 +84,7 @@ Widget settingsOptionButton(
   required Color btnTextOff,
   double fontSize = 12,
   EdgeInsets? margin,
+  Color selectedColor = Colors.indigo,
 }) {
   return GestureDetector(
     onTap: () {
@@ -94,15 +95,15 @@ Widget settingsOptionButton(
       margin: margin,
       padding: EdgeInsets.symmetric(vertical: 8.h),
       decoration: BoxDecoration(
-        color: isSelected ? Colors.indigo.withOpacity(0.15) : btnBgOff,
+        color: isSelected ? selectedColor.withOpacity(0.15) : btnBgOff,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: isSelected ? Colors.indigo : btnBorderOff),
+        border: Border.all(color: isSelected ? selectedColor : btnBorderOff),
       ),
       child: Text(
         label,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: isSelected ? Colors.indigo : btnTextOff,
+          color: isSelected ? selectedColor : btnTextOff,
           fontSize: fontSize.sp,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),

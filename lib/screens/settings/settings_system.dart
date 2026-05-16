@@ -79,6 +79,17 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
             ),
             SizedBox(height: 10.h),
             _navTile(
+              icon: Icons.balance_outlined,
+              title: '오픈소스 라이선스',
+              subtitle: '사용된 오픈소스 패키지 목록',
+              onTap: _showOpenSourceSheet,
+              isLoading: false,
+              panelColor: panelColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
+            ),
+            SizedBox(height: 10.h),
+            _navTile(
               icon: Icons.info_outline,
               title: '앱 정보',
               subtitle: _appVersion.isEmpty ? _kAppName : '$_kAppName  v$_appVersion',
@@ -139,7 +150,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         children: [
           Row(
             children: [
-              settingsIconBox(Icons.palette_outlined),
+              settingsIconBox(Icons.palette_outlined, color: Colors.blueGrey),
               SizedBox(width: 14.w),
               Expanded(
                 child: Column(
@@ -187,7 +198,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
           color: fixedBg,
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
-            color: isSelected ? Colors.lightBlue : btnBorderOff,
+            color: isSelected ? Colors.blueGrey : btnBorderOff,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -222,7 +233,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         children: [
           Row(
             children: [
-              settingsIconBox(Icons.home_outlined),
+              settingsIconBox(Icons.home_outlined, color: Colors.blueGrey),
               SizedBox(width: 14.w),
               Expanded(
                 child: Column(
@@ -246,6 +257,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
                 btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
                 fontSize: 11,
                 margin: EdgeInsets.only(right: i < labels.length - 1 ? 6.w : 0),
+                selectedColor: Colors.blueGrey,
               ),
             )),
           ),
@@ -263,7 +275,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     required Color panelColor,
     required Color titleColor,
     required Color subtitleColor,
-    Color iconColor = Colors.lightBlue,
+    Color iconColor = Colors.blueGrey,
   }) {
     return GestureDetector(
       onTap: onTap == null ? null : () {
@@ -290,6 +302,132 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
     );
   }
 
+  void _showOpenSourceSheet() {
+    const packages = [
+      ('flutter_naver_map',        'MIT',          '네이버 지도 SDK Flutter 래퍼'),
+      ('geolocator',               'MIT',          'GPS 위치 정보 수집'),
+      ('sqflite',                  'MIT',          'SQLite 로컬 데이터베이스'),
+      ('provider',                 'MIT',          '상태 관리'),
+      ('shared_preferences',       'BSD-3-Clause', '키-값 로컬 설정 저장'),
+      ('path_provider',            'BSD-3-Clause', '플랫폼 파일 경로 접근'),
+      ('path',                     'BSD-3-Clause', '파일 경로 유틸리티'),
+      ('share_plus',               'BSD-3-Clause', '시스템 공유 시트'),
+      ('file_picker',              'MIT',          '파일 선택 다이얼로그'),
+      ('flutter_foreground_task',  'MIT',          '포그라운드 서비스 관리'),
+      ('flutter_local_notifications', 'MIT',       '로컬 푸시 알림'),
+      ('wakelock_plus',            'MIT',          '화면 켜짐 유지'),
+      ('flutter_screenutil',       'MIT',          '반응형 UI 크기 조정'),
+      ('flutter_tts',              'MIT',          '텍스트 음성 변환 (TTS)'),
+      ('audioplayers',             'MIT',          '오디오 재생'),
+      ('vibration',                'MIT',          '진동 피드백'),
+      ('table_calendar',           'Apache-2.0',   '달력 위젯'),
+      ('intl',                     'BSD-3-Clause', '국제화 및 날짜 포맷'),
+      ('package_info_plus',        'BSD-3-Clause', '앱 버전 정보'),
+      ('flutter_launcher_icons',   'MIT',          '런처 아이콘 생성 도구'),
+      ('flutter_native_splash',    'MIT',          '스플래시 화면 생성 도구'),
+      ('cupertino_icons',          'MIT',          'iOS 스타일 아이콘'),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        final cs = Theme.of(ctx).colorScheme;
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          maxChildSize: 0.95,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (_, scrollController) => Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+                child: Container(
+                  width: 40.w, height: 4.h,
+                  decoration: BoxDecoration(
+                    color: cs.outlineVariant,
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('오픈소스 라이선스',
+                      style: TextStyle(color: cs.onSurface, fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              SizedBox(height: 12.h),
+              Expanded(
+                child: ListView.separated(
+                  controller: scrollController,
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  itemCount: packages.length,
+                  separatorBuilder: (_, __) => Divider(color: cs.outlineVariant, height: 1),
+                  itemBuilder: (_, i) {
+                    final (name, license, desc) = packages[i];
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(name,
+                                    style: TextStyle(color: cs.onSurface, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+                                SizedBox(height: 2.h),
+                                Text(desc,
+                                    style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp)),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                            child: Text(license,
+                                style: TextStyle(color: Colors.blueGrey, fontSize: 11.sp, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h + MediaQuery.of(ctx).viewPadding.bottom),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      showLicensePage(
+                        context: context,
+                        applicationName: _kAppName,
+                        applicationVersion: _appVersion,
+                      );
+                    },
+                    child: Text('전체 라이선스 원문 보기',
+                        style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13.sp)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _showAppInfoDialog() {
     final cs = Theme.of(context).colorScheme;
     final textColor = cs.onSurface;
@@ -309,17 +447,17 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
               Container(
                 width: 56.r, height: 56.r,
                 decoration: BoxDecoration(
-                  color: Colors.lightBlue.withOpacity(0.15),
+                  color: Colors.blueGrey.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(16.r),
                 ),
-                child: Icon(Icons.speed, color: Colors.lightBlue, size: 30.r),
+                child: Icon(Icons.speed, color: Colors.blueGrey, size: 30.r),
               ),
               SizedBox(height: 14.h),
               Text(_kAppName,
                   style: TextStyle(color: textColor, fontSize: 20.sp, fontWeight: FontWeight.bold)),
               SizedBox(height: 4.h),
               Text(_appVersion.isEmpty ? '-' : 'v$_appVersion',
-                  style: TextStyle(color: Colors.lightBlue, fontSize: 14.sp)),
+                  style: TextStyle(color: Colors.blueGrey, fontSize: 14.sp)),
               SizedBox(height: 20.h),
               Divider(color: divColor, height: 1),
               SizedBox(height: 16.h),
@@ -512,7 +650,7 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
           TextButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('생성', style: TextStyle(color: Colors.lightBlue))),
+              child: const Text('생성', style: TextStyle(color: Colors.blueGrey))),
         ],
       ),
     );
