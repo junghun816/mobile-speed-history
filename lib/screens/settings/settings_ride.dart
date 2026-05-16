@@ -227,8 +227,8 @@ class SettingsRideScreen extends StatelessWidget {
               SystemSound.play(SystemSoundType.click);
               onChanged(v);
             },
-            activeThumbColor: Colors.lightBlue,
-            activeTrackColor: Colors.lightBlue.withOpacity(0.4),
+            activeThumbColor: Colors.indigo,
+            activeTrackColor: Colors.indigo.withOpacity(0.4),
             inactiveTrackColor: inactiveTrackColor,
           ),
         ],

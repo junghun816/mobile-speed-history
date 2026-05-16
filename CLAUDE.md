@@ -254,7 +254,12 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 - `settings_user.dart` — 체중
 - `settings_system.dart` — 테마·시작 탭·백업/내보내기·앱 정보·(개발 섹션)
 
-모든 설정 아이콘 색상은 `Colors.lightBlue`로 통일. 알림 타일의 Switch 색(red/lightBlue/green)은 의미색이므로 제외.
+### 설정 화면 아이콘 색상 규칙
+- **단독 설정** (하위 아이콘 행 없음): `Colors.indigo` 사용. `settingsIconBox` 기본값이므로 별도 지정 불필요.
+- **상세 설정이 있는 경우** (예: 알림 화면의 팝업·진동·소리 행): 하위 아이콘은 `Colors.indigo[300]!`, 상위 타일 아이콘은 의미에 맞는 색 사용.
+- **의미색 예외**: 알림 타일 Switch 색(빨강/파랑/초록)과 상위 아이콘은 의미색 유지.
+- **시스템 설정** (`settings_system.dart`): 별도 결정 예정, 이 규칙 미적용.
+- **대메뉴 네비게이션 타일** (`settingsTile`): `Colors.lightBlue` 유지. `settingsOptionButton` 선택 상태는 `Colors.indigo`.
 앱 정보 상수(`_kAppName` 등)는 `_SettingsSystemScreenState`에서 수기 관리.
 
 ### 목표 화면 (`GoalScreen`)

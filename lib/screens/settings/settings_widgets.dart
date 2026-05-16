@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-Widget settingsIconBox(IconData icon, {Color color = Colors.lightBlue}) {
+Widget settingsIconBox(IconData icon, {Color color = Colors.indigo}) {
   return Container(
     width: 36.r,
     height: 36.r,
@@ -94,15 +94,15 @@ Widget settingsOptionButton(
       margin: margin,
       padding: EdgeInsets.symmetric(vertical: 8.h),
       decoration: BoxDecoration(
-        color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
+        color: isSelected ? Colors.indigo.withOpacity(0.15) : btnBgOff,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: isSelected ? Colors.lightBlue : btnBorderOff),
+        border: Border.all(color: isSelected ? Colors.indigo : btnBorderOff),
       ),
       child: Text(
         label,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: isSelected ? Colors.lightBlue : btnTextOff,
+          color: isSelected ? Colors.indigo : btnTextOff,
           fontSize: fontSize.sp,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),

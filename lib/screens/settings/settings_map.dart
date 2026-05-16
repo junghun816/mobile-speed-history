@@ -165,23 +165,23 @@ class SettingsMapScreen extends StatelessWidget {
                     margin: EdgeInsets.only(right: i < options.length - 1 ? 6.w : 0),
                     padding: EdgeInsets.symmetric(vertical: 8.h),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.lightBlue.withOpacity(0.15) : btnBgOff,
+                      color: isSelected ? Colors.indigo.withOpacity(0.15) : btnBgOff,
                       borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: isSelected ? Colors.lightBlue : btnBorderOff),
+                      border: Border.all(color: isSelected ? Colors.indigo : btnBorderOff),
                     ),
                     child: Column(
                       children: [
                         Text(labels[i],
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: isSelected ? Colors.lightBlue : btnTextOff,
+                              color: isSelected ? Colors.indigo : btnTextOff,
                               fontSize: 12.sp,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             )),
                         Text(descriptions[i],
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: isSelected ? Colors.lightBlue.withOpacity(0.7) : subtitleColor,
+                              color: isSelected ? Colors.indigo.withOpacity(0.7) : subtitleColor,
                               fontSize: 10.sp,
                             )),
                       ],
