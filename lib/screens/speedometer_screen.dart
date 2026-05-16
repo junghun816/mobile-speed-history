@@ -395,21 +395,10 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     ),
                   ),
                 ),
-                // 오른쪽: 일시정지/재개 + (자전거) 랩 버튼
+                // 오른쪽: 일시정지/재개 버튼
                 Expanded(
                   child: ride.isRiding
-                      ? Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _pauseResumeButton(ride),
-                              if (ride.activityType == 'bike') ...[
-                                SizedBox(height: 8.h),
-                                _lapButton(ride),
-                              ],
-                            ],
-                          ),
-                        )
+                      ? Center(child: _pauseResumeButton(ride))
                       : const SizedBox(),
                 ),
               ],
@@ -478,12 +467,45 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '주행 완료',
-                  style: TextStyle(
-                      color: cs.onSurface,
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.bold),
+                Row(
+                  children: [
+                    const Spacer(),
+                    Text(
+                      '주행 완료',
+                      style: TextStyle(
+                          color: cs.onSurface,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () async {
+                        SystemSound.play(SystemSoundType.click);
+                        final confirm = await showDialog<bool>(
+                          context: ctx,
+                          builder: (c) => AlertDialog(
+                            title: Text('기록 삭제', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                            content: Text('이 주행 기록을 저장하지 않을까요?', style: TextStyle(fontSize: 14.sp)),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(c, false),
+                                child: Text('취소', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 14.sp)),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(c, true),
+                                child: Text('삭제', style: TextStyle(color: Colors.red, fontSize: 14.sp, fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          ),
+                        );
+                        if ((confirm ?? false) && ctx.mounted) {
+                          if (record.id != null) await ride.deleteRecord(record.id!);
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        }
+                      },
+                      child: Icon(Icons.close, color: cs.onSurfaceVariant, size: 22.r),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 16.h),
 
@@ -590,10 +612,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.r)),
                         ),
-                        onPressed: () {
-                          SystemSound.play(SystemSoundType.click);
-                          shareCard();
-                        },
+                        onPressed: () => shareCard(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -807,36 +826,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
           isManuallyPaused ? Icons.play_arrow : Icons.pause,
           color: Colors.white,
           size: 28.r,
-        ),
-      ),
-    );
-  }
-
-  Widget _lapButton(RideProvider ride) {
-    return GestureDetector(
-      onTap: () {
-        SystemSound.play(SystemSoundType.click);
-        ride.recordManualLap();
-      },
-      child: Container(
-        width: 60.r,
-        height: 36.r,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.r),
-          color: Colors.indigo,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.indigo.withOpacity(0.4),
-              blurRadius: 10,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            'LAP${ride.manualLapCount > 0 ? ' ${ride.manualLapCount}' : ''}',
-            style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.bold),
-          ),
         ),
       ),
     );

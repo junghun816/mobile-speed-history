@@ -76,11 +76,6 @@ class RideProvider extends ChangeNotifier {
   int _lapStartDurationSec = 0;
   double _lapMaxSpeed = 0.0;
 
-  // 수동 랩 (자전거)
-  int _manualLapCount = 0;
-  double _manualLapStartDistance = 0.0;
-  int _manualLapStartDurationSec = 0;
-  double _manualLapSegmentMaxSpeed = 0.0;
 
   // 목표 페이스 알림 상태
   bool _wasOverTargetPace = false;
@@ -102,7 +97,6 @@ class RideProvider extends ChangeNotifier {
   int get lastAlertedKm => _lastAlertedKm;
   String get activityType => _activityType;
   int get completedLaps => _completedLaps;
-  int get manualLapCount => _manualLapCount;
 
   // 현재 페이스 (초/km). 속도가 너무 낮으면 null
   int? get currentPaceSecPerKm => paceFromSpeed(_currentSpeed);
@@ -230,10 +224,6 @@ class RideProvider extends ChangeNotifier {
     _completedLaps = 0;
     _lapStartDurationSec = 0;
     _lapMaxSpeed = 0.0;
-    _manualLapCount = 0;
-    _manualLapStartDistance = 0.0;
-    _manualLapStartDurationSec = 0;
-    _manualLapSegmentMaxSpeed = 0.0;
     _wasOverTargetPace = false;
 
     _currentSpeedMode = speedMode;
@@ -364,7 +354,6 @@ class RideProvider extends ChangeNotifier {
 
         // 랩 내 최고속도 추적
         if (rawSpeed > _lapMaxSpeed) _lapMaxSpeed = rawSpeed;
-        if (rawSpeed > _manualLapSegmentMaxSpeed) _manualLapSegmentMaxSpeed = rawSpeed;
       }
     }
 
@@ -531,25 +520,6 @@ class RideProvider extends ChangeNotifier {
     );
   }
 
-  void recordManualLap() {
-    if (!_isRiding || isPaused || _activityType != 'bike') return;
-    final currentDurationSec = duration;
-    final segmentDistance = _totalDistance - _manualLapStartDistance;
-    final segmentTimeSec = currentDurationSec - _manualLapStartDurationSec;
-    _manualLapCount++;
-    _lapData.add({
-      'lap': _manualLapCount,
-      'timeMs': segmentTimeSec * 1000,
-      'distanceKm': segmentDistance,
-      'maxSpeedKmh': _manualLapSegmentMaxSpeed,
-      'manual': true,
-    });
-    _manualLapStartDistance = _totalDistance;
-    _manualLapStartDurationSec = currentDurationSec;
-    _manualLapSegmentMaxSpeed = 0.0;
-    HapticFeedback.mediumImpact();
-    notifyListeners();
-  }
 
   void pauseRide() {
     if (!_isRiding || _isManuallyPaused) return;
