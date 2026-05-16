@@ -38,9 +38,9 @@ class SettingsAlertScreen extends StatelessWidget {
                   v ? (settings.speedAlertKmh?.toInt() ?? 30).toDouble() : null),
               stepperValue: '${settings.speedAlertKmh?.toInt() ?? 30} km/h',
               onDecrement: () => settings.setSpeedAlertKmh(
-                  ((settings.speedAlertKmh?.toInt() ?? 30) - 5).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
+                  ((settings.speedAlertKmh?.toInt() ?? 30) - 1).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
               onIncrement: () => settings.setSpeedAlertKmh(
-                  ((settings.speedAlertKmh?.toInt() ?? 30) + 5).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
+                  ((settings.speedAlertKmh?.toInt() ?? 30) + 1).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
               onTapValue: () async {
                 SystemSound.play(SystemSoundType.click);
                 final result = await NumberInputDialog.show(context,
@@ -74,9 +74,9 @@ class SettingsAlertScreen extends StatelessWidget {
                   v ? (settings.speedMinAlertKmh?.toInt() ?? 10).toDouble() : null),
               stepperValue: '${settings.speedMinAlertKmh?.toInt() ?? 10} km/h',
               onDecrement: () => settings.setSpeedMinAlertKmh(
-                  ((settings.speedMinAlertKmh?.toInt() ?? 10) - 5).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
+                  ((settings.speedMinAlertKmh?.toInt() ?? 10) - 1).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
               onIncrement: () => settings.setSpeedMinAlertKmh(
-                  ((settings.speedMinAlertKmh?.toInt() ?? 10) + 5).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
+                  ((settings.speedMinAlertKmh?.toInt() ?? 10) + 1).clamp(kDebugMode ? 0 : 1, 999).toDouble()),
               onTapValue: () async {
                 SystemSound.play(SystemSoundType.click);
                 final result = await NumberInputDialog.show(context,
@@ -190,7 +190,10 @@ class SettingsAlertScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GestureDetector(
-                  onTap: onDecrement,
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    onDecrement();
+                  },
                   child: Container(
                     width: 40.r, height: 40.r,
                     decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
@@ -211,7 +214,10 @@ class SettingsAlertScreen extends StatelessWidget {
                 ),
                 SizedBox(width: 20.w),
                 GestureDetector(
-                  onTap: onIncrement,
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    onIncrement();
+                  },
                   child: Container(
                     width: 40.r, height: 40.r,
                     decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
