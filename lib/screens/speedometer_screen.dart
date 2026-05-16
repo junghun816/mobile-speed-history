@@ -1,10 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../providers/ride_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/ride_record.dart';
@@ -59,23 +64,12 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     if (ride == null) return;
     if (ride.speedAlertTriggerCount != _lastSpeedAlertCount) {
       _lastSpeedAlertCount = ride.speedAlertTriggerCount;
-      _triggerAlertPopup(isDistance: false);
+      _alertPopupTimer?.cancel();
+      setState(() => _showAlertPopup = true);
+      _alertPopupTimer = Timer(const Duration(milliseconds: 2000), () {
+        if (mounted) setState(() => _showAlertPopup = false);
+      });
     }
-    if (ride.distanceAlertTriggerCount != _lastDistanceAlertCount) {
-      _lastDistanceAlertCount = ride.distanceAlertTriggerCount;
-      _triggerAlertPopup(isDistance: true);
-    }
-  }
-
-  void _triggerAlertPopup({required bool isDistance}) {
-    _alertPopupTimer?.cancel();
-    setState(() {
-      _isDistanceAlert = isDistance;
-      _showAlertPopup = true;
-    });
-    _alertPopupTimer = Timer(const Duration(milliseconds: 2000), () {
-      if (mounted) setState(() => _showAlertPopup = false);
-    });
   }
 
   @override
@@ -371,9 +365,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                         speedMinAlertPopupEnabled: isBike && settings.speedMinAlertPopup,
                         speedMinAlertVibrationEnabled: isBike && settings.speedMinAlertVibration,
                         speedMinAlertSoundEnabled: isBike && settings.speedMinAlertSound,
-                        distanceAlertPopupEnabled: isBike && settings.distanceAlertPopup,
-                        distanceAlertVibrationEnabled: isBike && settings.distanceAlertVibration,
-                        distanceAlertSoundEnabled: isBike && settings.distanceAlertSound,
                       );
                     }
                   },
@@ -394,7 +385,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     ),
                     child: Center(
                       child: Text(
-                        ride.isRiding ? '정지' : '시작',
+                        ride.isRiding ? '종료' : '시작',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 22.sp,
@@ -404,10 +395,21 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     ),
                   ),
                 ),
-                // 오른쪽: 일시정지/재개 버튼
+                // 오른쪽: 일시정지/재개 + (자전거) 랩 버튼
                 Expanded(
                   child: ride.isRiding
-                      ? Center(child: _pauseResumeButton(ride))
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _pauseResumeButton(ride),
+                              if (ride.activityType == 'bike') ...[
+                                SizedBox(height: 8.h),
+                                _lapButton(ride),
+                              ],
+                            ],
+                          ),
+                        )
                       : const SizedBox(),
                 ),
               ],
@@ -430,9 +432,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
           top: MediaQuery.of(context).padding.top + 8,
           left: 16.w,
           right: 16.w,
-          child: _isDistanceAlert
-              ? _distanceAlertBanner(ride)
-              : _speedAlertBanner(ride, settings, cs),
+          child: _speedAlertBanner(ride, settings, cs),
         ),
       ],
       ),
@@ -446,6 +446,21 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     final ctrl = TextEditingController();
     final ride = context.read<RideProvider>();
     final int? calories = calcCalories(record.totalDistance, weightKg);
+    final cardKey = GlobalKey();
+    final isBike = record.activityType == 'bike';
+
+    Future<void> shareCard() async {
+      final boundary = cardKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      final pngBytes = byteData.buffer.asUint8List();
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/ride_result.png');
+      await file.writeAsBytes(pngBytes);
+      await Share.shareXFiles([XFile(file.path)]);
+    }
 
     showDialog(
       context: context,
@@ -470,27 +485,79 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 20.h),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      StatDetailItem(label: '거리', value: formatDistance(record.totalDistance, useKmh), unit: distanceUnit(useKmh), textColor: cs.onSurface),
-                      StatDetailItem(label: '시간', value: formatDuration(record.duration), textColor: cs.onSurface),
-                      StatDetailItem(label: '최고속도', value: formatSpeed(record.maxSpeed, useKmh), unit: speedUnit(useKmh), textColor: cs.onSurface),
-                      if (calories != null)
-                        StatDetailItem(label: '칼로리', value: formatNumber(calories), unit: 'kcal', textColor: cs.onSurface)
-                      else
-                        StatDetailItem(label: '평균속도', value: formatSpeed(record.avgSpeed, useKmh), unit: speedUnit(useKmh), textColor: cs.onSurface),
-                    ],
+                SizedBox(height: 16.h),
+
+                // 공유 카드 (RepaintBoundary로 캡처)
+                RepaintBoundary(
+                  key: cardKey,
+                  child: Container(
+                    padding: EdgeInsets.all(16.r),
+                    decoration: BoxDecoration(
+                      color: cs.surface,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              isBike ? Icons.directions_bike : Icons.directions_run,
+                              color: Colors.blue,
+                              size: 16.r,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              isBike ? '자전거' : '런닝',
+                              style: TextStyle(color: Colors.blue, fontSize: 13.sp, fontWeight: FontWeight.bold),
+                            ),
+                            const Spacer(),
+                            Text(
+                              '${record.year}.${record.month.toString().padLeft(2, '0')}.${record.day.toString().padLeft(2, '0')}',
+                              style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            StatDetailItem(label: '거리', value: formatDistance(record.totalDistance, useKmh), unit: distanceUnit(useKmh), textColor: cs.onSurface),
+                            StatDetailItem(label: '시간', value: formatDuration(record.duration), textColor: cs.onSurface),
+                            StatDetailItem(label: '최고속도', value: formatSpeed(record.maxSpeed, useKmh), unit: speedUnit(useKmh), textColor: cs.onSurface),
+                            StatDetailItem(label: '평균속도', value: formatSpeed(record.avgSpeed, useKmh), unit: speedUnit(useKmh), textColor: cs.onSurface),
+                          ],
+                        ),
+                        if (calories != null) ...[
+                          SizedBox(height: 10.h),
+                          Divider(color: cs.outlineVariant, height: 1),
+                          SizedBox(height: 10.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.local_fire_department, color: Colors.orange, size: 14.r),
+                              SizedBox(width: 4.w),
+                              Text(
+                                '${formatNumber(calories)} kcal',
+                                style: TextStyle(color: Colors.orange, fontSize: 13.sp, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ],
+                        SizedBox(height: 10.h),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            'Speed Mobile',
+                            style: TextStyle(color: cs.outline, fontSize: 10.sp),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+
                 SizedBox(height: 16.h),
                 GestureDetector(
                   onTap: () async {
@@ -513,28 +580,55 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                   ),
                 ),
                 SizedBox(height: 16.h),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          side: BorderSide(color: cs.outlineVariant),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r)),
+                        ),
+                        onPressed: () {
+                          SystemSound.play(SystemSoundType.click);
+                          shareCard();
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.share, size: 16.r, color: cs.onSurface),
+                            SizedBox(width: 4.w),
+                            Text('공유',
+                                style: TextStyle(color: cs.onSurface, fontSize: 15.sp)),
+                          ],
+                        ),
+                      ),
                     ),
-                    onPressed: () async {
-                      final memo = ctrl.text.trim();
-                      if (memo.isNotEmpty && record.id != null) {
-                        await ride.updateMemo(record.id!, memo);
-                      }
-                      if (ctx.mounted) Navigator.pop(ctx);
-                    },
-                    child: Text('확인',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold)),
-                  ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r)),
+                        ),
+                        onPressed: () async {
+                          final memo = ctrl.text.trim();
+                          if (memo.isNotEmpty && record.id != null) {
+                            await ride.updateMemo(record.id!, memo);
+                          }
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        },
+                        child: Text('확인',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -602,30 +696,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
           Text(
             '현재 ${formatSpeed(speed, settings.useKmh)} ${speedUnit(settings.useKmh)}',
             style: TextStyle(color: Colors.white70, fontSize: 12.sp),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _distanceAlertBanner(RideProvider ride) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.88),
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.social_distance_outlined, color: Colors.white, size: 18.r),
-          SizedBox(width: 8.w),
-          Text(
-            '${ride.lastAlertedKm} km 도달',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 13.sp,
-              fontWeight: FontWeight.bold,
-            ),
           ),
         ],
       ),
@@ -737,6 +807,36 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
           isManuallyPaused ? Icons.play_arrow : Icons.pause,
           color: Colors.white,
           size: 28.r,
+        ),
+      ),
+    );
+  }
+
+  Widget _lapButton(RideProvider ride) {
+    return GestureDetector(
+      onTap: () {
+        SystemSound.play(SystemSoundType.click);
+        ride.recordManualLap();
+      },
+      child: Container(
+        width: 60.r,
+        height: 36.r,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          color: Colors.indigo,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.indigo.withOpacity(0.4),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            'LAP${ride.manualLapCount > 0 ? ' ${ride.manualLapCount}' : ''}',
+            style: TextStyle(color: Colors.white, fontSize: 11.sp, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );

@@ -140,7 +140,7 @@ class SettingsRunningScreen extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                color: Colors.lightBlue,
+                color: Colors.indigo,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -178,8 +178,8 @@ class SettingsRunningScreen extends StatelessWidget {
               SystemSound.play(SystemSoundType.click);
               onChanged(v);
             },
-            activeThumbColor: Colors.lightBlue,
-            activeTrackColor: Colors.lightBlue.withOpacity(0.4),
+            activeThumbColor: Colors.indigo,
+            activeTrackColor: Colors.indigo.withOpacity(0.4),
             inactiveTrackColor: inactiveTrackColor,
           ),
         ],

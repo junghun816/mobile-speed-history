@@ -19,7 +19,8 @@
       "Bash(del \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\settings_screen.dart\")",
       "Bash(flutter devices *)",
       "Bash(flutter run *)",
-      "Bash(findstr -i \"audioplayers\\\\|vibration\\\\|just_audio\")"
+      "Bash(findstr -i \"audioplayers\\\\|vibration\\\\|just_audio\")",
+      "Bash(dir \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\history\")"
     ]
   }
 }
