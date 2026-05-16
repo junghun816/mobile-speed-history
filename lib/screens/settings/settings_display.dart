@@ -46,18 +46,7 @@ class SettingsDisplayScreen extends StatelessWidget {
                     children: [
                       settingsIconBox(Icons.dashboard_outlined),
                       SizedBox(width: 14.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('주행 중 표시 항목',
-                                style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 2.h),
-                            Text('속도계 하단에 표시할 통계 선택',
-                                style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                          ],
-                        ),
-                      ),
+                      Expanded(child: settingsTileLabel('주행 중 표시 항목', '속도계 하단에 표시할 통계 선택', titleColor, subtitleColor)),
                     ],
                   ),
                   SizedBox(height: 12.h),
@@ -89,18 +78,7 @@ class SettingsDisplayScreen extends StatelessWidget {
                     children: [
                       settingsIconBox(Icons.access_time),
                       SizedBox(width: 14.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('속도계 시계',
-                                style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 2.h),
-                            Text('속도계 화면 상단에 현재 시각 표시',
-                                style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                          ],
-                        ),
-                      ),
+                      Expanded(child: settingsTileLabel('속도계 시계', '속도계 화면 상단에 현재 시각 표시', titleColor, subtitleColor)),
                     ],
                   ),
                   SizedBox(height: 12.h),

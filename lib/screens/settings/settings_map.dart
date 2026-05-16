@@ -87,17 +87,7 @@ class SettingsMapScreen extends StatelessWidget {
             children: [
               settingsIconBox(icon),
               SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
+              Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
             ],
           ),
           SizedBox(height: 12.h),
@@ -137,18 +127,7 @@ class SettingsMapScreen extends StatelessWidget {
             children: [
               settingsIconBox(Icons.my_location),
               SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('지도 추적 모드 기본값',
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text('주행 지도 시작 시 초기 추적 모드',
-                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
+              Expanded(child: settingsTileLabel('지도 추적 모드 기본값', '주행 지도 시작 시 초기 추적 모드', titleColor, subtitleColor)),
             ],
           ),
           SizedBox(height: 12.h),
@@ -214,16 +193,7 @@ class SettingsMapScreen extends StatelessWidget {
           settingsIconBox(Icons.route),
           SizedBox(width: 14.w),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('경로 색상',
-                    style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                SizedBox(height: 2.h),
-                Text('주행·기록 지도의 경로 선 색상',
-                    style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-              ],
-            ),
+            child: settingsTileLabel('경로 색상', '주행·기록 지도의 경로 선 색상', titleColor, subtitleColor),
           ),
           SizedBox(width: 8.w),
           Container(
