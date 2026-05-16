@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +23,12 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     with WidgetsBindingObserver {
   bool _locationGranted = true;
   String _selectedActivityType = 'bike';
+  RideProvider? _ride;
+  int _lastSpeedAlertCount = 0;
+  int _lastDistanceAlertCount = 0;
+  bool _showAlertPopup = false;
+  bool _isDistanceAlert = false;
+  Timer? _alertPopupTimer;
 
   @override
   void initState() {
@@ -33,6 +40,8 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
         setState(() {
           _selectedActivityType = context.read<SettingsProvider>().lastActivityType;
         });
+        _ride = context.read<RideProvider>();
+        _ride!.addListener(_onRideUpdate);
       }
     });
   }
@@ -40,7 +49,33 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _ride?.removeListener(_onRideUpdate);
+    _alertPopupTimer?.cancel();
     super.dispose();
+  }
+
+  void _onRideUpdate() {
+    final ride = _ride;
+    if (ride == null) return;
+    if (ride.speedAlertTriggerCount != _lastSpeedAlertCount) {
+      _lastSpeedAlertCount = ride.speedAlertTriggerCount;
+      _triggerAlertPopup(isDistance: false);
+    }
+    if (ride.distanceAlertTriggerCount != _lastDistanceAlertCount) {
+      _lastDistanceAlertCount = ride.distanceAlertTriggerCount;
+      _triggerAlertPopup(isDistance: true);
+    }
+  }
+
+  void _triggerAlertPopup({required bool isDistance}) {
+    _alertPopupTimer?.cancel();
+    setState(() {
+      _isDistanceAlert = isDistance;
+      _showAlertPopup = true;
+    });
+    _alertPopupTimer = Timer(const Duration(milliseconds: 2000), () {
+      if (mounted) setState(() => _showAlertPopup = false);
+    });
   }
 
   @override
@@ -67,17 +102,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final isBikeRide = ride.isRiding && ride.activityType == 'bike';
-    final alertKmh = settings.speedAlertKmh;
-    final isOverAlert = alertKmh != null && isBikeRide && ride.currentSpeed >= alertKmh;
-
-    final minAlertKmh = settings.speedMinAlertKmh;
-    final isUnderAlert = minAlertKmh != null &&
-        isBikeRide &&
-        !ride.isPaused &&
-        ride.currentSpeed > 0 &&
-        ride.currentSpeed < minAlertKmh;
-
     final isRunning = ride.isRiding
         ? ride.activityType == 'run'
         : _selectedActivityType == 'run';
@@ -85,13 +109,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
 
     final isOverTargetPace = ride.isRiding && ride.isOverTargetPace;
 
-    final speedTextColor = isOverAlert
-        ? Colors.red
-        : isUnderAlert
-            ? Colors.blue
-            : isOverTargetPace
-                ? Colors.orange
-                : cs.onSurface;
+    final speedTextColor = isOverTargetPace ? Colors.orange : cs.onSurface;
     final panelColor = cs.surfaceContainer;
     final unitTextColor = cs.onSurfaceVariant;
     final dividerColor = cs.outlineVariant;
@@ -155,8 +173,6 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                     speed: ride.currentSpeed,
                     maxSpeed: maxSpeed,
                     isDark: isDark,
-                    isOverAlert: isOverAlert,
-                    isUnderAlert: isUnderAlert,
                   ),
                   child: Center(
                     child: Column(
@@ -349,6 +365,15 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                             settings.runningVoiceGuidance,
                         cadenceVibration: settings.cadenceVibration,
                         cadenceSound: settings.cadenceSound,
+                        speedMaxAlertPopupEnabled: isBike && settings.speedMaxAlertPopup,
+                        speedMaxAlertVibrationEnabled: isBike && settings.speedMaxAlertVibration,
+                        speedMaxAlertSoundEnabled: isBike && settings.speedMaxAlertSound,
+                        speedMinAlertPopupEnabled: isBike && settings.speedMinAlertPopup,
+                        speedMinAlertVibrationEnabled: isBike && settings.speedMinAlertVibration,
+                        speedMinAlertSoundEnabled: isBike && settings.speedMinAlertSound,
+                        distanceAlertPopupEnabled: isBike && settings.distanceAlertPopup,
+                        distanceAlertVibrationEnabled: isBike && settings.distanceAlertVibration,
+                        distanceAlertSoundEnabled: isBike && settings.distanceAlertSound,
                       );
                     }
                   },
@@ -399,6 +424,15 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
           left: 16.w,
           right: 16.w,
           child: _permissionBanner(cs),
+        ),
+      if (_showAlertPopup)
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 8,
+          left: 16.w,
+          right: 16.w,
+          child: _isDistanceAlert
+              ? _distanceAlertBanner(ride)
+              : _speedAlertBanner(ride, settings, cs),
         ),
       ],
       ),
@@ -532,6 +566,68 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _speedAlertBanner(RideProvider ride, SettingsProvider settings, ColorScheme cs) {
+    final speed = ride.currentSpeed;
+    final isOver = settings.speedAlertKmh != null && speed >= settings.speedAlertKmh!;
+    final color = isOver ? Colors.red : Colors.blue;
+    final icon = isOver ? Icons.arrow_upward : Icons.arrow_downward;
+    final message = isOver ? '속도 초과' : '속도 미달';
+    final limit = isOver
+        ? '${settings.speedAlertKmh!.toInt()} km/h'
+        : '${settings.speedMinAlertKmh!.toInt()} km/h';
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.88),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.white, size: 18.r),
+          SizedBox(width: 8.w),
+          Expanded(
+            child: Text(
+              '$message  |  기준 $limit',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Text(
+            '현재 ${formatSpeed(speed, settings.useKmh)} ${speedUnit(settings.useKmh)}',
+            style: TextStyle(color: Colors.white70, fontSize: 12.sp),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _distanceAlertBanner(RideProvider ride) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: Colors.green.withOpacity(0.88),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.social_distance_outlined, color: Colors.white, size: 18.r),
+          SizedBox(width: 8.w),
+          Text(
+            '${ride.lastAlertedKm} km 도달',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -740,15 +836,11 @@ class SpeedometerPainter extends CustomPainter {
   final double speed;
   final double maxSpeed;
   final bool isDark;
-  final bool isOverAlert;
-  final bool isUnderAlert;
 
   SpeedometerPainter({
     required this.speed,
     required this.maxSpeed,
     this.isDark = true,
-    this.isOverAlert = false,
-    this.isUnderAlert = false,
   });
 
   @override
@@ -780,11 +872,7 @@ class SpeedometerPainter extends CustomPainter {
 
     if (speedSweep > 0) {
       final Color arcColor;
-      if (isOverAlert) {
-        arcColor = Colors.red;
-      } else if (isUnderAlert) {
-        arcColor = Colors.blue;
-      } else if (speedRatio < 0.5) {
+      if (speedRatio < 0.5) {
         arcColor = Colors.blue;
       } else if (speedRatio < 0.75) {
         arcColor = Colors.green;
@@ -903,11 +991,7 @@ class SpeedometerPainter extends CustomPainter {
       tailEnd,
       needleEnd,
       Paint()
-        ..color = isOverAlert
-            ? Colors.red
-            : isUnderAlert
-                ? Colors.blue
-                : (isDark ? Colors.white : Colors.black87)
+        ..color = isDark ? Colors.white : Colors.black87
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round,
     );
@@ -917,8 +1001,6 @@ class SpeedometerPainter extends CustomPainter {
   bool shouldRepaint(SpeedometerPainter oldDelegate) {
     return oldDelegate.speed != speed ||
         oldDelegate.maxSpeed != maxSpeed ||
-        oldDelegate.isDark != isDark ||
-        oldDelegate.isOverAlert != isOverAlert ||
-        oldDelegate.isUnderAlert != isUnderAlert;
+        oldDelegate.isDark != isDark;
   }
 }

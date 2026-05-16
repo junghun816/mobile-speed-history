@@ -38,6 +38,15 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyDefaultCadenceBpm = 'default_cadence_bpm';
   static const _keyDefaultTargetPaceSecPerKm = 'default_target_pace_sec_per_km';
   static const _keyLastActivityType = 'last_activity_type';
+  static const _keySpeedMaxAlertPopup = 'speed_max_alert_popup';
+  static const _keySpeedMaxAlertVibration = 'speed_max_alert_vibration';
+  static const _keySpeedMaxAlertSound = 'speed_max_alert_sound';
+  static const _keySpeedMinAlertPopup = 'speed_min_alert_popup';
+  static const _keySpeedMinAlertVibration = 'speed_min_alert_vibration';
+  static const _keySpeedMinAlertSound = 'speed_min_alert_sound';
+  static const _keyDistanceAlertPopup = 'distance_alert_popup';
+  static const _keyDistanceAlertVibration = 'distance_alert_vibration';
+  static const _keyDistanceAlertSound = 'distance_alert_sound';
 
   late SharedPreferences _prefs;
 
@@ -75,6 +84,15 @@ class SettingsProvider extends ChangeNotifier {
   int? _defaultCadenceBpm;
   String _lastActivityType = 'bike';
   int? _defaultTargetPaceSecPerKm;
+  bool _speedMaxAlertPopup = true;
+  bool _speedMaxAlertVibration = true;
+  bool _speedMaxAlertSound = false;
+  bool _speedMinAlertPopup = true;
+  bool _speedMinAlertVibration = true;
+  bool _speedMinAlertSound = false;
+  bool _distanceAlertPopup = true;
+  bool _distanceAlertVibration = true;
+  bool _distanceAlertSound = false;
 
   bool get useKmh => _useKmh;
   bool get gpsHighAccuracy => _gpsHighAccuracy;
@@ -111,6 +129,15 @@ class SettingsProvider extends ChangeNotifier {
   int? get defaultCadenceBpm => _defaultCadenceBpm;
   String get lastActivityType => _lastActivityType;
   int? get defaultTargetPaceSecPerKm => _defaultTargetPaceSecPerKm;
+  bool get speedMaxAlertPopup => _speedMaxAlertPopup;
+  bool get speedMaxAlertVibration => _speedMaxAlertVibration;
+  bool get speedMaxAlertSound => _speedMaxAlertSound;
+  bool get speedMinAlertPopup => _speedMinAlertPopup;
+  bool get speedMinAlertVibration => _speedMinAlertVibration;
+  bool get speedMinAlertSound => _speedMinAlertSound;
+  bool get distanceAlertPopup => _distanceAlertPopup;
+  bool get distanceAlertVibration => _distanceAlertVibration;
+  bool get distanceAlertSound => _distanceAlertSound;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -155,6 +182,15 @@ class SettingsProvider extends ChangeNotifier {
     _defaultCadenceBpm = _prefs.getInt(_keyDefaultCadenceBpm);
     _lastActivityType = _prefs.getString(_keyLastActivityType) ?? 'bike';
     _defaultTargetPaceSecPerKm = _prefs.getInt(_keyDefaultTargetPaceSecPerKm);
+    _speedMaxAlertPopup = _prefs.getBool(_keySpeedMaxAlertPopup) ?? true;
+    _speedMaxAlertVibration = _prefs.getBool(_keySpeedMaxAlertVibration) ?? true;
+    _speedMaxAlertSound = _prefs.getBool(_keySpeedMaxAlertSound) ?? false;
+    _speedMinAlertPopup = _prefs.getBool(_keySpeedMinAlertPopup) ?? true;
+    _speedMinAlertVibration = _prefs.getBool(_keySpeedMinAlertVibration) ?? true;
+    _speedMinAlertSound = _prefs.getBool(_keySpeedMinAlertSound) ?? false;
+    _distanceAlertPopup = _prefs.getBool(_keyDistanceAlertPopup) ?? true;
+    _distanceAlertVibration = _prefs.getBool(_keyDistanceAlertVibration) ?? true;
+    _distanceAlertSound = _prefs.getBool(_keyDistanceAlertSound) ?? false;
     notifyListeners();
   }
 
@@ -397,5 +433,59 @@ class SettingsProvider extends ChangeNotifier {
     _lastActivityType = value;
     notifyListeners();
     await _prefs.setString(_keyLastActivityType, value);
+  }
+
+  Future<void> setSpeedMaxAlertPopup(bool value) async {
+    _speedMaxAlertPopup = value;
+    notifyListeners();
+    await _prefs.setBool(_keySpeedMaxAlertPopup, value);
+  }
+
+  Future<void> setSpeedMaxAlertVibration(bool value) async {
+    _speedMaxAlertVibration = value;
+    notifyListeners();
+    await _prefs.setBool(_keySpeedMaxAlertVibration, value);
+  }
+
+  Future<void> setSpeedMaxAlertSound(bool value) async {
+    _speedMaxAlertSound = value;
+    notifyListeners();
+    await _prefs.setBool(_keySpeedMaxAlertSound, value);
+  }
+
+  Future<void> setSpeedMinAlertPopup(bool value) async {
+    _speedMinAlertPopup = value;
+    notifyListeners();
+    await _prefs.setBool(_keySpeedMinAlertPopup, value);
+  }
+
+  Future<void> setSpeedMinAlertVibration(bool value) async {
+    _speedMinAlertVibration = value;
+    notifyListeners();
+    await _prefs.setBool(_keySpeedMinAlertVibration, value);
+  }
+
+  Future<void> setSpeedMinAlertSound(bool value) async {
+    _speedMinAlertSound = value;
+    notifyListeners();
+    await _prefs.setBool(_keySpeedMinAlertSound, value);
+  }
+
+  Future<void> setDistanceAlertPopup(bool value) async {
+    _distanceAlertPopup = value;
+    notifyListeners();
+    await _prefs.setBool(_keyDistanceAlertPopup, value);
+  }
+
+  Future<void> setDistanceAlertVibration(bool value) async {
+    _distanceAlertVibration = value;
+    notifyListeners();
+    await _prefs.setBool(_keyDistanceAlertVibration, value);
+  }
+
+  Future<void> setDistanceAlertSound(bool value) async {
+    _distanceAlertSound = value;
+    notifyListeners();
+    await _prefs.setBool(_keyDistanceAlertSound, value);
   }
 }

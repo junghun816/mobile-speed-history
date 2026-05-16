@@ -28,9 +28,10 @@ class SettingsAlertScreen extends StatelessWidget {
           children: [
             _alertTile(
               context: context,
-              icon: Icons.speed_outlined,
-              title: '속도 초과 알림',
-              subtitle: '설정 속도 초과 시 진동 + 빨간색 표시',
+              iconColor: Colors.red,
+              icon: Icons.arrow_upward,
+              title: '최고 속도',
+              subtitle: '설정 속도 초과 시 알림',
               isOn: settings.speedAlertKmh != null,
               switchActiveColor: Colors.red,
               onSwitchChanged: (v) => settings.setSpeedAlertKmh(
@@ -43,22 +44,30 @@ class SettingsAlertScreen extends StatelessWidget {
               onTapValue: () async {
                 SystemSound.play(SystemSoundType.click);
                 final result = await NumberInputDialog.show(context,
-                    title: '속도 알림 기준', initialValue: settings.speedAlertKmh,
+                    title: '최고 속도 기준', initialValue: settings.speedAlertKmh,
                     unit: 'km/h', maxDigits: 3, allowEmpty: false, allowDecimal: false);
                 if (result != null) settings.setSpeedAlertKmh(result.toDouble());
               },
+              popupValue: settings.speedMaxAlertPopup,
+              onPopupChanged: (v) => settings.setSpeedMaxAlertPopup(v),
+              vibrationValue: settings.speedMaxAlertVibration,
+              onVibrationChanged: (v) => settings.setSpeedMaxAlertVibration(v),
+              soundValue: settings.speedMaxAlertSound,
+              onSoundChanged: (v) => settings.setSpeedMaxAlertSound(v),
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
+              dividerColor: cs.outlineVariant,
             ),
             SizedBox(height: 10.h),
             _alertTile(
               context: context,
-              icon: Icons.speed_outlined,
-              title: '속도 미달 알림',
-              subtitle: '설정 속도 미만 시 진동 + 파란색 표시',
+              iconColor: Colors.lightBlue,
+              icon: Icons.arrow_downward,
+              title: '최저 속도',
+              subtitle: '설정 속도 미만 시 알림',
               isOn: settings.speedMinAlertKmh != null,
               switchActiveColor: Colors.lightBlue,
               onSwitchChanged: (v) => settings.setSpeedMinAlertKmh(
@@ -71,22 +80,30 @@ class SettingsAlertScreen extends StatelessWidget {
               onTapValue: () async {
                 SystemSound.play(SystemSoundType.click);
                 final result = await NumberInputDialog.show(context,
-                    title: '속도 미달 알림 기준', initialValue: settings.speedMinAlertKmh,
+                    title: '최저 속도 기준', initialValue: settings.speedMinAlertKmh,
                     unit: 'km/h', maxDigits: 3, allowEmpty: false, allowDecimal: false);
                 if (result != null) settings.setSpeedMinAlertKmh(result.toDouble());
               },
+              popupValue: settings.speedMinAlertPopup,
+              onPopupChanged: (v) => settings.setSpeedMinAlertPopup(v),
+              vibrationValue: settings.speedMinAlertVibration,
+              onVibrationChanged: (v) => settings.setSpeedMinAlertVibration(v),
+              soundValue: settings.speedMinAlertSound,
+              onSoundChanged: (v) => settings.setSpeedMinAlertSound(v),
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
+              dividerColor: cs.outlineVariant,
             ),
             SizedBox(height: 10.h),
             _alertTile(
               context: context,
+              iconColor: Colors.green,
               icon: Icons.social_distance_outlined,
               title: '거리 알림',
-              subtitle: '설정 km 도달마다 알림 · 진동',
+              subtitle: '설정 km 도달마다 알림',
               isOn: settings.distanceAlertKm != null,
               switchActiveColor: Colors.green,
               onSwitchChanged: (v) => settings.setDistanceAlertKm(v ? (settings.distanceAlertKm ?? 5) : null),
@@ -100,11 +117,18 @@ class SettingsAlertScreen extends StatelessWidget {
                     unit: 'km', maxDigits: 3, allowEmpty: false, allowDecimal: false);
                 if (result != null) settings.setDistanceAlertKm(result.toInt());
               },
+              popupValue: settings.distanceAlertPopup,
+              onPopupChanged: (v) => settings.setDistanceAlertPopup(v),
+              vibrationValue: settings.distanceAlertVibration,
+              onVibrationChanged: (v) => settings.setDistanceAlertVibration(v),
+              soundValue: settings.distanceAlertSound,
+              onSoundChanged: (v) => settings.setDistanceAlertSound(v),
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
+              dividerColor: cs.outlineVariant,
             ),
           ],
         ),
@@ -114,6 +138,7 @@ class SettingsAlertScreen extends StatelessWidget {
 
   Widget _alertTile({
     required BuildContext context,
+    required Color iconColor,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -124,11 +149,18 @@ class SettingsAlertScreen extends StatelessWidget {
     required VoidCallback onDecrement,
     required VoidCallback onIncrement,
     required Future<void> Function() onTapValue,
+    bool? popupValue,
+    void Function(bool)? onPopupChanged,
+    bool? vibrationValue,
+    void Function(bool)? onVibrationChanged,
+    bool? soundValue,
+    void Function(bool)? onSoundChanged,
     required Color panelColor,
     required Color titleColor,
     required Color subtitleColor,
     required Color btnBgOff,
     required Color inactiveTrackColor,
+    required Color dividerColor,
   }) {
     return settingsPanelContainer(
       panelColor: panelColor,
@@ -137,7 +169,7 @@ class SettingsAlertScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              settingsIconBox(icon),
+              settingsIconBox(icon, color: iconColor),
               SizedBox(width: 14.w),
               Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
               Switch(
@@ -188,7 +220,61 @@ class SettingsAlertScreen extends StatelessWidget {
                 ),
               ],
             ),
+            if (popupValue != null &&
+                vibrationValue != null &&
+                soundValue != null &&
+                onPopupChanged != null &&
+                onVibrationChanged != null &&
+                onSoundChanged != null) ...[
+              SizedBox(height: 12.h),
+              Divider(height: 1, thickness: 0.5, color: dividerColor),
+              _methodRow(Icons.notifications_outlined, Colors.orange, '팝업',
+                  popupValue, onPopupChanged, inactiveTrackColor),
+              Divider(height: 1, thickness: 0.5, color: dividerColor),
+              _methodRow(Icons.vibration, Colors.deepPurple, '진동',
+                  vibrationValue, onVibrationChanged, inactiveTrackColor),
+              Divider(height: 1, thickness: 0.5, color: dividerColor),
+              _methodRow(Icons.volume_up_outlined, Colors.teal, '소리',
+                  soundValue, onSoundChanged, inactiveTrackColor),
+            ],
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _methodRow(
+    IconData icon,
+    Color iconColor,
+    String title,
+    bool value,
+    void Function(bool) onChanged,
+    Color inactiveTrackColor,
+  ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6.h),
+      child: Row(
+        children: [
+          settingsIconBox(icon, color: iconColor),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Text(title,
+                style: TextStyle(
+                  color: iconColor,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                )),
+          ),
+          Switch(
+            value: value,
+            onChanged: (v) {
+              SystemSound.play(SystemSoundType.click);
+              onChanged(v);
+            },
+            activeThumbColor: iconColor,
+            activeTrackColor: iconColor.withOpacity(0.35),
+            inactiveTrackColor: inactiveTrackColor,
+          ),
         ],
       ),
     );

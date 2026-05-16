@@ -29,13 +29,23 @@ class RideProvider extends ChangeNotifier {
 
   // 속도 알림
   double? _speedAlertKmh;
-  bool _wasAboveSpeedAlert = false;
   double? _speedMinAlertKmh;
-  bool _wasBelowSpeedAlert = false;
+  bool _speedMaxAlertPopupEnabled = true;
+  bool _speedMaxAlertVibrationEnabled = true;
+  bool _speedMaxAlertSoundEnabled = false;
+  bool _speedMinAlertPopupEnabled = true;
+  bool _speedMinAlertVibrationEnabled = true;
+  bool _speedMinAlertSoundEnabled = false;
+  int _speedAlertTriggerCount = 0;
+  int _lastSpeedAlertMs = 0;
 
   // 거리 알림
   int? _distanceAlertKm;
   int _lastAlertedKm = 0;
+  bool _distanceAlertPopupEnabled = true;
+  bool _distanceAlertVibrationEnabled = true;
+  bool _distanceAlertSoundEnabled = false;
+  int _distanceAlertTriggerCount = 0;
 
   // 자동 일시정지
   bool _autoPauseEnabled = false;
@@ -81,6 +91,9 @@ class RideProvider extends ChangeNotifier {
   bool get isAutoPaused => _isAutoPaused;
   bool get isManuallyPaused => _isManuallyPaused;
   bool get isPaused => _isManuallyPaused || _isAutoPaused;
+  int get speedAlertTriggerCount => _speedAlertTriggerCount;
+  int get distanceAlertTriggerCount => _distanceAlertTriggerCount;
+  int get lastAlertedKm => _lastAlertedKm;
   String get activityType => _activityType;
   int get completedLaps => _completedLaps;
 
@@ -151,6 +164,15 @@ class RideProvider extends ChangeNotifier {
     bool voiceGuidance = false,
     bool cadenceVibration = true,
     bool cadenceSound = false,
+    bool speedMaxAlertPopupEnabled = true,
+    bool speedMaxAlertVibrationEnabled = true,
+    bool speedMaxAlertSoundEnabled = false,
+    bool speedMinAlertPopupEnabled = true,
+    bool speedMinAlertVibrationEnabled = true,
+    bool speedMinAlertSoundEnabled = false,
+    bool distanceAlertPopupEnabled = true,
+    bool distanceAlertVibrationEnabled = true,
+    bool distanceAlertSoundEnabled = false,
   }) async {
     final hasPermission = await LocationService.requestPermission();
     if (!hasPermission) return;
@@ -175,11 +197,21 @@ class RideProvider extends ChangeNotifier {
     _isManuallyPaused = false;
     _manualPausedAt = null;
     _speedAlertKmh = speedAlertKmh;
-    _wasAboveSpeedAlert = false;
     _speedMinAlertKmh = speedMinAlertKmh;
-    _wasBelowSpeedAlert = false;
+    _speedMaxAlertPopupEnabled = speedMaxAlertPopupEnabled;
+    _speedMaxAlertVibrationEnabled = speedMaxAlertVibrationEnabled;
+    _speedMaxAlertSoundEnabled = speedMaxAlertSoundEnabled;
+    _speedMinAlertPopupEnabled = speedMinAlertPopupEnabled;
+    _speedMinAlertVibrationEnabled = speedMinAlertVibrationEnabled;
+    _speedMinAlertSoundEnabled = speedMinAlertSoundEnabled;
+    _speedAlertTriggerCount = 0;
+    _lastSpeedAlertMs = DateTime.now().millisecondsSinceEpoch;
     _distanceAlertKm = distanceAlertKm;
     _lastAlertedKm = 0;
+    _distanceAlertPopupEnabled = distanceAlertPopupEnabled;
+    _distanceAlertVibrationEnabled = distanceAlertVibrationEnabled;
+    _distanceAlertSoundEnabled = distanceAlertSoundEnabled;
+    _distanceAlertTriggerCount = 0;
     _useKmh = useKmh;
     _notificationTick = 0;
 
@@ -213,7 +245,7 @@ class RideProvider extends ChangeNotifier {
     if (cadenceBpm != null) {
       await _cadenceService.start(cadenceBpm, useVibration: cadenceVibration, useSound: cadenceSound);
     }
-    if (voiceGuidance) {
+    if (voiceGuidance || speedMaxAlertSoundEnabled || speedMinAlertSoundEnabled || distanceAlertSoundEnabled) {
       await VoiceGuidanceService.instance.init();
     }
 
@@ -274,27 +306,6 @@ class RideProvider extends ChangeNotifier {
 
     if (rawSpeed > _maxSpeed) _maxSpeed = rawSpeed;
 
-    // 속도 초과 알림: 임계값 상향 돌파 시 1회 진동
-    final alertKmh = _speedAlertKmh;
-    if (alertKmh != null) {
-      final isAbove = rawSpeed >= alertKmh;
-      if (isAbove && !_wasAboveSpeedAlert) {
-        HapticFeedback.heavyImpact();
-      }
-      _wasAboveSpeedAlert = isAbove;
-    }
-
-    // 속도 미만 알림: 임계값 하향 돌파 시 1회 진동 (정지·일시정지·초과 알림 활성 중 억제)
-    final minAlertKmh = _speedMinAlertKmh;
-    if (minAlertKmh != null) {
-      final suppressed = rawSpeed == 0 || _isManuallyPaused || _isAutoPaused || _wasAboveSpeedAlert;
-      final isBelow = !suppressed && rawSpeed < minAlertKmh;
-      if (isBelow && !_wasBelowSpeedAlert) {
-        HapticFeedback.heavyImpact();
-      }
-      _wasBelowSpeedAlert = isBelow;
-    }
-
     if (_lastPosition != null) {
       final distanceInMeters = LocationService.calculateDistance(
         _lastPosition!, position,
@@ -310,6 +321,11 @@ class RideProvider extends ChangeNotifier {
           if (reached > 0 && reached > _lastAlertedKm) {
             _lastAlertedKm = reached;
             ForegroundServiceHelper.showDistanceAlert(reached);
+            if (_distanceAlertPopupEnabled) _distanceAlertTriggerCount++;
+            if (_distanceAlertVibrationEnabled) HapticFeedback.heavyImpact();
+            if (_distanceAlertSoundEnabled) {
+              VoiceGuidanceService.instance.speak('$reached킬로미터 도달');
+            }
           }
         }
 
@@ -382,6 +398,27 @@ class RideProvider extends ChangeNotifier {
           _previousSpeed + (_targetSpeed - _previousSpeed) * t;
     } else {
       _currentSpeed = _targetSpeed;
+    }
+
+    // 속도 구간 이탈 시 주기적 알림 (3초 간격)
+    if (_isRiding && !_isManuallyPaused && !_isAutoPaused) {
+      final isOver = _speedAlertKmh != null && _currentSpeed >= _speedAlertKmh!;
+      final isUnder = _speedMinAlertKmh != null && _currentSpeed > 0 && _currentSpeed < _speedMinAlertKmh!;
+      if (isOver || isUnder) {
+        final nowMs = DateTime.now().millisecondsSinceEpoch;
+        if (nowMs - _lastSpeedAlertMs >= 3000) {
+          _lastSpeedAlertMs = nowMs;
+          if (isOver) {
+            if (_speedMaxAlertPopupEnabled) _speedAlertTriggerCount++;
+            if (_speedMaxAlertVibrationEnabled) HapticFeedback.heavyImpact();
+            if (_speedMaxAlertSoundEnabled) VoiceGuidanceService.instance.speak('속도 초과');
+          } else {
+            if (_speedMinAlertPopupEnabled) _speedAlertTriggerCount++;
+            if (_speedMinAlertVibrationEnabled) HapticFeedback.heavyImpact();
+            if (_speedMinAlertSoundEnabled) VoiceGuidanceService.instance.speak('속도 미달');
+          }
+        }
+      }
     }
 
     _notificationTick++;
