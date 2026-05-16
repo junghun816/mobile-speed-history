@@ -6,6 +6,11 @@ import 'package:vibration/vibration.dart';
 
 class CadenceService {
   Timer? _timer;
+  DateTime? _startTime;
+  int _beatCount = 0;
+  int _bpm = 0;
+  bool _useVibration = false;
+  bool _useSound = false;
   final AudioPlayer _audioPlayer = AudioPlayer();
   static final Uint8List _beepWav = _generateBeepWav();
 
@@ -49,16 +54,31 @@ class CadenceService {
       await _audioPlayer.setSourceBytes(_beepWav);
       await _audioPlayer.setReleaseMode(ReleaseMode.stop);
     }
-    final interval = Duration(milliseconds: (60000 / bpm).round());
-    _timer = Timer.periodic(interval, (_) {
-      if (useSound) _audioPlayer.seek(Duration.zero).then((_) => _audioPlayer.resume());
-      if (useVibration) Vibration.vibrate(duration: 50);
+    _bpm = bpm;
+    _useVibration = useVibration;
+    _useSound = useSound;
+    _beatCount = 0;
+    _startTime = DateTime.now();
+    _scheduleNext();
+  }
+
+  void _scheduleNext() {
+    _beatCount++;
+    final nextMs = (60000.0 * _beatCount / _bpm).round();
+    final nextTime = _startTime!.add(Duration(milliseconds: nextMs));
+    final delay = nextTime.difference(DateTime.now());
+    _timer = Timer(delay.isNegative ? Duration.zero : delay, () {
+      if (_useSound) _audioPlayer.seek(Duration.zero).then((_) => _audioPlayer.resume());
+      if (_useVibration) Vibration.vibrate(duration: 50);
+      _scheduleNext();
     });
   }
 
   void stop() {
     _timer?.cancel();
     _timer = null;
+    _startTime = null;
+    _beatCount = 0;
   }
 
   Future<void> dispose() async {
