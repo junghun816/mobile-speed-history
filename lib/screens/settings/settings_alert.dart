@@ -26,8 +26,7 @@ class SettingsAlertScreen extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [
-            _alertTile(
-              context: context,
+            _AlertTileWidget(
               iconColor: Colors.red,
               icon: Icons.arrow_upward,
               title: '최고 속도',
@@ -62,8 +61,7 @@ class SettingsAlertScreen extends StatelessWidget {
               dividerColor: cs.outlineVariant,
             ),
             SizedBox(height: 10.h),
-            _alertTile(
-              context: context,
+            _AlertTileWidget(
               iconColor: Colors.lightBlue,
               icon: Icons.arrow_downward,
               title: '최저 속도',
@@ -98,8 +96,7 @@ class SettingsAlertScreen extends StatelessWidget {
               dividerColor: cs.outlineVariant,
             ),
             SizedBox(height: 10.h),
-            _alertTile(
-              context: context,
+            _AlertTileWidget(
               iconColor: Colors.green,
               icon: Icons.social_distance_outlined,
               title: '거리 알림',
@@ -135,56 +132,125 @@ class SettingsAlertScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _alertTile({
-    required BuildContext context,
-    required Color iconColor,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool isOn,
-    required Color switchActiveColor,
-    required void Function(bool) onSwitchChanged,
-    required String stepperValue,
-    required VoidCallback onDecrement,
-    required VoidCallback onIncrement,
-    required Future<void> Function() onTapValue,
-    bool? popupValue,
-    void Function(bool)? onPopupChanged,
-    bool? vibrationValue,
-    void Function(bool)? onVibrationChanged,
-    bool? soundValue,
-    void Function(bool)? onSoundChanged,
-    required Color panelColor,
-    required Color titleColor,
-    required Color subtitleColor,
-    required Color btnBgOff,
-    required Color inactiveTrackColor,
-    required Color dividerColor,
-  }) {
+class _AlertTileWidget extends StatefulWidget {
+  final Color iconColor;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool isOn;
+  final Color switchActiveColor;
+  final void Function(bool) onSwitchChanged;
+  final String stepperValue;
+  final VoidCallback onDecrement;
+  final VoidCallback onIncrement;
+  final Future<void> Function() onTapValue;
+  final bool? popupValue;
+  final void Function(bool)? onPopupChanged;
+  final bool? vibrationValue;
+  final void Function(bool)? onVibrationChanged;
+  final bool? soundValue;
+  final void Function(bool)? onSoundChanged;
+  final Color panelColor;
+  final Color titleColor;
+  final Color subtitleColor;
+  final Color btnBgOff;
+  final Color inactiveTrackColor;
+  final Color dividerColor;
+
+  const _AlertTileWidget({
+    required this.iconColor,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.isOn,
+    required this.switchActiveColor,
+    required this.onSwitchChanged,
+    required this.stepperValue,
+    required this.onDecrement,
+    required this.onIncrement,
+    required this.onTapValue,
+    this.popupValue,
+    this.onPopupChanged,
+    this.vibrationValue,
+    this.onVibrationChanged,
+    this.soundValue,
+    this.onSoundChanged,
+    required this.panelColor,
+    required this.titleColor,
+    required this.subtitleColor,
+    required this.btnBgOff,
+    required this.inactiveTrackColor,
+    required this.dividerColor,
+  });
+
+  @override
+  State<_AlertTileWidget> createState() => _AlertTileWidgetState();
+}
+
+class _AlertTileWidgetState extends State<_AlertTileWidget> {
+  bool _isExpanded = false;
+
+  @override
+  void didUpdateWidget(_AlertTileWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isOn && !oldWidget.isOn) setState(() => _isExpanded = true);
+    if (!widget.isOn && oldWidget.isOn) setState(() => _isExpanded = false);
+  }
+
+  void _toggleExpand() {
+    SystemSound.play(SystemSoundType.click);
+    setState(() => _isExpanded = !_isExpanded);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return settingsPanelContainer(
-      panelColor: panelColor,
+      panelColor: widget.panelColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              settingsIconBox(icon, color: iconColor),
-              SizedBox(width: 14.w),
-              Expanded(child: settingsTileLabel(title, subtitle, titleColor, subtitleColor)),
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: widget.isOn ? _toggleExpand : null,
+                  child: Row(
+                    children: [
+                      settingsIconBox(widget.icon, color: widget.iconColor),
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: settingsTileLabel(
+                            widget.title, widget.subtitle, widget.titleColor, widget.subtitleColor),
+                      ),
+                      if (widget.isOn) ...[
+                        Icon(
+                          _isExpanded ? Icons.expand_less : Icons.expand_more,
+                          color: widget.subtitleColor,
+                          size: 20.r,
+                        ),
+                        SizedBox(width: 4.w),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
               Switch(
-                value: isOn,
+                value: widget.isOn,
                 onChanged: (v) {
                   SystemSound.play(SystemSoundType.click);
-                  onSwitchChanged(v);
+                  widget.onSwitchChanged(v);
                 },
-                activeThumbColor: switchActiveColor,
-                activeTrackColor: switchActiveColor.withOpacity(0.4),
-                inactiveTrackColor: inactiveTrackColor,
+                activeThumbColor: widget.switchActiveColor,
+                activeTrackColor: widget.switchActiveColor.withOpacity(0.4),
+                inactiveTrackColor: widget.inactiveTrackColor,
               ),
             ],
           ),
-          if (isOn) ...[
+          if (widget.isOn && _isExpanded) ...[
+            Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
             SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -192,56 +258,64 @@ class SettingsAlertScreen extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     SystemSound.play(SystemSoundType.click);
-                    onDecrement();
+                    widget.onDecrement();
                   },
                   child: Container(
                     width: 40.r, height: 40.r,
-                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
-                    child: Icon(Icons.remove, color: titleColor, size: 20.r),
+                    decoration: BoxDecoration(
+                        color: widget.btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Icon(Icons.remove, color: widget.titleColor, size: 20.r),
                   ),
                 ),
                 SizedBox(width: 20.w),
                 GestureDetector(
-                  onTap: onTapValue,
+                  onTap: widget.onTapValue,
                   child: Container(
                     width: 90.w,
                     padding: EdgeInsets.symmetric(vertical: 8.h),
-                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
-                    child: Text(stepperValue,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: titleColor, fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                    decoration: BoxDecoration(
+                        color: widget.btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Text(
+                      widget.stepperValue,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: widget.titleColor,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
                 SizedBox(width: 20.w),
                 GestureDetector(
                   onTap: () {
                     SystemSound.play(SystemSoundType.click);
-                    onIncrement();
+                    widget.onIncrement();
                   },
                   child: Container(
                     width: 40.r, height: 40.r,
-                    decoration: BoxDecoration(color: btnBgOff, borderRadius: BorderRadius.circular(8.r)),
-                    child: Icon(Icons.add, color: titleColor, size: 20.r),
+                    decoration: BoxDecoration(
+                        color: widget.btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Icon(Icons.add, color: widget.titleColor, size: 20.r),
                   ),
                 ),
               ],
             ),
-            if (popupValue != null &&
-                vibrationValue != null &&
-                soundValue != null &&
-                onPopupChanged != null &&
-                onVibrationChanged != null &&
-                onSoundChanged != null) ...[
-              SizedBox(height: 12.h),
-              Divider(height: 1, thickness: 0.5, color: dividerColor),
+            SizedBox(height: 12.h),
+            if (widget.popupValue != null &&
+                widget.vibrationValue != null &&
+                widget.soundValue != null &&
+                widget.onPopupChanged != null &&
+                widget.onVibrationChanged != null &&
+                widget.onSoundChanged != null) ...[
+              Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
               _methodRow(Icons.notifications_outlined, Colors.indigo[300]!, '팝업',
-                  popupValue, onPopupChanged, inactiveTrackColor),
-              Divider(height: 1, thickness: 0.5, color: dividerColor),
+                  widget.popupValue!, widget.onPopupChanged!, widget.inactiveTrackColor),
+              Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
               _methodRow(Icons.vibration, Colors.indigo[300]!, '진동',
-                  vibrationValue, onVibrationChanged, inactiveTrackColor),
-              Divider(height: 1, thickness: 0.5, color: dividerColor),
+                  widget.vibrationValue!, widget.onVibrationChanged!, widget.inactiveTrackColor),
+              Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
               _methodRow(Icons.volume_up_outlined, Colors.indigo[300]!, '소리',
-                  soundValue, onSoundChanged, inactiveTrackColor),
+                  widget.soundValue!, widget.onSoundChanged!, widget.inactiveTrackColor),
             ],
           ],
         ],

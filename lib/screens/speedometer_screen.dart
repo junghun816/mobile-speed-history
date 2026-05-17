@@ -349,7 +349,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                         distanceAlertKm: isBike ? settings.distanceAlertKm : null,
                         useKmh: settings.useKmh,
                         activityType: _selectedActivityType,
-                        cadenceBpm: _selectedActivityType == 'run'
+                        cadenceBpm: _selectedActivityType == 'run' && settings.cadenceEnabled
                             ? settings.defaultCadenceBpm
                             : null,
                         targetPaceSecPerKm: _selectedActivityType == 'run'

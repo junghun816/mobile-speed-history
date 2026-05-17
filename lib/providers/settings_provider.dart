@@ -33,6 +33,7 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyMapTrackingMode = 'map_tracking_mode';
   static const _keyStartTab = 'start_tab';
   static const _keyRunningVoiceGuidance = 'running_voice_guidance';
+  static const _keyCadenceEnabled = 'cadence_enabled';
   static const _keyCadenceVibration = 'cadence_vibration';
   static const _keyCadenceSound = 'cadence_sound';
   static const _keyDefaultCadenceBpm = 'default_cadence_bpm';
@@ -80,9 +81,10 @@ class SettingsProvider extends ChangeNotifier {
   String _mapTrackingMode = 'none';
   int _startTab = 0;
   bool _runningVoiceGuidance = true;
+  bool _cadenceEnabled = false;
   bool _cadenceVibration = true;
   bool _cadenceSound = false;
-  int? _defaultCadenceBpm;
+  int _defaultCadenceBpm = 160;
   String _lastActivityType = 'bike';
   int? _defaultTargetPaceSecPerKm;
   bool _speedMaxAlertPopup = true;
@@ -126,9 +128,10 @@ class SettingsProvider extends ChangeNotifier {
   String get mapTrackingMode => _mapTrackingMode;
   int get startTab => _startTab;
   bool get runningVoiceGuidance => _runningVoiceGuidance;
+  bool get cadenceEnabled => _cadenceEnabled;
   bool get cadenceVibration => _cadenceVibration;
   bool get cadenceSound => _cadenceSound;
-  int? get defaultCadenceBpm => _defaultCadenceBpm;
+  int get defaultCadenceBpm => _defaultCadenceBpm;
   String get lastActivityType => _lastActivityType;
   int? get defaultTargetPaceSecPerKm => _defaultTargetPaceSecPerKm;
   bool get speedMaxAlertPopup => _speedMaxAlertPopup;
@@ -180,9 +183,10 @@ class SettingsProvider extends ChangeNotifier {
     _mapTrackingMode = _prefs.getString(_keyMapTrackingMode) ?? 'none';
     _startTab = _prefs.getInt(_keyStartTab) ?? 0;
     _runningVoiceGuidance = _prefs.getBool(_keyRunningVoiceGuidance) ?? true;
+    _cadenceEnabled = _prefs.getBool(_keyCadenceEnabled) ?? (_prefs.getInt(_keyDefaultCadenceBpm) != null);
     _cadenceVibration = _prefs.getBool(_keyCadenceVibration) ?? true;
     _cadenceSound = _prefs.getBool(_keyCadenceSound) ?? false;
-    _defaultCadenceBpm = _prefs.getInt(_keyDefaultCadenceBpm);
+    _defaultCadenceBpm = _prefs.getInt(_keyDefaultCadenceBpm) ?? 160;
     _lastActivityType = _prefs.getString(_keyLastActivityType) ?? 'bike';
     _defaultTargetPaceSecPerKm = _prefs.getInt(_keyDefaultTargetPaceSecPerKm);
     _speedMaxAlertPopup = _prefs.getBool(_keySpeedMaxAlertPopup) ?? true;
@@ -405,6 +409,12 @@ class SettingsProvider extends ChangeNotifier {
     await _prefs.setBool(_keyRunningVoiceGuidance, value);
   }
 
+  Future<void> setCadenceEnabled(bool value) async {
+    _cadenceEnabled = value;
+    notifyListeners();
+    await _prefs.setBool(_keyCadenceEnabled, value);
+  }
+
   Future<void> setCadenceVibration(bool value) async {
     _cadenceVibration = value;
     notifyListeners();
@@ -417,12 +427,10 @@ class SettingsProvider extends ChangeNotifier {
     await _prefs.setBool(_keyCadenceSound, value);
   }
 
-  Future<void> setDefaultCadenceBpm(int? value) async {
-    _defaultCadenceBpm = value != null ? value.clamp(40, 240) : null;
+  Future<void> setDefaultCadenceBpm(int value) async {
+    _defaultCadenceBpm = value.clamp(40, 240);
     notifyListeners();
-    _defaultCadenceBpm != null
-        ? await _prefs.setInt(_keyDefaultCadenceBpm, _defaultCadenceBpm!)
-        : await _prefs.remove(_keyDefaultCadenceBpm);
+    await _prefs.setInt(_keyDefaultCadenceBpm, _defaultCadenceBpm);
   }
 
   Future<void> setDefaultTargetPaceSecPerKm(int? value) async {

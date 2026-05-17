@@ -23,64 +23,21 @@ class SettingsRunningScreen extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [
-            _switchTile(
-              context: context,
-              icon: Icons.record_voice_over_outlined,
-              title: '음성 안내',
-              subtitle: '랩마다 거리·페이스를 음성으로 안내',
-              value: settings.runningVoiceGuidance,
-              onChanged: (v) => settings.setRunningVoiceGuidance(v),
+            _CadenceTile(
+              cadenceEnabled: settings.cadenceEnabled,
+              cadenceVibration: settings.cadenceVibration,
+              cadenceSound: settings.cadenceSound,
+              defaultCadenceBpm: settings.defaultCadenceBpm,
+              onEnabledChanged: settings.setCadenceEnabled,
+              onVibrationChanged: settings.setCadenceVibration,
+              onSoundChanged: settings.setCadenceSound,
+              onBpmChanged: (v) => settings.setDefaultCadenceBpm(v),
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
-            ),
-            SizedBox(height: 10.h),
-            _switchTile(
-              context: context,
-              icon: Icons.vibration,
-              title: '케이던스 진동',
-              subtitle: 'BPM 박자에 맞춰 진동',
-              value: settings.cadenceVibration,
-              onChanged: (v) => settings.setCadenceVibration(v),
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-            ),
-            SizedBox(height: 10.h),
-            _switchTile(
-              context: context,
-              icon: Icons.volume_up_outlined,
-              title: '케이던스 소리',
-              subtitle: 'BPM 박자에 맞춰 미디어 음 출력',
-              value: settings.cadenceSound,
-              onChanged: (v) => settings.setCadenceSound(v),
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-            ),
-            SizedBox(height: 10.h),
-            _inputTile(
-              context: context,
-              icon: Icons.music_note_outlined,
-              title: '케이던스 BPM',
-              subtitle: '40~240 BPM.\n설정 안 하면 비활성',
-              value: settings.defaultCadenceBpm != null
-                  ? '${settings.defaultCadenceBpm} bpm'
-                  : '비활성',
-              panelColor: panelColor,
-              titleColor: titleColor,
-              subtitleColor: subtitleColor,
-              onTap: () async {
-                final v = await NumberInputDialog.show(
-                  context,
-                  title: '케이던스 BPM',
-                  unit: 'bpm',
-                  initialValue: settings.defaultCadenceBpm,
-                  allowDecimal: false,
-                );
-                if (v == null) return;
-                await settings.setDefaultCadenceBpm(v < 40 ? null : v.toInt());
-              },
+              btnBgOff: cs.surfaceContainerHighest,
+              inactiveTrackColor: cs.outlineVariant,
+              dividerColor: cs.outlineVariant,
             ),
             SizedBox(height: 10.h),
             _inputTile(
@@ -105,6 +62,18 @@ class SettingsRunningScreen extends StatelessWidget {
                 if (v == null) return;
                 await settings.setDefaultTargetPaceSecPerKm(v <= 0 ? null : v.toInt());
               },
+            ),
+            SizedBox(height: 10.h),
+            _switchTile(
+              context: context,
+              icon: Icons.record_voice_over_outlined,
+              title: '음성 안내',
+              subtitle: '랩마다 거리·페이스를 음성으로 안내',
+              value: settings.runningVoiceGuidance,
+              onChanged: (v) => settings.setRunningVoiceGuidance(v),
+              panelColor: panelColor,
+              titleColor: titleColor,
+              subtitleColor: subtitleColor,
             ),
           ],
         ),
@@ -180,6 +149,216 @@ class SettingsRunningScreen extends StatelessWidget {
             },
             activeThumbColor: Colors.indigo,
             activeTrackColor: Colors.indigo.withOpacity(0.4),
+            inactiveTrackColor: inactiveTrackColor,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CadenceTile extends StatefulWidget {
+  final bool cadenceEnabled;
+  final bool cadenceVibration;
+  final bool cadenceSound;
+  final int defaultCadenceBpm;
+  final void Function(bool) onEnabledChanged;
+  final void Function(bool) onVibrationChanged;
+  final void Function(bool) onSoundChanged;
+  final void Function(int) onBpmChanged;
+  final Color panelColor;
+  final Color titleColor;
+  final Color subtitleColor;
+  final Color btnBgOff;
+  final Color inactiveTrackColor;
+  final Color dividerColor;
+
+  const _CadenceTile({
+    required this.cadenceEnabled,
+    required this.cadenceVibration,
+    required this.cadenceSound,
+    required this.defaultCadenceBpm,
+    required this.onEnabledChanged,
+    required this.onVibrationChanged,
+    required this.onSoundChanged,
+    required this.onBpmChanged,
+    required this.panelColor,
+    required this.titleColor,
+    required this.subtitleColor,
+    required this.btnBgOff,
+    required this.inactiveTrackColor,
+    required this.dividerColor,
+  });
+
+  @override
+  State<_CadenceTile> createState() => _CadenceTileState();
+}
+
+class _CadenceTileState extends State<_CadenceTile> {
+  bool _isExpanded = false;
+
+  @override
+  void didUpdateWidget(_CadenceTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.cadenceEnabled && !oldWidget.cadenceEnabled) setState(() => _isExpanded = true);
+    if (!widget.cadenceEnabled && oldWidget.cadenceEnabled) setState(() => _isExpanded = false);
+  }
+
+  void _toggleExpand() {
+    SystemSound.play(SystemSoundType.click);
+    setState(() => _isExpanded = !_isExpanded);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const mainColor = Colors.green;
+    return settingsPanelContainer(
+      panelColor: widget.panelColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: widget.cadenceEnabled ? _toggleExpand : null,
+                  child: Row(
+                    children: [
+                      settingsIconBox(Icons.music_note_outlined, color: mainColor),
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: settingsTileLabel('케이던스', 'BPM 박자에 맞춰 진동·소리 출력',
+                            widget.titleColor, widget.subtitleColor),
+                      ),
+                      if (widget.cadenceEnabled) ...[
+                        Icon(
+                          _isExpanded ? Icons.expand_less : Icons.expand_more,
+                          color: widget.subtitleColor,
+                          size: 20.r,
+                        ),
+                        SizedBox(width: 4.w),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+              Switch(
+                value: widget.cadenceEnabled,
+                onChanged: (v) {
+                  SystemSound.play(SystemSoundType.click);
+                  widget.onEnabledChanged(v);
+                },
+                activeThumbColor: mainColor,
+                activeTrackColor: mainColor.withOpacity(0.35),
+                inactiveTrackColor: widget.inactiveTrackColor,
+              ),
+            ],
+          ),
+          if (widget.cadenceEnabled && _isExpanded) ...[
+            Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
+            SizedBox(height: 12.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    widget.onBpmChanged(widget.defaultCadenceBpm - 1);
+                  },
+                  child: Container(
+                    width: 40.r, height: 40.r,
+                    decoration: BoxDecoration(
+                        color: widget.btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Icon(Icons.remove, color: widget.titleColor, size: 20.r),
+                  ),
+                ),
+                SizedBox(width: 20.w),
+                GestureDetector(
+                  onTap: () async {
+                    SystemSound.play(SystemSoundType.click);
+                    final result = await NumberInputDialog.show(context,
+                        title: '케이던스 BPM',
+                        initialValue: widget.defaultCadenceBpm.toDouble(),
+                        unit: 'bpm',
+                        maxDigits: 3,
+                        allowEmpty: false,
+                        allowDecimal: false);
+                    if (result != null) widget.onBpmChanged(result.toInt());
+                  },
+                  child: Container(
+                    width: 90.w,
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    decoration: BoxDecoration(
+                        color: widget.btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Text(
+                      '${widget.defaultCadenceBpm} bpm',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: widget.titleColor,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20.w),
+                GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    widget.onBpmChanged(widget.defaultCadenceBpm + 1);
+                  },
+                  child: Container(
+                    width: 40.r, height: 40.r,
+                    decoration: BoxDecoration(
+                        color: widget.btnBgOff, borderRadius: BorderRadius.circular(8.r)),
+                    child: Icon(Icons.add, color: widget.titleColor, size: 20.r),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
+            _methodRow(Icons.vibration, Colors.indigo[300]!, '진동',
+                widget.cadenceVibration, widget.onVibrationChanged, widget.inactiveTrackColor),
+            Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
+            _methodRow(Icons.volume_up_outlined, Colors.indigo[300]!, '소리',
+                widget.cadenceSound, widget.onSoundChanged, widget.inactiveTrackColor),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _methodRow(
+    IconData icon,
+    Color iconColor,
+    String title,
+    bool value,
+    void Function(bool) onChanged,
+    Color inactiveTrackColor,
+  ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 6.h),
+      child: Row(
+        children: [
+          settingsIconBox(icon, color: iconColor),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Text(title,
+                style: TextStyle(
+                  color: iconColor,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                )),
+          ),
+          Switch(
+            value: value,
+            onChanged: (v) {
+              SystemSound.play(SystemSoundType.click);
+              onChanged(v);
+            },
+            activeThumbColor: iconColor,
+            activeTrackColor: iconColor.withOpacity(0.35),
             inactiveTrackColor: inactiveTrackColor,
           ),
         ],
