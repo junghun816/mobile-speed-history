@@ -120,7 +120,7 @@ class _SettingsUserScreenState extends State<SettingsUserScreen> {
                             settings.userName.isNotEmpty ? settings.userName : '--',
                             style: TextStyle(
                               color: settings.userName.isNotEmpty
-                                  ? Colors.indigo
+                                  ? Colors.blueGrey
                                   : subtitleColor,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
@@ -180,7 +180,7 @@ class _SettingsUserScreenState extends State<SettingsUserScreen> {
                                 : '--',
                             style: TextStyle(
                               color: settings.weightKg != null
-                                  ? Colors.indigo
+                                  ? Colors.blueGrey
                                   : subtitleColor,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
@@ -220,12 +220,12 @@ class _SettingsUserScreenState extends State<SettingsUserScreen> {
                     },
                     child: Row(
                       children: [
-                        Icon(Icons.add, color: Colors.indigo, size: 16.r),
+                        Icon(Icons.add, color: Colors.blueGrey, size: 16.r),
                         SizedBox(width: 2.w),
                         Text(
                           '추가',
                           style: TextStyle(
-                              color: Colors.indigo,
+                              color: Colors.blueGrey,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.bold),
                         ),

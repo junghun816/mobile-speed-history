@@ -109,7 +109,7 @@ class SettingsRunningScreen extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                color: Colors.indigo,
+                color: Colors.blueGrey,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
               ),
@@ -147,8 +147,8 @@ class SettingsRunningScreen extends StatelessWidget {
               SystemSound.play(SystemSoundType.click);
               onChanged(v);
             },
-            activeThumbColor: Colors.indigo,
-            activeTrackColor: Colors.indigo.withOpacity(0.4),
+            activeThumbColor: Colors.blueGrey,
+            activeTrackColor: Colors.blueGrey.withOpacity(0.4),
             inactiveTrackColor: inactiveTrackColor,
           ),
         ],
@@ -318,10 +318,10 @@ class _CadenceTileState extends State<_CadenceTile> {
             ),
             SizedBox(height: 12.h),
             Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
-            _methodRow(Icons.vibration, Colors.indigo[300]!, '진동',
+            _methodRow(Icons.vibration, Colors.blueGrey, '진동',
                 widget.cadenceVibration, widget.onVibrationChanged, widget.inactiveTrackColor),
             Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
-            _methodRow(Icons.volume_up_outlined, Colors.indigo[300]!, '소리',
+            _methodRow(Icons.volume_up_outlined, Colors.blueGrey, '소리',
                 widget.cadenceSound, widget.onSoundChanged, widget.inactiveTrackColor),
           ],
         ],

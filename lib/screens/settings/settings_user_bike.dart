@@ -618,7 +618,7 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
             Text(
               date != null ? _formatDate(date) : '미설정',
               style: TextStyle(
-                color: date != null ? Colors.indigo : subtitleColor,
+                color: date != null ? Colors.blueGrey : subtitleColor,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.bold,
               ),

@@ -308,13 +308,13 @@ class _AlertTileWidgetState extends State<_AlertTileWidget> {
                 widget.onVibrationChanged != null &&
                 widget.onSoundChanged != null) ...[
               Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
-              _methodRow(Icons.notifications_outlined, Colors.indigo[300]!, '팝업',
+              _methodRow(Icons.notifications_outlined, Colors.blueGrey, '팝업',
                   widget.popupValue!, widget.onPopupChanged!, widget.inactiveTrackColor),
               Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
-              _methodRow(Icons.vibration, Colors.indigo[300]!, '진동',
+              _methodRow(Icons.vibration, Colors.blueGrey, '진동',
                   widget.vibrationValue!, widget.onVibrationChanged!, widget.inactiveTrackColor),
               Divider(height: 1, thickness: 0.5, color: widget.dividerColor),
-              _methodRow(Icons.volume_up_outlined, Colors.indigo[300]!, '소리',
+              _methodRow(Icons.volume_up_outlined, Colors.blueGrey, '소리',
                   widget.soundValue!, widget.onSoundChanged!, widget.inactiveTrackColor),
             ],
           ],

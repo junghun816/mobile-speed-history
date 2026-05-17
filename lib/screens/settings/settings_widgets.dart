@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-Widget settingsIconBox(IconData icon, {Color color = Colors.indigo}) {
+Widget settingsIconBox(IconData icon, {Color color = Colors.blueGrey}) {
   return Container(
     width: 36.r,
     height: 36.r,
@@ -84,7 +84,7 @@ Widget settingsOptionButton(
   required Color btnTextOff,
   double fontSize = 12,
   EdgeInsets? margin,
-  Color selectedColor = Colors.indigo,
+  Color selectedColor = Colors.blueGrey,
 }) {
   return GestureDetector(
     onTap: () {

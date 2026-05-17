@@ -7,7 +7,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../db/database_helper.dart';
 import '../../db/sample_data.dart';
 import '../../providers/ride_provider.dart';
-import '../../providers/settings_provider.dart';
 import '../../utils/utils_backup.dart';
 import '../../utils/utils_gpx.dart';
 import '../../widgets/widgets_loading_overlay.dart';
@@ -47,14 +46,10 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<SettingsProvider>();
     final cs = Theme.of(context).colorScheme;
     final panelColor = cs.surfaceContainer;
     final titleColor = cs.onSurface;
     final subtitleColor = cs.onSurfaceVariant;
-    final btnBgOff = cs.surfaceContainerHighest;
-    final btnBorderOff = cs.outlineVariant;
-    final btnTextOff = cs.onSurfaceVariant;
     final sectionColor = cs.outline;
 
     return Scaffold(
@@ -63,10 +58,6 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [
-            _themeTile(settings, panelColor, titleColor, subtitleColor, btnBorderOff),
-            SizedBox(height: 10.h),
-            _startTabTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
-            SizedBox(height: 10.h),
             _navTile(
               icon: Icons.upload_file,
               title: '백업 / 내보내기',
@@ -132,136 +123,6 @@ class _SettingsSystemScreenState extends State<SettingsSystemScreen> {
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _themeTile(
-    SettingsProvider settings,
-    Color panelColor,
-    Color titleColor,
-    Color subtitleColor,
-    Color btnBorderOff,
-  ) {
-    return settingsPanelContainer(
-      panelColor: panelColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              settingsIconBox(Icons.palette_outlined, color: Colors.blueGrey),
-              SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('테마',
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text('속도계 화면 색상 테마',
-                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Row(
-            children: [
-              Expanded(child: _themeButton(settings, 'dark', Icons.dark_mode_outlined, 'Dark',
-                  fixedBg: Colors.grey[900]!, fixedFg: Colors.white, btnBorderOff: btnBorderOff)),
-              SizedBox(width: 6.w),
-              Expanded(child: _themeButton(settings, 'light', Icons.light_mode_outlined, 'Light',
-                  fixedBg: Colors.white, fixedFg: Colors.black87, btnBorderOff: btnBorderOff)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _themeButton(SettingsProvider settings, String theme, IconData icon, String label, {
-    required Color fixedBg,
-    required Color fixedFg,
-    required Color btnBorderOff,
-  }) {
-    final isSelected = settings.appTheme == theme;
-    return GestureDetector(
-      onTap: () {
-        SystemSound.play(SystemSoundType.click);
-        settings.setAppTheme(theme);
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.h),
-        decoration: BoxDecoration(
-          color: fixedBg,
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(
-            color: isSelected ? Colors.blueGrey : btnBorderOff,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: fixedFg, size: 16.r),
-            SizedBox(width: 6.w),
-            Text(label,
-                style: TextStyle(color: fixedFg, fontSize: 13.sp,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _startTabTile(
-    SettingsProvider settings,
-    Color panelColor,
-    Color titleColor,
-    Color subtitleColor,
-    Color btnBgOff,
-    Color btnBorderOff,
-    Color btnTextOff,
-  ) {
-    const labels = ['속도계', '지도', '기록', '목표', '설정'];
-    return settingsPanelContainer(
-      panelColor: panelColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              settingsIconBox(Icons.home_outlined, color: Colors.blueGrey),
-              SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('시작 탭',
-                        style: TextStyle(color: titleColor, fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2.h),
-                    Text('앱 실행 시 처음 열리는 탭',
-                        style: TextStyle(color: subtitleColor, fontSize: 12.sp)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Row(
-            children: List.generate(labels.length, (i) => Expanded(
-              child: settingsOptionButton(
-                labels[i], settings.startTab == i, () => settings.setStartTab(i),
-                btnBgOff: btnBgOff, btnBorderOff: btnBorderOff, btnTextOff: btnTextOff,
-                fontSize: 11,
-                margin: EdgeInsets.only(right: i < labels.length - 1 ? 6.w : 0),
-                selectedColor: Colors.blueGrey,
-              ),
-            )),
-          ),
-        ],
       ),
     );
   }
