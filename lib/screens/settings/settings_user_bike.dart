@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../db/database_helper.dart';
 import '../../models/bike_record.dart';
+import '../../widgets/widgets_app_body.dart';
 import '../../widgets/widgets_text_field.dart';
 import 'settings_widgets.dart';
 
@@ -417,9 +418,7 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
           ),
         ],
       ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        behavior: HitTestBehavior.translucent,
+      body: AppBody(
         child: ListView(
         padding: EdgeInsets.all(16.r),
         children: [

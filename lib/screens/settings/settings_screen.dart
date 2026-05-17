@@ -78,7 +78,7 @@ class SettingsScreen extends StatelessWidget {
             settingsTile(
               icon: Icons.person_outline,
               title: '사용자',
-              subtitle: '',
+              subtitle: '개인 · 자전거 정보 관리',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,

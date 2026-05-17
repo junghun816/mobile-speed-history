@@ -59,6 +59,14 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+class _UnfocusObserver extends NavigatorObserver {
+  @override
+  void didPop(Route route, Route? previousRoute) {
+    final ctx = navigator?.context;
+    if (ctx != null) FocusScope.of(ctx).unfocus();
+  }
+}
+
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
@@ -89,6 +97,7 @@ class _MyAppState extends State<MyApp> {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: settings.themeMode,
+        navigatorObservers: [_UnfocusObserver()],
         home: settings.shouldShowOnboarding
             ? const OnboardingScreen()
             : const MainScreen(),
