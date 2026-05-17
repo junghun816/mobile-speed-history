@@ -185,7 +185,9 @@ Android/iOS를 지원하는 자전거 속도계 앱. 상태관리는 **Provider*
 
 ### 데이터 레이어
 
-`DatabaseHelper` (`lib/db/database_helper.dart`) — sqflite를 감싸는 싱글턴. DB 파일명 `bike_speedometer.db`, 버전 4. 테이블: `ride_records` (`id, year, month, day, totalDistance, maxSpeed, avgSpeed, duration, pathPoints(JSON), createdAt(ms epoch), memo`).
+`DatabaseHelper` (`lib/db/database_helper.dart`) — sqflite를 감싸는 싱글턴. DB 파일명 `bike_speedometer.db`, 버전 **6**. 마이그레이션 추가 시 버전을 올려야 한다.
+- 테이블 `ride_records`: `id, year, month, day, totalDistance, maxSpeed, avgSpeed, duration, pathPoints(JSON), createdAt(ms epoch), memo, activityType, lapSplits(JSON)`
+- 테이블 `bikes`: 자전거 관리용 (v6 신규)
 
 `RideRecord` (`lib/models/ride_record.dart`) — `toMap()`/`fromMap()`을 가진 불변 데이터 클래스.
 
@@ -195,13 +197,19 @@ GPS 경로 좌표는 `pathPoints` 컬럼에 `[{lat, lng}, ...]` 형태의 JSON �
 
 - **`LocationService`** — `geolocator` 래퍼. 플랫폼별 설정(Android: `AndroidSettings`, iOS: `AppleSettings`)으로 `Stream<Position>`을 반환한다.
 - **`ForegroundServiceHelper`** — `flutter_local_notifications`로 주행 중 상태 알림을 관리한다. Android는 `AndroidNotificationDetails`, iOS는 `DarwinNotificationDetails`를 사용한다. 주행 시작 시 `start()`, 종료 시 `stop()` 호출.
+- **`CadenceService`** — 런닝 케이던스 메트로놈. 진동·소리 독립 제어.
+- **`VoiceGuidanceService`** — `flutter_tts` 기반 런닝 음성 안내 TTS.
 
 ### GPS 필터링 (`RideProvider._onPositionUpdate`)
 
+`SpeedMode`에 따라 임계값이 달라진다. `SpeedMode.normal`(자전거)과 `SpeedMode.lowSpeed`(런닝) 두 가지이며 `_applySpeedMode()`로 적용된다:
+- `normal`: 정확도 게이트 15m, 최소 이동 5m
+- `lowSpeed`: 정확도 게이트 25m, 최소 이동 2m
+
 GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
-1. 정확도 게이트: `accuracy > 25m`이면 무시
+1. 정확도 게이트: `accuracy > _maxAccuracyMeters`이면 무시 (모드별 상이)
 2. 속도 급등 필터: 이전 속도 대비 3배 이상 급등하고 20 km/h 초과이면 무시
-3. 드리프트 게이트: 이전 위치와의 거리가 3m 미만이면 거리 누적 안 함
+3. 드리프트 게이트: 이전 위치와의 거리가 `_minMovementMeters` 미만이면 거리 누적 안 함 (모드별 상이)
 
 화면에 표시되는 속도는 이전 GPS 속도와 새 속도 사이를 5단계로 선형 보간(200ms × 5 = 1초)하여 바늘이 부드럽게 움직이도록 한다.
 
@@ -217,7 +225,7 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 
 ### 단위 변환
 
-내부 값은 모두 **km/h**(속도), **km**(거리)로 저장·계산한다. `lib/utils/format_utils.dart`의 `formatSpeed`, `formatDistance`, `speedUnit`, `distanceUnit`, `convertSpeed`, `convertDistance`를 사용해 표시 시점에만 변환한다. 저장 시점에 변환하지 않는다.
+내부 값은 모두 **km/h**(속도), **km**(거리)로 저장·계산한다. `lib/utils/utils_format.dart`의 `formatSpeed`, `formatDistance`, `speedUnit`, `distanceUnit`, `convertSpeed`, `convertDistance`를 사용해 표시 시점에만 변환한다. 저장 시점에 변환하지 않는다.
 
 ### 네이버 지도
 
@@ -231,27 +239,31 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 
 억지로 묶지 않되, 동일한 로직이나 UI 패턴이 여러 곳에서 반복된다고 판단되면 `lib/utils/` 또는 `lib/widgets/`로 분리한다.
 
-- `lib/utils/format_utils.dart` — 속도·거리·시간·숫자 포맷, 단위 변환, 칼로리 계산
-- `lib/widgets/number_input_dialog.dart` — 숫자 키패드 입력 다이얼로그. `allowDecimal: true`로 소수점 입력 활성화 가능. 반환 타입 `double?`, 빈 확인 시 `clearValue(-1)` 반환
-- `lib/widgets/memo_bottom_sheet.dart` — 메모 입력 바텀시트. `showMemoBottomSheet(context, controller: ctrl)` 호출. 완료 시 `controller.text`에 값이 쓰여 반환되므로 호출 후 직접 읽으면 된다.
-- `lib/widgets/stat_item.dart` — 통계 표시 위젯 2종:
+파일명 규칙: 유틸은 `utils_*.dart`, 위젯은 `widgets_*.dart` 접두사를 사용한다. 새 파일 생성 시 이 규칙을 따른다.
+
+- `lib/utils/utils_format.dart` — 속도·거리·시간·숫자 포맷, 단위 변환, 칼로리 계산, `paceFromSpeed()`
+- `lib/widgets/widgets_number_input.dart` — 숫자 키패드 입력 다이얼로그. `allowDecimal: true`로 소수점 입력 활성화 가능. 반환 타입 `double?`, 빈 확인 시 `clearValue(-1)` 반환
+- `lib/widgets/widgets_memo_sheet.dart` — 메모 입력 바텀시트. `showMemoBottomSheet(context, controller: ctrl)` 호출. 완료 시 `controller.text`에 값이 쓰여 반환되므로 호출 후 직접 읽으면 된다.
+- `lib/widgets/widgets_stat_item.dart` — 통계 표시 위젯 2종:
   - `StatDetailItem(label, value, unit, textColor)` — 값(16px 굵게) + 단위(파란색, 선택) + 라벨(회색 11px). 주행 상세/요약 행에 사용.
   - `StatItem(label, value, textColor, {labelBlue})` — 값(13px 굵게) + 라벨(기본 회색, `labelBlue: true`이면 파란색). 목록 카드 내 통계 행에 사용.
-- `lib/utils/backup_utils.dart` — 백업/복원 유틸. `shareBackup()` : 공유 시트 표시. `exportBackup()` : 파일 저장 위치 선택 → `true`=저장완료/`false`=취소. `pickBackupFile()` : 파일 선택 → 경로 반환(`null`=취소). `importFromPath(path, {onProgress})` : 파싱·삽입 → 새로 추가된 건수 반환. 가져오기 후 반드시 `ride.loadRecords()` 호출로 Provider 갱신.
-- `lib/utils/gpx_utils.dart` — GPX 내보내기 유틸. `shareGpx(record)` : 단일 주행 GPX 공유. `shareAllGpx()` : 전체 기록 다중 트랙 GPX 공유. 표준 GPX 1.1 포맷 (Strava 등 호환).
-- `lib/widgets/loading_overlay.dart` — 전화면 터치 차단 로딩 오버레이. `runWithLoading<T>(context, task: (setProgress) async { ... }, label: '...')` 호출. `setProgress(0.0~1.0)` 전달 시 진행률 바, `null` 전달 시 무한 스피너.
-- `lib/widgets/record_detail_dialog.dart` — 주행 기록 상세 팝업. `showRecordDetailDialog(context, record, useKmh, weightKg)` 호출. 날짜/시간·통계 4종·칼로리·메모 입력·경로 보기·GPX 공유 버튼 포함. `history_total_screen`, `history_detail_screen` 양쪽에서 공용.
+- `lib/utils/utils_backup.dart` — 백업/복원 유틸. `shareBackup()` : 공유 시트 표시. `exportBackup()` : 파일 저장 위치 선택 → `true`=저장완료/`false`=취소. `pickBackupFile()` : 파일 선택 → 경로 반환(`null`=취소). `importFromPath(path, {onProgress})` : 파싱·삽입 → 새로 추가된 건수 반환. 가져오기 후 반드시 `ride.loadRecords()` 호출로 Provider 갱신.
+- `lib/utils/utils_gpx.dart` — GPX 내보내기 유틸. `shareGpx(record)` : 단일 주행 GPX 공유. `shareAllGpx()` : 전체 기록 다중 트랙 GPX 공유. 표준 GPX 1.1 포맷 (Strava 등 호환).
+- `lib/widgets/widgets_loading_overlay.dart` — 전화면 터치 차단 로딩 오버레이. `runWithLoading<T>(context, task: (setProgress) async { ... }, label: '...')` 호출. `setProgress(0.0~1.0)` 전달 시 진행률 바, `null` 전달 시 무한 스피너.
+- `lib/widgets/widgets_ride_detail.dart` — 주행 기록 상세 팝업. `showRecordDetailDialog(context, record, useKmh, weightKg)` 호출. 날짜/시간·통계 4종·칼로리·메모 입력·경로 보기·GPX 공유 버튼 포함. `history_total_screen`, `history_detail_screen` 양쪽에서 공용.
 
 ### 설정 화면 구조
 
 설정 화면은 2단계 네비게이션으로 구성된다. `lib/screens/settings/` 폴더:
-- `settings_screen.dart` — 대메뉴 목록 (주행·화면·알림·지도·사용자·시스템)
+- `settings_screen.dart` — 대메뉴 목록
 - `settings_widgets.dart` — 공통 위젯: `settingsIconBox`, `settingsPanelContainer`, `settingsOptionButton`
 - `settings_ride.dart` — 속도 측정 모드·자동 일시정지·최소 기록 거리/시간·단위·GPS
 - `settings_display.dart` — 주행 중 표시 항목·속도계 시계
-- `settings_alert.dart` — 속도 초과/미달 알림·거리 알림
+- `settings_alert.dart` — **자전거 전용** 속도 초과/미달 알림·거리 알림
+- `settings_running.dart` — **런닝 전용** 음성 안내·케이던스·목표 페이스
 - `settings_map.dart` — 지도 스타일·경로 색상/두께·추적 모드
 - `settings_user.dart` — 체중
+- `settings_user_bike.dart` — 자전거 관리 (등록·수정·삭제)
 - `settings_system.dart` — 테마·시작 탭·백업/내보내기·앱 정보·(개발 섹션)
 
 ### 설정 화면 아이콘 색상 규칙
@@ -269,11 +281,18 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 - **도전 목표** (최고속도/최장거리/최장시간) — 현재 기록 대비 목표 표시. 최장시간은 분 단위 입력, 초 단위 저장
 - **스트릭** — 설정 없음. records 날짜로 현재 연속일·역대 최장 계산. 오늘 또는 어제 주행이 있으면 스트릭 유지
 
-### 속도 알림 (`speedAlertKmh`)
+### 알림 시스템
 
-설정에서 켜면 두 가지 피드백이 동작한다:
-- **진동** — 임계값 상향 돌파 시 1회 `HapticFeedback.heavyImpact()` (edge-trigger)
-- **시각** — `currentSpeed >= speedAlertKmh`인 동안 속도계 숫자·게이지 호·바늘이 빨간색으로 변경. `SpeedometerPainter`의 `isOverAlert` 파라미터로 제어.
+모든 알림(속도 초과/미달/거리)은 **팝업·진동·소리** 세 채널을 각각 독립적으로 on/off할 수 있다. 새 알림 기능을 추가할 때도 반드시 이 3분리 구조를 따른다.
+
+`startRide()` 파라미터 예시:
+```
+speedMaxAlertPopupEnabled, speedMaxAlertVibrationEnabled, speedMaxAlertSoundEnabled
+speedMinAlertPopupEnabled, speedMinAlertVibrationEnabled, speedMinAlertSoundEnabled
+distanceAlertPopupEnabled, distanceAlertVibrationEnabled, distanceAlertSoundEnabled
+```
+
+속도 초과 알림의 **시각 표시** — `currentSpeed >= speedAlertKmh`인 동안 속도계 숫자·게이지 호·바늘이 빨간색으로 변경. `SpeedometerPainter`의 `isOverAlert` 파라미터로 제어.
 
 속도 알림 최솟값은 릴리즈 1 km/h, 디버그 0 km/h (`kDebugMode` 분기).
 
@@ -295,37 +314,7 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 | **런닝 전용** | 음성 안내, 케이던스 BPM, 목표 페이스 알림 | `activityType == 'run'`일 때만 |
 
 구현 위치 (`speedometer_screen.dart`):
-- `startRide()` 호출 시 자전거 전용 파라미터(`speedAlertKmh`, `speedMinAlertKmh`, `distanceAlertKm`)는 `isBike ? value : null`로 전달한다.
+- `startRide()` 호출 시 자전거 전용 파라미터(`speedAlertKmh`, `speedMinAlertKmh`, `distanceAlertKm` 및 각 3분리 파라미터)는 `isBike ? value : null`로 전달한다.
+- 런닝 전용 파라미터(`cadenceBpm`, `targetPaceSecPerKm`, `voiceGuidance`)는 `isBike ? null : value`로 전달한다.
 - 시각 경고(`isOverAlert`, `isUnderAlert`) 계산 시 `ride.isRiding && ride.activityType == 'bike'` 조건을 반드시 포함한다. `ride.isRiding`만으로 체크하면 런닝 중에도 자전거 알림이 활성화되는 버그가 발생한다.
 
----
-
-## 미결 TODO
-
-- [ ] 지도 or 기타에 추가할 설정 고민
-
-### 런닝 기능 테스트 항목
-- [ ] 케이던스 진동 + 소리 동시 작동 확인
-- [ ] 음성 안내 TTS 실제 발화 확인 ("N킬로미터 완주, 페이스 X분 Y초")
-- [ ] 목표 페이스 초과 시 진동 작동 확인
-- [ ] 런닝 모드 속도계 30 km/h 최대값 표시 확인
-- [ ] 앱 재시작 후 마지막 선택 모드(자전거/런닝) 유지 확인
-
-### 기록/분석 화면 런닝 대응
-- [ ] 기록 목록에서 런닝 기록 구분 표시 (아이콘 등)
-- [ ] 기록 상세 랩 테이블 UI 확인 (코드는 구현됨)
-- [ ] 런닝 기록 평균 페이스·최고 페이스 통계 표시 검토
-
-### 잠재적 추가 기능
-- [ ] 케이던스 타이밍 오프셋 수동 보정 설정 (소리가 살짝 느린 기기 대응)
-- [ ] 심박수 연동 (나중에)
-
-### 데이터 확장
-- [ ] 고도 저장 — `RideRecord`에 `elevationGain`(총 상승 고도, m), `elevationLoss`(총 하강 고도, m) 컬럼 추가. GPS `Position.altitude` 값으로 계산. DB 마이그레이션 필요 (version bump). 표시 UI는 별도 TODO.
-
-### 분석/시각화
-- [ ] 속도 그래프 — 기록 상세 팝업에 시간축 기반 속도 변화 꺾은선 그래프 추가 (`fl_chart` 등)
-- [ ] 캘린더 히트맵 — 기록 탭에 GitHub 잔디 스타일 연간 활동 히트맵 추가 (`table_calendar` 또는 커스텀 그리드)
-
-### 훈련 기능
-- [ ] 인터벌 트레이닝 — 고강도/저강도 구간 설정 (예: 3분 고강도 + 2분 저강도 × 5세트), 구간 전환 시 음성/진동 큐. 런닝·자전거 공통 적용.
