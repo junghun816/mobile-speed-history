@@ -154,6 +154,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                         weekdayStyle: TextStyle(color: cs.onSurfaceVariant),
                         weekendStyle: TextStyle(color: cs.onSurfaceVariant),
                       ),
+                      daysOfWeekHeight: 20.h,
                       eventLoader: (day) {
                         final key = DateTime(day.year, day.month, day.day);
                         return recordedDays.contains(key) ? [true] : [];

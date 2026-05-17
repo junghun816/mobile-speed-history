@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 import '../../db/database_helper.dart';
 import '../../models/bike_record.dart';
 import 'settings_widgets.dart';
@@ -94,7 +95,6 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
                 leading: Icon(Icons.camera_alt_outlined, color: cs.onSurface),
                 title: const Text('카메라로 촬영'),
                 onTap: () {
-                  SystemSound.play(SystemSoundType.click);
                   Navigator.pop(ctx);
                   _pickImage(ImageSource.camera);
                 },
@@ -103,7 +103,6 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
                 leading: Icon(Icons.photo_library_outlined, color: cs.onSurface),
                 title: const Text('갤러리에서 선택'),
                 onTap: () {
-                  SystemSound.play(SystemSoundType.click);
                   Navigator.pop(ctx);
                   _pickImage(ImageSource.gallery);
                 },
@@ -113,7 +112,6 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
                   leading: const Icon(Icons.delete_outline, color: Colors.red),
                   title: const Text('사진 삭제', style: TextStyle(color: Colors.red)),
                   onTap: () async {
-                    SystemSound.play(SystemSoundType.click);
                     Navigator.pop(ctx);
                     final f = File(_photoPath!);
                     if (await f.exists()) await f.delete();
@@ -128,26 +126,208 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
   }
 
   Future<void> _pickDate({required bool isFrom}) async {
-    final now = DateTime.now();
-    final initial = isFrom ? (_fromDate ?? now) : (_toDate ?? now);
-    final firstDate = isFrom ? DateTime(2000) : (_fromDate ?? DateTime(2000));
+    final cs = Theme.of(context).colorScheme;
+    final textColor = cs.onSurface;
+    final initial = isFrom
+        ? (_fromDate ?? DateTime.now())
+        : (_toDate ?? DateTime.now());
 
-    final picked = await showDatePicker(
+    DateTime? result;
+
+    await showModalBottomSheet(
       context: context,
-      initialDate: initial,
-      firstDate: firstDate,
-      lastDate: DateTime(2100),
+      backgroundColor: cs.surfaceContainer,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        DateTime focusedDay = initial;
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(16.r),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      isFrom ? '사용 시작일' : '사용 종료일',
+                      style: TextStyle(
+                          color: textColor,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12.h),
+                    TableCalendar(
+                      locale: 'ko_KR',
+                      firstDay: DateTime(2000),
+                      lastDay: DateTime(2100),
+                      focusedDay: focusedDay,
+                      sixWeekMonthsEnforced: true,
+                      selectedDayPredicate: (day) {
+                        final sel = isFrom ? _fromDate : _toDate;
+                        return sel != null && isSameDay(day, sel);
+                      },
+                      onDaySelected: (selected, _) {
+                        result = selected;
+                        Navigator.pop(ctx);
+                      },
+                      onPageChanged: (focused) =>
+                          setModalState(() => focusedDay = focused),
+                      calendarBuilders: CalendarBuilders(
+                        headerTitleBuilder: (context, day) => GestureDetector(
+                          onTap: () => _showYearMonthPickerDialog(
+                            ctx: ctx,
+                            initialYear: focusedDay.year,
+                            initialMonth: focusedDay.month,
+                            textColor: textColor,
+                            dialogBg: cs.surfaceContainer,
+                            dropdownBg: cs.surfaceContainerHighest,
+                            onConfirm: (d) =>
+                                setModalState(() => focusedDay = d),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '${day.year}년 ${day.month}월',
+                                style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 2.w),
+                              Icon(Icons.arrow_drop_down,
+                                  color: textColor, size: 22.r),
+                            ],
+                          ),
+                        ),
+                      ),
+                      calendarStyle: CalendarStyle(
+                        defaultTextStyle: TextStyle(color: textColor),
+                        weekendTextStyle: TextStyle(color: textColor),
+                        outsideTextStyle:
+                            TextStyle(color: cs.outlineVariant),
+                        selectedDecoration: const BoxDecoration(
+                            color: Colors.blue, shape: BoxShape.circle),
+                        todayDecoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.3),
+                            shape: BoxShape.circle),
+                        todayTextStyle: TextStyle(color: textColor),
+                      ),
+                      headerStyle: HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                        leftChevronIcon:
+                            Icon(Icons.chevron_left, color: textColor),
+                        rightChevronIcon:
+                            Icon(Icons.chevron_right, color: textColor),
+                      ),
+                      daysOfWeekStyle: DaysOfWeekStyle(
+                        weekdayStyle:
+                            TextStyle(color: cs.onSurfaceVariant),
+                        weekendStyle:
+                            TextStyle(color: cs.onSurfaceVariant),
+                      ),
+                      daysOfWeekHeight: 20.h,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
-    if (picked == null) return;
 
+    if (result == null) return;
     setState(() {
       if (isFrom) {
-        _fromDate = picked;
-        if (_toDate != null && picked.isAfter(_toDate!)) _toDate = null;
+        _fromDate = result;
+        if (_toDate != null && result!.isAfter(_toDate!)) _toDate = null;
       } else {
-        _toDate = picked;
+        _toDate = result;
       }
     });
+  }
+
+  void _showYearMonthPickerDialog({
+    required BuildContext ctx,
+    required int initialYear,
+    required int initialMonth,
+    required Color textColor,
+    required Color dialogBg,
+    required Color dropdownBg,
+    required void Function(DateTime) onConfirm,
+  }) {
+    int tempYear = initialYear;
+    int tempMonth = initialMonth;
+    final years = List.generate(
+        DateTime.now().year + 10 - 2000 + 1, (i) => 2000 + i);
+
+    showDialog(
+      context: ctx,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (dialogCtx, setDialogState) => AlertDialog(
+          backgroundColor: dialogBg,
+          title: Text('연도 / 월 선택',
+              style: TextStyle(color: textColor, fontSize: 15.sp)),
+          content: Row(
+            children: [
+              Expanded(
+                child: DropdownButton<int>(
+                  value: tempYear,
+                  isExpanded: true,
+                  dropdownColor: dropdownBg,
+                  style: TextStyle(color: textColor),
+                  underline: const SizedBox(),
+                  items: years
+                      .map((y) =>
+                          DropdownMenuItem(value: y, child: Text('$y년')))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setDialogState(() => tempYear = v);
+                  },
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: DropdownButton<int>(
+                  value: tempMonth,
+                  isExpanded: true,
+                  dropdownColor: dropdownBg,
+                  style: TextStyle(color: textColor),
+                  underline: const SizedBox(),
+                  items: List.generate(12, (i) => i + 1)
+                      .map((m) =>
+                          DropdownMenuItem(value: m, child: Text('$m월')))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setDialogState(() => tempMonth = v);
+                  },
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child:
+                  const Text('취소', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                onConfirm(DateTime(tempYear, tempMonth, 1));
+                Navigator.pop(dialogCtx);
+              },
+              child:
+                  const Text('이동', style: TextStyle(color: Colors.blue)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _save() async {

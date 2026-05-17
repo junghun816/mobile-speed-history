@@ -28,7 +28,7 @@ class SettingsScreen extends StatelessWidget {
             settingsTile(
               icon: Icons.tune,
               title: '일반',
-              subtitle: '자동정지 · GPS · 단위',
+              subtitle: '기본 · 공통 설정',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
@@ -38,7 +38,7 @@ class SettingsScreen extends StatelessWidget {
             settingsTile(
               icon: Icons.directions_bike,
               title: '자전거',
-              subtitle: '속도 초과 · 미달 · 거리 알림',
+              subtitle: '자전거 모드 설정',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
@@ -48,7 +48,7 @@ class SettingsScreen extends StatelessWidget {
             settingsTile(
               icon: Icons.directions_run,
               title: '런닝',
-              subtitle: '음성 안내 · 케이던스 · 목표 페이스',
+              subtitle: '런닝 모드 설정',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
@@ -58,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
             settingsTile(
               icon: Icons.dashboard_outlined,
               title: '화면',
-              subtitle: '표시 항목 · 속도계 시계',
+              subtitle: '속도계 화면 설정',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
@@ -68,7 +68,7 @@ class SettingsScreen extends StatelessWidget {
             settingsTile(
               icon: Icons.map_outlined,
               title: '지도',
-              subtitle: '지도 스타일 · 경로 색상 · 두께 · 추적',
+              subtitle: '지도 스타일 설정',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
@@ -78,7 +78,7 @@ class SettingsScreen extends StatelessWidget {
             settingsTile(
               icon: Icons.person_outline,
               title: '사용자',
-              subtitle: '체중',
+              subtitle: '',
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
