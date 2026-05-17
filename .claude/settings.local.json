@@ -24,7 +24,25 @@
       "Bash(Get-ChildItem -Path \"C:\\\\flutter-workspace\\\\speed-mobile\\\\lib\" -Directory)",
       "Bash(Select-Object -ExpandProperty Name)",
       "Bash(xargs sed -i -e 's|utils/format_utils|utils/utils_format|g' -e 's|utils/backup_utils|utils/utils_backup|g' -e 's|utils/gpx_utils|utils/utils_gpx|g' -e 's|widgets/settings_text_field|widgets/widgets_text_field|g' -e 's|widgets/bar_chart_widget|widgets/widgets_bar_chart|g' -e 's|'\\\\''stat_item.dart'\\\\''|'\\\\''widgets_stat_item.dart'\\\\''|g' -e 's|widgets/stat_item|widgets/widgets_stat_item|g' -e 's|widgets/loading_overlay|widgets/widgets_loading_overlay|g' -e 's|widgets/number_input_dialog|widgets/widgets_number_input|g' -e 's|'\\\\''memo_bottom_sheet.dart'\\\\''|'\\\\''widgets_memo_sheet.dart'\\\\''|g' -e 's|widgets/memo_bottom_sheet|widgets/widgets_memo_sheet|g' -e 's|widgets/record_badges|widgets/widgets_badges|g' -e 's|widgets/record_detail_dialog|widgets/widgets_ride_detail|g')",
-      "Bash(grep -E \"\\\\.dart$\")"
+      "Bash(grep -E \"\\\\.dart$\")",
+      "Bash(python -c \"from PIL import Image, ImageDraw; print\\('Pillow OK'\\)\")",
+      "PowerShell(python --version)",
+      "PowerShell(python -c \"from PIL import Image; print\\('ok'\\)\")",
+      "PowerShell(Get-Command python3 -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command python -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command py -ErrorAction SilentlyContinue)",
+      "PowerShell(py -3 --version)",
+      "PowerShell(py -3 -c \"from PIL import Image; print\\('Pillow OK'\\)\" 2>&1)",
+      "PowerShell(& \"C:\\\\Users\\\\jungh\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe\" --version 2>&1)",
+      "PowerShell(& \"C:\\\\Users\\\\jungh\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe\" -c \"from PIL import Image; print\\('Pillow OK'\\)\" 2>&1)",
+      "Read(//c//**)",
+      "PowerShell(node --version 2>&1)",
+      "PowerShell(dart --version 2>&1)",
+      "Bash(node -e \"const {createCanvas} = require\\('canvas'\\); console.log\\('canvas OK'\\)\")",
+      "Bash(flutter test *)",
+      "Bash(copy /Y icon_preview_blue_cyan.png assets\\\\icon\\\\icon.png)",
+      "PowerShell(Copy-Item \"c:\\\\flutter-workspace\\\\speed-mobile\\\\icon_preview_blue_cyan.png\" \"c:\\\\flutter-workspace\\\\speed-mobile\\\\assets\\\\icon\\\\icon.png\" -Force)",
+      "Bash(dart run *)"
     ]
   }
 }

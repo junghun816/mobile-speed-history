@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
     <application
-        android:label="모바일 속도계"
+        android:label="Pacer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
