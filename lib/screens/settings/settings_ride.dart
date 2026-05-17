@@ -25,6 +25,10 @@ class SettingsRideScreen extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16.r),
           children: [
+            _themeTile(settings, panelColor, titleColor, subtitleColor, btnBorderOff),
+            SizedBox(height: 10.h),
+            _startTabTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
+            SizedBox(height: 10.h),
             _switchTile(
               context: context,
               icon: Icons.pause_circle_outline,
@@ -99,10 +103,6 @@ class SettingsRideScreen extends StatelessWidget {
               btnBorderOff: btnBorderOff,
               btnTextOff: btnTextOff,
             ),
-            SizedBox(height: 10.h),
-            _themeTile(settings, panelColor, titleColor, subtitleColor, btnBorderOff),
-            SizedBox(height: 10.h),
-            _startTabTile(settings, panelColor, titleColor, subtitleColor, btnBgOff, btnBorderOff, btnTextOff),
           ],
         ),
       ),
