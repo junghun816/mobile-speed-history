@@ -20,7 +20,9 @@
       "Bash(flutter devices *)",
       "Bash(flutter run *)",
       "Bash(findstr -i \"audioplayers\\\\|vibration\\\\|just_audio\")",
-      "Bash(dir \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\history\")"
+      "Bash(dir \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\history\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\flutter-workspace\\\\speed-mobile\\\\lib\" -Directory)",
+      "Bash(Select-Object -ExpandProperty Name)"
     ]
   }
 }

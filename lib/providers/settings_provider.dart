@@ -47,6 +47,7 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyDistanceAlertPopup = 'distance_alert_popup';
   static const _keyDistanceAlertVibration = 'distance_alert_vibration';
   static const _keyDistanceAlertSound = 'distance_alert_sound';
+  static const _keyUserName = 'user_name';
 
   late SharedPreferences _prefs;
 
@@ -93,6 +94,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _distanceAlertPopup = true;
   bool _distanceAlertVibration = true;
   bool _distanceAlertSound = false;
+  String _userName = '';
 
   bool get useKmh => _useKmh;
   bool get gpsHighAccuracy => _gpsHighAccuracy;
@@ -138,6 +140,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get distanceAlertPopup => _distanceAlertPopup;
   bool get distanceAlertVibration => _distanceAlertVibration;
   bool get distanceAlertSound => _distanceAlertSound;
+  String get userName => _userName;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -191,6 +194,7 @@ class SettingsProvider extends ChangeNotifier {
     _distanceAlertPopup = _prefs.getBool(_keyDistanceAlertPopup) ?? true;
     _distanceAlertVibration = _prefs.getBool(_keyDistanceAlertVibration) ?? true;
     _distanceAlertSound = _prefs.getBool(_keyDistanceAlertSound) ?? false;
+    _userName = _prefs.getString(_keyUserName) ?? '';
     notifyListeners();
   }
 
@@ -487,5 +491,13 @@ class SettingsProvider extends ChangeNotifier {
     _distanceAlertSound = value;
     notifyListeners();
     await _prefs.setBool(_keyDistanceAlertSound, value);
+  }
+
+  Future<void> setUserName(String value) async {
+    _userName = value;
+    notifyListeners();
+    value.isNotEmpty
+        ? await _prefs.setString(_keyUserName, value)
+        : await _prefs.remove(_keyUserName);
   }
 }

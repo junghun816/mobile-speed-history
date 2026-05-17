@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../models/bike_record.dart';
 import '../models/ride_record.dart';
 
 class DatabaseHelper {
@@ -19,7 +20,7 @@ class DatabaseHelper {
     final path = join(dbPath, fileName);
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createDB,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 4) {
@@ -30,6 +31,19 @@ class DatabaseHelper {
           await db.execute('ALTER TABLE ride_records ADD COLUMN lapSplits TEXT');
           await db.execute('ALTER TABLE ride_records ADD COLUMN targetPace INTEGER');
           await db.execute('ALTER TABLE ride_records ADD COLUMN cadenceBpm INTEGER');
+        }
+        if (oldVersion < 6) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS bikes (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              manufacturer TEXT NOT NULL,
+              model TEXT NOT NULL,
+              fromDateMs INTEGER,
+              toDateMs INTEGER,
+              photoPath TEXT,
+              notes TEXT
+            )
+          ''');
         }
       },
     );
@@ -53,6 +67,17 @@ class DatabaseHelper {
                 lapSplits TEXT,
                 targetPace INTEGER,
                 cadenceBpm INTEGER
+            )
+        ''');
+    await db.execute('''
+            CREATE TABLE bikes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                manufacturer TEXT NOT NULL,
+                model TEXT NOT NULL,
+                fromDateMs INTEGER,
+                toDateMs INTEGER,
+                photoPath TEXT,
+                notes TEXT
             )
         ''');
   }
@@ -131,5 +156,26 @@ class DatabaseHelper {
   Future<void> deleteAllRecords() async {
     final db = await database;
     await db.delete('ride_records');
+  }
+
+  Future<int> insertBike(BikeRecord bike) async {
+    final db = await database;
+    return db.insert('bikes', bike.toMap());
+  }
+
+  Future<void> updateBike(BikeRecord bike) async {
+    final db = await database;
+    await db.update('bikes', bike.toMap(), where: 'id = ?', whereArgs: [bike.id]);
+  }
+
+  Future<void> deleteBike(int id) async {
+    final db = await database;
+    await db.delete('bikes', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<List<BikeRecord>> getAllBikes() async {
+    final db = await database;
+    final maps = await db.query('bikes', orderBy: 'id ASC');
+    return maps.map((m) => BikeRecord.fromMap(m)).toList();
   }
 }

@@ -71,6 +71,9 @@ dependencies:
   # 앱 버전 정보
   package_info_plus: ^8.0.0
 
+  # 이미지 선택 (카메라/갤러리)
+  image_picker: ^1.1.2
+
   # 달력
   table_calendar: ^3.1.2
 
