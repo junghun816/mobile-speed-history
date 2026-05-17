@@ -11,7 +11,7 @@ import '../services/location_service.dart';
 import '../services/foreground_service.dart';
 import '../services/cadence_service.dart';
 import '../services/voice_guidance_service.dart';
-import '../utils/format_utils.dart';
+import '../utils/utils_format.dart';
 
 class RideProvider extends ChangeNotifier {
   double _currentSpeed = 0.0;

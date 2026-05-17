@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import '../../models/ride_record.dart';
 import '../../providers/ride_provider.dart';
 import '../../providers/settings_provider.dart';
-import '../../widgets/bar_chart_widget.dart';
-import '../../utils/format_utils.dart';
-import '../../widgets/stat_item.dart';
+import '../../widgets/widgets_bar_chart.dart';
+import '../../utils/utils_format.dart';
+import '../../widgets/widgets_stat_item.dart';
 
 class HistoryYearlyScreen extends StatefulWidget {
   const HistoryYearlyScreen({super.key});

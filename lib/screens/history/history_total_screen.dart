@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import '../../models/ride_record.dart';
 import '../../providers/ride_provider.dart';
 import '../../providers/settings_provider.dart';
-import '../../widgets/record_badges.dart';
-import '../../utils/format_utils.dart';
-import '../../widgets/stat_item.dart';
-import '../../widgets/record_detail_dialog.dart';
+import '../../widgets/widgets_badges.dart';
+import '../../utils/utils_format.dart';
+import '../../widgets/widgets_stat_item.dart';
+import '../../widgets/widgets_ride_detail.dart';
 
 enum SortType {
   dateDesc,

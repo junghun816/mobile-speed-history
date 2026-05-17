@@ -13,9 +13,9 @@ import 'package:share_plus/share_plus.dart';
 import '../providers/ride_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/ride_record.dart';
-import '../utils/format_utils.dart';
-import '../widgets/memo_bottom_sheet.dart';
-import '../widgets/stat_item.dart';
+import '../utils/utils_format.dart';
+import '../widgets/widgets_memo_sheet.dart';
+import '../widgets/widgets_stat_item.dart';
 
 class SpeedometerScreen extends StatefulWidget {
   const SpeedometerScreen({super.key});

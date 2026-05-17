@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 import '../models/ride_record.dart';
 import '../providers/ride_provider.dart';
 import '../screens/history/history_detail_map_screen.dart';
-import '../utils/format_utils.dart';
-import '../utils/gpx_utils.dart';
-import 'memo_bottom_sheet.dart';
-import 'stat_item.dart';
+import '../utils/utils_format.dart';
+import '../utils/utils_gpx.dart';
+import 'widgets_memo_sheet.dart';
+import 'widgets_stat_item.dart';
 
 Widget _buildLapTable(
     List<Map<String, dynamic>> laps, Color textColor, ColorScheme cs) {

@@ -4,7 +4,7 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:provider/provider.dart';
 import '../../models/ride_record.dart';
 import '../../providers/settings_provider.dart';
-import '../../utils/format_utils.dart';
+import '../../utils/utils_format.dart';
 
 class HistoryDetailMapScreen extends StatefulWidget {
   final RideRecord record;

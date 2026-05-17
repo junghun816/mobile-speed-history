@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/ride_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../models/ride_record.dart';
-import '../../utils/format_utils.dart';
+import '../../utils/utils_format.dart';
 
 class HistoryAverageScreen extends StatelessWidget {
   const HistoryAverageScreen({super.key});

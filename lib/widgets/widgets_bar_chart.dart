@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
-import '../utils/format_utils.dart';
+import '../utils/utils_format.dart';
 
 enum ChartDataType { distance, duration, maxSpeed, avgSpeed }
 

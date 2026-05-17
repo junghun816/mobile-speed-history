@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../../db/database_helper.dart';
 import '../../models/bike_record.dart';
 import '../../providers/settings_provider.dart';
-import '../../widgets/number_input_dialog.dart';
+import '../../widgets/widgets_number_input.dart';
 import 'settings_user_bike.dart';
 import 'settings_widgets.dart';
 

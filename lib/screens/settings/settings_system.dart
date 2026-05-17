@@ -8,9 +8,9 @@ import '../../db/database_helper.dart';
 import '../../db/sample_data.dart';
 import '../../providers/ride_provider.dart';
 import '../../providers/settings_provider.dart';
-import '../../utils/backup_utils.dart';
-import '../../utils/gpx_utils.dart';
-import '../../widgets/loading_overlay.dart';
+import '../../utils/utils_backup.dart';
+import '../../utils/utils_gpx.dart';
+import '../../widgets/widgets_loading_overlay.dart';
 import 'settings_widgets.dart';
 
 class SettingsSystemScreen extends StatefulWidget {

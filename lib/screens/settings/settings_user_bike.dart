@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../db/database_helper.dart';
 import '../../models/bike_record.dart';
-import '../../widgets/settings_text_field.dart';
+import '../../widgets/widgets_text_field.dart';
 import 'settings_widgets.dart';
 
 class BikeEditScreen extends StatefulWidget {

@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
-import '../../widgets/number_input_dialog.dart';
+import '../../widgets/widgets_number_input.dart';
 import 'settings_widgets.dart';
 
 class SettingsAlertScreen extends StatelessWidget {
