@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../db/database_helper.dart';
 import '../../models/bike_record.dart';
+import '../../widgets/settings_text_field.dart';
 import 'settings_widgets.dart';
 
 class BikeEditScreen extends StatefulWidget {
@@ -162,7 +163,7 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
                     TableCalendar(
                       locale: 'ko_KR',
                       firstDay: DateTime(2000),
-                      lastDay: DateTime(2100),
+                      lastDay: DateTime(DateTime.now().year + 10),
                       focusedDay: focusedDay,
                       sixWeekMonthsEnforced: true,
                       selectedDayPredicate: (day) {
@@ -416,7 +417,10 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
           ),
         ],
       ),
-      body: ListView(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.translucent,
+        child: ListView(
         padding: EdgeInsets.all(16.r),
         children: [
           // 사진 영역
@@ -445,22 +449,18 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
             ),
             child: Column(
               children: [
-                _textFieldRow(
+                SettingsTextField(
                   icon: Icons.business_outlined,
                   label: '제조사',
-                  ctrl: _manufacturerCtrl,
+                  controller: _manufacturerCtrl,
                   hint: '예: Trek, Giant, Specialized',
-                  titleColor: titleColor,
-                  subtitleColor: subtitleColor,
                 ),
                 Divider(height: 1, color: cs.outlineVariant, indent: 16.w),
-                _textFieldRow(
+                SettingsTextField(
                   icon: Icons.directions_bike_outlined,
                   label: '기종',
-                  ctrl: _modelCtrl,
+                  controller: _modelCtrl,
                   hint: '예: FX 3 Disc, TCR Advanced',
-                  titleColor: titleColor,
-                  subtitleColor: subtitleColor,
                 ),
                 Divider(height: 1, color: cs.outlineVariant, indent: 16.w),
                 _dateRow(
@@ -489,29 +489,16 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
 
           // 비고 패널
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
               color: panelColor,
               borderRadius: BorderRadius.circular(12.r),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                settingsIconBox(Icons.notes_outlined),
-                SizedBox(width: 14.w),
-                Expanded(
-                  child: TextField(
-                    controller: _notesCtrl,
-                    maxLines: null,
-                    minLines: 2,
-                    style: TextStyle(color: titleColor, fontSize: 14.sp),
-                    decoration: InputDecoration.collapsed(
-                      hintText: '비고 (선택사항)',
-                      hintStyle: TextStyle(color: subtitleColor, fontSize: 14.sp),
-                    ),
-                  ),
-                ),
-              ],
+            child: SettingsTextField(
+              icon: Icons.notes_outlined,
+              controller: _notesCtrl,
+              hint: '비고 (선택사항)',
+              maxLines: null,
+              minLines: 2,
             ),
           ),
 
@@ -550,6 +537,7 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
 
           SizedBox(height: 24.h),
         ],
+        ),
       ),
     );
   }
@@ -587,49 +575,6 @@ class _BikeEditScreenState extends State<BikeEditScreen> {
           style: TextStyle(color: cs.outline, fontSize: 11.sp),
         ),
       ],
-    );
-  }
-
-  Widget _textFieldRow({
-    required IconData icon,
-    required String label,
-    required TextEditingController ctrl,
-    required String hint,
-    required Color titleColor,
-    required Color subtitleColor,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      child: Row(
-        children: [
-          settingsIconBox(icon),
-          SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label,
-                    style: TextStyle(color: subtitleColor, fontSize: 11.sp)),
-                SizedBox(height: 2.h),
-                TextField(
-                  controller: ctrl,
-                  style: TextStyle(
-                      color: titleColor,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold),
-                  decoration: InputDecoration.collapsed(
-                    hintText: hint,
-                    hintStyle: TextStyle(
-                        color: subtitleColor,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.normal),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
