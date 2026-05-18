@@ -649,6 +649,9 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                   final timeStr =
                       '${time.hour.toString().padLeft(2, '0')}:'
                       '${time.minute.toString().padLeft(2, '0')}';
+                  final isRun = record.activityType == 'run';
+                  final avgPaceVal = isRun ? paceFromSpeed(record.avgSpeed) : null;
+                  final bestPaceVal = isRun ? paceFromSpeed(record.maxSpeed) : null;
 
                   return GestureDetector(
                     onTap: () {
@@ -665,13 +668,23 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '$timeStr 출발',
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                isRun ? Icons.directions_run : Icons.directions_bike,
+                                color: isRun ? Colors.green : Colors.blue,
+                                size: 15.r,
+                              ),
+                              SizedBox(width: 5.w),
+                              Text(
+                                '$timeStr 출발',
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height: 6.h),
                           RecordBadges(recordId: record.id, bestIds: bestIds),
@@ -681,8 +694,20 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
                             children: [
                               StatItem(label: '거리', value: '${formatDistance(record.totalDistance, useKmh)} ${distanceUnit(useKmh)}', textColor: textColor),
                               StatItem(label: '시간', value: formatDuration(record.duration), textColor: textColor),
-                              StatItem(label: '최고속도', value: '${formatSpeed(record.maxSpeed, useKmh)} ${speedUnit(useKmh)}', textColor: textColor),
-                              StatItem(label: '평균속도', value: '${formatSpeed(record.avgSpeed, useKmh)} ${speedUnit(useKmh)}', textColor: textColor),
+                              StatItem(
+                                label: isRun ? '최고페이스' : '최고속도',
+                                value: isRun && bestPaceVal != null
+                                    ? '${formatPace(bestPaceVal)}/km'
+                                    : '${formatSpeed(record.maxSpeed, useKmh)} ${speedUnit(useKmh)}',
+                                textColor: textColor,
+                              ),
+                              StatItem(
+                                label: isRun ? '평균페이스' : '평균속도',
+                                value: isRun && avgPaceVal != null
+                                    ? '${formatPace(avgPaceVal)}/km'
+                                    : '${formatSpeed(record.avgSpeed, useKmh)} ${speedUnit(useKmh)}',
+                                textColor: textColor,
+                              ),
                             ],
                           ),
                           if (weightKg != null ||

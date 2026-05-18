@@ -7,6 +7,7 @@ import 'history_monthly_screen.dart';
 import 'history_daily_screen.dart';
 import 'history_average_screen.dart';
 import 'history_total_screen.dart';
+import 'history_heatmap_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -22,7 +23,7 @@ class _HistoryScreenState extends State<HistoryScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<RideProvider>().loadRecords();
     });
@@ -50,6 +51,7 @@ class _HistoryScreenState extends State<HistoryScreen>
             Tab(text: '일별'),
             Tab(text: '상세'),
             Tab(text: '전체'),
+            Tab(text: '히트맵'),
           ],
         ),
       ),
@@ -62,6 +64,7 @@ class _HistoryScreenState extends State<HistoryScreen>
           const HistoryDailyScreen(),
           HistoryDetailScreen(),
           const HistoryTotalScreen(),
+          const HistoryHeatmapScreen(),
         ],
       ),
     );

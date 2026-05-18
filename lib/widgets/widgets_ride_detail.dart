@@ -140,8 +140,23 @@ void showRecordDetailDialog(
                         children: [
                           StatDetailItem(label: '거리', value: formatDistance(record.totalDistance, useKmh), unit: distanceUnit(useKmh), textColor: textColor),
                           StatDetailItem(label: '시간', value: formatDuration(record.duration), textColor: textColor),
-                          StatDetailItem(label: '최고속도', value: formatSpeed(record.maxSpeed, useKmh), unit: speedUnit(useKmh), textColor: textColor),
-                          StatDetailItem(label: '평균속도', value: formatSpeed(record.avgSpeed, useKmh), unit: speedUnit(useKmh), textColor: textColor),
+                          if (isRunning) ...[
+                            StatDetailItem(
+                              label: '최고페이스',
+                              value: record.maxSpeed >= 0.5 ? formatPace(paceFromSpeed(record.maxSpeed)!) : '--',
+                              unit: '/km',
+                              textColor: textColor,
+                            ),
+                            StatDetailItem(
+                              label: '평균페이스',
+                              value: record.avgSpeed >= 0.5 ? formatPace(paceFromSpeed(record.avgSpeed)!) : '--',
+                              unit: '/km',
+                              textColor: textColor,
+                            ),
+                          ] else ...[
+                            StatDetailItem(label: '최고속도', value: formatSpeed(record.maxSpeed, useKmh), unit: speedUnit(useKmh), textColor: textColor),
+                            StatDetailItem(label: '평균속도', value: formatSpeed(record.avgSpeed, useKmh), unit: speedUnit(useKmh), textColor: textColor),
+                          ],
                         ],
                       ),
                       if (calories != null) ...[
