@@ -88,8 +88,6 @@ class CadenceService {
           options: {AVAudioSessionOptions.mixWithOthers},
         ),
       ));
-      await _audioPlayer.setSourceBytes(_beepWav);
-      await _audioPlayer.setReleaseMode(ReleaseMode.stop);
     }
 
     _receivePort = ReceivePort();
@@ -106,12 +104,7 @@ class CadenceService {
 
       // 진동·소리 동시 fire-and-forget
       if (_useVibration) Vibration.vibrate(duration: 50);
-      if (_useSound) {
-        _audioPlayer.resume();
-        // beep(50ms) 종료 후 미리 seek → 다음 비트에서 resume()만 호출 가능
-        Future.delayed(const Duration(milliseconds: 60),
-            () { if (_running) _audioPlayer.seek(Duration.zero); });
-      }
+      if (_useSound) _audioPlayer.play(BytesSource(_beepWav));
     });
   }
 
