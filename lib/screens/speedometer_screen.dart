@@ -503,7 +503,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                           if (ctx.mounted) Navigator.pop(ctx);
                         }
                       },
-                      child: Icon(Icons.close, color: cs.onSurfaceVariant, size: 22.r),
+                      child: Icon(Icons.close, color: cs.onSurfaceVariant, size: 26.r),
                     ),
                   ],
                 ),

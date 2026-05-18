@@ -121,7 +121,7 @@ void showRecordDetailDialog(
                         SystemSound.play(SystemSoundType.click);
                         Navigator.pop(ctx);
                       },
-                      child: Icon(Icons.close, color: Colors.grey, size: 22.r),
+                      child: Icon(Icons.close, color: Colors.grey, size: 26.r),
                     ),
                   ],
                 ),

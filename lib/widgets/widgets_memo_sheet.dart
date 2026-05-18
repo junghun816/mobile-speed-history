@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Future<void> showMemoBottomSheet(
   BuildContext context, {
@@ -63,11 +64,23 @@ class _MemoSheetState extends State<_MemoSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('메모',
-                style: TextStyle(
-                    color: cs.onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                Text('메모',
+                    style: TextStyle(
+                        color: cs.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold)),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    SystemSound.play(SystemSoundType.click);
+                    Navigator.pop(context);
+                  },
+                  child: Icon(Icons.close, color: cs.onSurfaceVariant, size: 26),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             TextField(
               controller: _ctrl,
