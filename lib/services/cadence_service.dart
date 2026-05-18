@@ -1,16 +1,35 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vibration/vibration.dart';
 
+// Isolate.spawn은 top-level 함수만 허용
+void _cadenceLoop(List<dynamic> args) async {
+  final sendPort = args[0] as SendPort;
+  final bpm = args[1] as int;
+  final stopwatch = Stopwatch()..start();
+  int beat = 0;
+  while (true) {
+    beat++;
+    final targetMs = (60000.0 * beat / bpm).round();
+    final waitMs = targetMs - stopwatch.elapsedMilliseconds;
+    // 나머지 1ms는 tight spin으로 정밀도 확보 (이솔레이트 전용이라 부하 없음)
+    if (waitMs > 1) await Future.delayed(Duration(milliseconds: waitMs - 1));
+    while (stopwatch.elapsedMilliseconds < targetMs) {}
+    sendPort.send(null);
+  }
+}
+
 class CadenceService {
-  Timer? _timer;
-  DateTime? _startTime;
-  int _beatCount = 0;
-  int _bpm = 0;
+  Isolate? _isolate;
+  ReceivePort? _receivePort;
   bool _useVibration = false;
   bool _useSound = false;
+  bool _running = false;
+  int _bpm = 0;
+  int _lastBeatMs = 0;
   final AudioPlayer _audioPlayer = AudioPlayer();
   static final Uint8List _beepWav = _generateBeepWav();
 
@@ -48,37 +67,61 @@ class CadenceService {
     return data;
   }
 
-  Future<void> start(int bpm, {bool useVibration = true, bool useSound = false}) async {
+  Future<void> start(int bpm,
+      {bool useVibration = true, bool useSound = false}) async {
     stop();
+    _useVibration = useVibration;
+    _useSound = useSound;
+    _bpm = bpm;
+    _lastBeatMs = 0;
+    _running = true;
+
     if (useSound) {
+      await _audioPlayer.setAudioContext(AudioContext(
+        android: const AudioContextAndroid(
+          audioFocus: AndroidAudioFocus.none,
+          contentType: AndroidContentType.sonification,
+          usageType: AndroidUsageType.assistanceSonification,
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.ambient,
+          options: {AVAudioSessionOptions.mixWithOthers},
+        ),
+      ));
       await _audioPlayer.setSourceBytes(_beepWav);
       await _audioPlayer.setReleaseMode(ReleaseMode.stop);
     }
-    _bpm = bpm;
-    _useVibration = useVibration;
-    _useSound = useSound;
-    _beatCount = 0;
-    _startTime = DateTime.now();
-    _scheduleNext();
-  }
 
-  void _scheduleNext() {
-    _beatCount++;
-    final nextMs = (60000.0 * _beatCount / _bpm).round();
-    final nextTime = _startTime!.add(Duration(milliseconds: nextMs));
-    final delay = nextTime.difference(DateTime.now());
-    _timer = Timer(delay.isNegative ? Duration.zero : delay, () {
-      if (_useSound) _audioPlayer.seek(Duration.zero).then((_) => _audioPlayer.resume());
+    _receivePort = ReceivePort();
+    _isolate =
+        await Isolate.spawn(_cadenceLoop, [_receivePort!.sendPort, bpm]);
+
+    _receivePort!.listen((_) {
+      if (!_running) return;
+      // 큐 쌓임 방지: 최소 간격(비트 주기의 70%) 이내 재발화 무시
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      final minIntervalMs = (60000 / _bpm * 0.7).round();
+      if (nowMs - _lastBeatMs < minIntervalMs) return;
+      _lastBeatMs = nowMs;
+
+      // 진동·소리 동시 fire-and-forget
       if (_useVibration) Vibration.vibrate(duration: 50);
-      _scheduleNext();
+      if (_useSound) {
+        _audioPlayer.resume();
+        // beep(50ms) 종료 후 미리 seek → 다음 비트에서 resume()만 호출 가능
+        Future.delayed(const Duration(milliseconds: 60),
+            () { if (_running) _audioPlayer.seek(Duration.zero); });
+      }
     });
   }
 
   void stop() {
-    _timer?.cancel();
-    _timer = null;
-    _startTime = null;
-    _beatCount = 0;
+    _running = false;
+    _isolate?.kill(priority: Isolate.immediate);
+    _isolate = null;
+    _receivePort?.close();
+    _receivePort = null;
+    _audioPlayer.stop();
   }
 
   Future<void> dispose() async {
@@ -86,5 +129,5 @@ class CadenceService {
     await _audioPlayer.dispose();
   }
 
-  bool get isRunning => _timer != null;
+  bool get isRunning => _running;
 }

@@ -25,7 +25,7 @@ class SpeedometerScreen extends StatefulWidget {
 }
 
 class _SpeedometerScreenState extends State<SpeedometerScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   bool _locationGranted = true;
   String _selectedActivityType = 'bike';
   RideProvider? _ride;
@@ -34,10 +34,17 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
   bool _showAlertPopup = false;
   bool _isDistanceAlert = false;
   Timer? _alertPopupTimer;
+  late AnimationController _needleController;
+  late Animation<double> _needleAnim;
 
   @override
   void initState() {
     super.initState();
+    _needleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _needleAnim = Tween<double>(begin: 0, end: 0).animate(_needleController);
     WidgetsBinding.instance.addObserver(this);
     _checkLocationPermission();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -53,6 +60,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
 
   @override
   void dispose() {
+    _needleController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     _ride?.removeListener(_onRideUpdate);
     _alertPopupTimer?.cancel();
@@ -70,6 +78,14 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
         if (mounted) setState(() => _showAlertPopup = false);
       });
     }
+    // 침 애니메이션: 현재 위치 → targetSpeed, 1Hz notifyListeners 마다 갱신
+    final fromSpeed = _needleController.isAnimating
+        ? _needleAnim.value
+        : ride.currentSpeed;
+    _needleAnim = Tween<double>(begin: fromSpeed, end: ride.targetSpeed)
+        .animate(CurvedAnimation(
+            parent: _needleController, curve: Curves.easeOut));
+    _needleController.forward(from: 0);
   }
 
   @override
@@ -157,76 +173,83 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
               },
             ),
 
-          // 속도계 게이지
-          Center(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.75,
-                height: MediaQuery.of(context).size.width * 0.75,
-                child: CustomPaint(
-                  painter: SpeedometerPainter(
-                    speed: ride.currentSpeed,
-                    maxSpeed: maxSpeed,
-                    isDark: isDark,
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 150.h),
-                        if (isRunning) ...[
-                          Text(
-                            ride.currentPaceSecPerKm != null
-                                ? formatPace(ride.currentPaceSecPerKm!)
-                                : '--:--',
-                            style: TextStyle(
-                              color: speedTextColor,
-                              fontSize: 64.sp,
-                              fontWeight: FontWeight.bold,
-                              height: 1.0,
-                            ),
-                          ),
-                          Text(
-                            'min/km',
-                            style: TextStyle(
-                              color: unitTextColor,
-                              fontSize: 18.sp,
-                              height: 1.0,
-                            ),
-                          ),
-                          if (ride.isRiding) ...[
-                            SizedBox(height: 4.h),
+          // 속도계 게이지 — AnimatedBuilder로 침만 60fps, 나머지 1Hz
+          AnimatedBuilder(
+            animation: _needleAnim,
+            builder: (ctx, _) {
+              final displaySpeed = _needleAnim.value;
+              final displayPace = paceFromSpeed(displaySpeed);
+              return Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  height: MediaQuery.of(context).size.width * 0.75,
+                  child: CustomPaint(
+                    painter: SpeedometerPainter(
+                      speed: displaySpeed,
+                      maxSpeed: maxSpeed,
+                      isDark: isDark,
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 150.h),
+                          if (isRunning) ...[
                             Text(
-                              '${ride.completedLaps} km 완주',
+                              displayPace != null
+                                  ? formatPace(displayPace)
+                                  : '--:--',
                               style: TextStyle(
-                                color: cs.onSurfaceVariant,
-                                fontSize: 13.sp,
+                                color: speedTextColor,
+                                fontSize: 64.sp,
+                                fontWeight: FontWeight.bold,
+                                height: 1.0,
+                              ),
+                            ),
+                            Text(
+                              'min/km',
+                              style: TextStyle(
+                                color: unitTextColor,
+                                fontSize: 18.sp,
+                                height: 1.0,
+                              ),
+                            ),
+                            if (ride.isRiding) ...[
+                              SizedBox(height: 4.h),
+                              Text(
+                                '${ride.completedLaps} km 완주',
+                                style: TextStyle(
+                                  color: cs.onSurfaceVariant,
+                                  fontSize: 13.sp,
+                                ),
+                              ),
+                            ],
+                          ] else ...[
+                            Text(
+                              formatSpeed(displaySpeed, useKmh),
+                              style: TextStyle(
+                                color: speedTextColor,
+                                fontSize: 64.sp,
+                                fontWeight: FontWeight.bold,
+                                height: 1.0,
+                              ),
+                            ),
+                            Text(
+                              speedUnit(useKmh),
+                              style: TextStyle(
+                                color: unitTextColor,
+                                fontSize: 18.sp,
+                                height: 1.0,
                               ),
                             ),
                           ],
-                        ] else ...[
-                          Text(
-                            formatSpeed(ride.currentSpeed, useKmh),
-                            style: TextStyle(
-                              color: speedTextColor,
-                              fontSize: 64.sp,
-                              fontWeight: FontWeight.bold,
-                              height: 1.0,
-                            ),
-                          ),
-                          Text(
-                            speedUnit(useKmh),
-                            style: TextStyle(
-                              color: unitTextColor,
-                              fontSize: 18.sp,
-                              height: 1.0,
-                            ),
-                          ),
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              );
+            },
           ),
 
           SizedBox(height: 2.h),

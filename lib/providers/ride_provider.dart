@@ -86,6 +86,7 @@ class RideProvider extends ChangeNotifier {
   StreamSubscription<Position>? _positionSubscription;
 
   double get currentSpeed => _currentSpeed;
+  double get targetSpeed => _targetSpeed;
   double get maxSpeed => _maxSpeed;
   double get totalDistance => _totalDistance;
   bool get isRiding => _isRiding;
@@ -236,11 +237,12 @@ class RideProvider extends ChangeNotifier {
           _onPositionUpdate(position);
         });
 
-    // 0.2초마다 타이머 — 속도 보간 + UI 갱신
+    // 50ms 타이머 — 속도 보간은 매 tick, UI 갱신은 5Hz (4tick = 200ms)
+    // 침 애니메이션은 위젯 AnimationController가 60fps로 독립 구동
     _durationTimer =
         Timer.periodic(Duration(milliseconds: 1000 ~/ _interpolationSteps), (_) {
           _interpolateSpeed();
-          notifyListeners();
+          if (_notificationTick % 4 == 0) notifyListeners();
         });
 
     if (cadenceBpm != null) {

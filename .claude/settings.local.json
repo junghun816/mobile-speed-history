@@ -42,7 +42,10 @@
       "Bash(flutter test *)",
       "Bash(copy /Y icon_preview_blue_cyan.png assets\\\\icon\\\\icon.png)",
       "PowerShell(Copy-Item \"c:\\\\flutter-workspace\\\\speed-mobile\\\\icon_preview_blue_cyan.png\" \"c:\\\\flutter-workspace\\\\speed-mobile\\\\assets\\\\icon\\\\icon.png\" -Force)",
-      "Bash(dart run *)"
+      "Bash(dart run *)",
+      "Bash(Get-Content \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\speedometer_screen.dart\")",
+      "Bash(Measure-Object -Line)",
+      "Bash(Select-Object -ExpandProperty Lines)"
     ]
   }
 }
