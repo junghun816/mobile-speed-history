@@ -14,8 +14,7 @@ class SampleDataHelper {
 
     final random = Random();
 
-    // 2022년 1월 1일부터 오늘까지
-    final start = DateTime(2016, 1, 1);
+    final start = DateTime(2020, 5, 5);
     final end = DateTime.now();
 
     DateTime current = start;
@@ -58,6 +57,8 @@ class SampleDataHelper {
             final rideTime = DateTime(
                 day.year, day.month, day.day, hour, minute);
 
+            final activityType = random.nextDouble() > 0.5 ? 'bike' : 'run';
+
             final record = RideRecord(
               year: day.year,
               month: day.month,
@@ -71,6 +72,7 @@ class SampleDataHelper {
               duration: duration,
               pathPoints: '[]',
               createdAt: rideTime.millisecondsSinceEpoch,
+              activityType: activityType
             );
 
             await db.insertRecord(record);
