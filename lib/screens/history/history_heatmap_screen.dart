@@ -77,6 +77,33 @@ class _HistoryHeatmapScreenState extends State<HistoryHeatmapScreen>
     final totalKm = dayKm.values.fold(0.0, (s, v) => s + v);
     final totalRides = dayCount.values.fold(0, (s, v) => s + v);
 
+    final activeDays = dayKm.keys.length;
+    final avgPerActive = activeDays > 0 ? totalKm / activeDays : 0.0;
+
+    final Map<int, double> monthKmMap = {};
+    for (final e in dayKm.entries) {
+      final month = yearStart.add(Duration(days: e.key)).month;
+      monthKmMap[month] = (monthKmMap[month] ?? 0) + e.value;
+    }
+    int busiestMonth = 0;
+    double busiestMonthKm = 0;
+    for (final e in monthKmMap.entries) {
+      if (e.value > busiestMonthKm) {
+        busiestMonthKm = e.value;
+        busiestMonth = e.key;
+      }
+    }
+
+    int longestStreak = 0, curStreak = 0;
+    for (int i = 0; i < daysInYear; i++) {
+      if (dayKm.containsKey(i)) {
+        curStreak++;
+        if (curStreak > longestStreak) longestStreak = curStreak;
+      } else {
+        curStreak = 0;
+      }
+    }
+
     final numWeeks = ((startOffset + daysInYear) / 7).ceil();
     final levels = _levelColors(isDark);
 
@@ -365,7 +392,7 @@ class _HistoryHeatmapScreenState extends State<HistoryHeatmapScreen>
 
           // 범례
           Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
+            padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0),
             child: Row(
               children: [
                 Text('적음',
@@ -394,6 +421,43 @@ class _HistoryHeatmapScreenState extends State<HistoryHeatmapScreen>
               ],
             ),
           ),
+
+          // 통계 패널
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
+            child: Container(
+              padding:
+                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainer,
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _statCell('활동일', '$activeDays일', textColor, cs),
+                  Container(width: 1, height: 30.h, color: cs.outlineVariant),
+                  _statCell(
+                    '일평균 거리',
+                    activeDays > 0
+                        ? '${formatDistance(avgPerActive, useKmh)} ${distanceUnit(useKmh)}'
+                        : '--',
+                    textColor,
+                    cs,
+                  ),
+                  Container(width: 1, height: 30.h, color: cs.outlineVariant),
+                  _statCell(
+                    '최다 활동월',
+                    busiestMonth > 0 ? '$busiestMonth월' : '--',
+                    textColor,
+                    cs,
+                  ),
+                  Container(width: 1, height: 30.h, color: cs.outlineVariant),
+                  _statCell('최장 연속', '$longestStreak일', textColor, cs),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -402,5 +466,23 @@ class _HistoryHeatmapScreenState extends State<HistoryHeatmapScreen>
   String _weekdayLabel(int weekday) {
     const labels = ['월', '화', '수', '목', '금', '토', '일'];
     return labels[weekday - 1];
+  }
+
+  Widget _statCell(
+      String label, String value, Color textColor, ColorScheme cs) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(value,
+            style: TextStyle(
+                color: textColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold)),
+        SizedBox(height: 3.h),
+        Text(label,
+            style:
+                TextStyle(color: cs.onSurfaceVariant, fontSize: 11.sp)),
+      ],
+    );
   }
 }
