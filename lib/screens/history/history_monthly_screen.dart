@@ -141,7 +141,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
                 underline: const SizedBox(),
                 dropdownColor: panelColor,
                 isDense: true,
-                icon: Icon(Icons.arrow_drop_down, color: textColor, size: 20.r),
+                icon: const SizedBox.shrink(),
                 style: TextStyle(color: textColor, fontSize: 15.sp, fontWeight: FontWeight.bold),
                 items: allYears.map((y) => DropdownMenuItem(value: y, child: Text('$y년'))).toList(),
                 onChanged: (y) {
