@@ -223,10 +223,23 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                       color: hasPrev ? textColor : dividerColor, size: 24.r),
                 ),
               ),
-              Text(
-                '$_selectedYear년',
-                style: TextStyle(
-                    color: textColor, fontSize: 15.sp, fontWeight: FontWeight.bold),
+              DropdownButton<int>(
+                value: allYears.contains(_selectedYear) ? _selectedYear : allYears.lastOrNull,
+                underline: const SizedBox(),
+                dropdownColor: panelColor,
+                isDense: true,
+                icon: Icon(Icons.arrow_drop_down, color: textColor, size: 20.r),
+                style: TextStyle(color: textColor, fontSize: 15.sp, fontWeight: FontWeight.bold),
+                items: allYears.map((y) => DropdownMenuItem(value: y, child: Text('$y년'))).toList(),
+                onChanged: (y) {
+                  if (y == null) return;
+                  SystemSound.play(SystemSoundType.click);
+                  setState(() {
+                    _selectedYear = y;
+                    _selectedIndex = -1;
+                    _recentDays = null;
+                  });
+                },
               ),
               GestureDetector(
                 onTap: hasNext ? () {

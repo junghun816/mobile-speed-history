@@ -6,6 +6,8 @@ import '../utils/utils_format.dart';
 
 enum ChartDataType { distance, duration, maxSpeed, avgSpeed }
 
+const double _chartSidePadding = 16.0;
+
 class BarChartWidget extends StatefulWidget {
   final List<String> labels;
   final List<double> distanceData;
@@ -100,8 +102,8 @@ class _BarChartWidgetState extends State<BarChartWidget>
     final scrollOffset = _scrollController.offset;
     final viewportWidth = _scrollController.position.viewportDimension;
 
-    final start = (scrollOffset / itemWidth).floor().clamp(0, data.length - 1);
-    final end = ((scrollOffset + viewportWidth) / itemWidth).ceil().clamp(
+    final start = ((scrollOffset - _chartSidePadding) / itemWidth).floor().clamp(0, data.length - 1);
+    final end = ((scrollOffset + viewportWidth - _chartSidePadding) / itemWidth).ceil().clamp(
       0,
       data.length - 1,
     );
@@ -271,7 +273,7 @@ class _BarChartWidgetState extends State<BarChartWidget>
 
   Widget _buildChart(bool isDark) {
     final data = _currentData;
-    final totalWidth = (barWidth + barSpacing) * data.length;
+    final totalWidth = _chartSidePadding + (barWidth + barSpacing) * data.length + _chartSidePadding;
 
     return GestureDetector(
       onHorizontalDragUpdate: (_) {},
@@ -279,7 +281,7 @@ class _BarChartWidgetState extends State<BarChartWidget>
         final scrollOffset = _scrollController.hasClients
             ? _scrollController.offset
             : 0.0;
-        final tapX = details.localPosition.dx + scrollOffset;
+        final tapX = details.localPosition.dx + scrollOffset - _chartSidePadding;
         final index = (tapX / (barWidth + barSpacing)).floor().clamp(
           0,
           widget.labels.length - 1,
@@ -386,7 +388,7 @@ class BarChartPainter extends CustomPainter {
       final value = data[i];
       final ratio = maxValue > 0 ? (value / maxValue).clamp(0.0, 1.0) : 0.0;
       final barHeight = (chartHeight * ratio).clamp(4.0, chartHeight);
-      final x = i * (barWidth + barSpacing);
+      final x = _chartSidePadding + i * (barWidth + barSpacing);
 
       final barTop = valueHeight + (chartHeight - barHeight);
       final barRect = RRect.fromRectAndCorners(
