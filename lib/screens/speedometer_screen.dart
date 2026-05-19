@@ -13,6 +13,7 @@ import 'package:share_plus/share_plus.dart';
 import '../providers/ride_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/ride_record.dart';
+import '../models/speed_mode.dart';
 import '../utils/utils_format.dart';
 import '../widgets/widgets_memo_sheet.dart';
 import '../widgets/widgets_stat_item.dart';
@@ -368,7 +369,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                         autoPause: settings.autoPause,
                         speedAlertKmh: isBike ? settings.speedAlertKmh : null,
                         speedMinAlertKmh: isBike ? settings.speedMinAlertKmh : null,
-                        speedMode: settings.speedMode,
+                        speedMode: _selectedActivityType == 'run' ? SpeedMode.lowSpeed : settings.speedMode,
                         distanceAlertKm: isBike ? settings.distanceAlertKm : null,
                         useKmh: settings.useKmh,
                         activityType: _selectedActivityType,
@@ -869,31 +870,28 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
 
     final items = <(String, String)>[
       if (settings.showDistance)
-        ('거리',
-            '${formatDistance(ride.totalDistance, useKmh)} ${distanceUnit(useKmh)}'),
+        ('거리(${distanceUnit(useKmh)})', formatDistance(ride.totalDistance, useKmh)),
       if (settings.showDuration) ('시간', ride.formattedDuration),
       if (settings.showMaxSpeed)
         isRunMode
             ? ('최고페이스',
                 ride.maxSpeed > 0
-                    ? '${formatPace(paceFromSpeed(ride.maxSpeed)!)} min/km'
+                    ? formatPace(paceFromSpeed(ride.maxSpeed)!)
                     : '--:--')
-            : ('최고속도',
-                '${formatSpeed(ride.maxSpeed, useKmh)} ${speedUnit(useKmh)}'),
+            : ('최고(${speedUnit(useKmh)})', formatSpeed(ride.maxSpeed, useKmh)),
       if (settings.showAvgSpeed)
         isRunMode
             ? ('평균페이스',
                 currentAvgSpeed > 0
-                    ? '${formatPace(paceFromSpeed(currentAvgSpeed)!)} min/km'
+                    ? formatPace(paceFromSpeed(currentAvgSpeed)!)
                     : '--:--')
-            : ('평균속도',
-                '${formatSpeed(currentAvgSpeed, useKmh)} ${speedUnit(useKmh)}'),
+            : ('평균(${speedUnit(useKmh)})', formatSpeed(currentAvgSpeed, useKmh)),
     ];
 
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 20.h),
         decoration: BoxDecoration(

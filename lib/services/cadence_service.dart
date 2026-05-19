@@ -81,7 +81,7 @@ class CadenceService {
         android: const AudioContextAndroid(
           audioFocus: AndroidAudioFocus.none,
           contentType: AndroidContentType.sonification,
-          usageType: AndroidUsageType.assistanceSonification,
+          usageType: AndroidUsageType.media,
         ),
         iOS: AudioContextIOS(
           category: AVAudioSessionCategory.ambient,
