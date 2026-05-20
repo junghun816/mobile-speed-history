@@ -881,10 +881,10 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
             : ('최고(${speedUnit(useKmh)})', formatSpeed(ride.maxSpeed, useKmh)),
       if (settings.showAvgSpeed)
         isRunMode
-            ? ('평균페이스',
-                currentAvgSpeed > 0
-                    ? formatPace(paceFromSpeed(currentAvgSpeed)!)
-                    : '--:--')
+            ? ('평균페이스', () {
+                final pace = paceFromSpeed(currentAvgSpeed);
+                return pace != null ? formatPace(pace) : '--:--';
+              }())
             : ('평균(${speedUnit(useKmh)})', formatSpeed(currentAvgSpeed, useKmh)),
     ];
 

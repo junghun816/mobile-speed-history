@@ -5,19 +5,18 @@ import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:vibration/vibration.dart';
 
-// Isolate.spawn은 top-level 함수만 허용
 void _cadenceLoop(List<dynamic> args) async {
   final sendPort = args[0] as SendPort;
   final bpm = args[1] as int;
   final stopwatch = Stopwatch()..start();
+  sendPort.send(null); // 즉시 첫 비트
   int beat = 0;
   while (true) {
     beat++;
     final targetMs = (60000.0 * beat / bpm).round();
     final waitMs = targetMs - stopwatch.elapsedMilliseconds;
-    // 나머지 1ms는 tight spin으로 정밀도 확보 (이솔레이트 전용이라 부하 없음)
     if (waitMs > 1) await Future.delayed(Duration(milliseconds: waitMs - 1));
-    while (stopwatch.elapsedMilliseconds < targetMs) {}
+    while (stopwatch.elapsedMilliseconds < targetMs) {} // tight spin으로 정밀도 확보
     sendPort.send(null);
   }
 }
@@ -67,16 +66,9 @@ class CadenceService {
     return data;
   }
 
-  Future<void> start(int bpm,
-      {bool useVibration = true, bool useSound = false}) async {
-    stop();
-    _useVibration = useVibration;
-    _useSound = useSound;
-    _bpm = bpm;
-    _lastBeatMs = 0;
-    _running = true;
-
-    if (useSound) {
+  // 앱 시작 시 1회 — 오디오 컨텍스트만 설정 (음악 등 다른 오디오와 믹싱)
+  Future<void> prepare() async {
+    try {
       await _audioPlayer.setAudioContext(AudioContext(
         android: const AudioContextAndroid(
           audioFocus: AndroidAudioFocus.none,
@@ -88,7 +80,17 @@ class CadenceService {
           options: {AVAudioSessionOptions.mixWithOthers},
         ),
       ));
-    }
+    } catch (_) {}
+  }
+
+  Future<void> start(int bpm,
+      {bool useVibration = true, bool useSound = false}) async {
+    stop();
+    _useVibration = useVibration;
+    _useSound = useSound;
+    _bpm = bpm;
+    _lastBeatMs = 0;
+    _running = true;
 
     _receivePort = ReceivePort();
     _isolate =
@@ -96,14 +98,15 @@ class CadenceService {
 
     _receivePort!.listen((_) {
       if (!_running) return;
-      // 큐 쌓임 방지: 최소 간격(비트 주기의 70%) 이내 재발화 무시
+      // 큐 쌓임 방지: 비트 주기의 70% 이내 재발화 무시
       final nowMs = DateTime.now().millisecondsSinceEpoch;
       final minIntervalMs = (60000 / _bpm * 0.7).round();
       if (nowMs - _lastBeatMs < minIntervalMs) return;
       _lastBeatMs = nowMs;
 
-      // 진동·소리 동시 fire-and-forget
       if (_useVibration) Vibration.vibrate(duration: 50);
+      // _beepWav는 정적 메모리 상주(4.4KB) — BytesSource 로딩 오버헤드 무시 가능
+      // play()는 매번 새 재생을 시작하므로 이중 재생·상태 관리 이슈 없음
       if (_useSound) _audioPlayer.play(BytesSource(_beepWav));
     });
   }

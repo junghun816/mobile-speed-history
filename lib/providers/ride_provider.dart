@@ -70,6 +70,10 @@ class RideProvider extends ChangeNotifier {
   bool _voiceGuidanceEnabled = false;
   final CadenceService _cadenceService = CadenceService();
 
+  RideProvider() {
+    _cadenceService.prepare();
+  }
+
   // 랩 기록 (런닝 자동 1km)
   List<Map<String, dynamic>> _lapData = [];
   int _completedLaps = 0;
@@ -287,7 +291,7 @@ class RideProvider extends ChangeNotifier {
     switch (mode) {
       case SpeedMode.lowSpeed:
         _maxAccuracyMeters = 25.0;
-        _minMovementMeters = 2.0;
+        _minMovementMeters = 1.0;
       case SpeedMode.normal:
         _maxAccuracyMeters = 15.0;
         _minMovementMeters = 5.0;
