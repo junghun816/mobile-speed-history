@@ -102,6 +102,11 @@ class SettingsProvider extends ChangeNotifier {
   bool _distanceAlertSound = false;
   String _userName = '';
 
+  // 타일 접힘 상태 (in-memory only, 앱 세션 내 유지)
+  final Map<String, bool> _tileExpanded = {};
+  bool getTileExpanded(String key) => _tileExpanded[key] ?? false;
+  void setTileExpanded(String key, bool v) { _tileExpanded[key] = v; }
+
   bool get useKmh => _useKmh;
   bool get gpsHighAccuracy => _gpsHighAccuracy;
   double get minRecordDistanceKm => _minRecordDistanceKm;

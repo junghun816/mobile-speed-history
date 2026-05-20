@@ -144,6 +144,7 @@ class _SettingsUserScreenState extends State<SettingsUserScreen> {
                         maxDigits: 3,
                         allowEmpty: true,
                         allowDecimal: true,
+                        rangeHint: '1 ~ 999 kg',
                       );
                       if (result == null) return;
                       if (result == NumberInputDialog.clearValue) {

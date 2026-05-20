@@ -38,6 +38,8 @@ class SettingsRunningScreen extends StatelessWidget {
               btnBgOff: cs.surfaceContainerHighest,
               inactiveTrackColor: cs.outlineVariant,
               dividerColor: cs.outlineVariant,
+              initialExpanded: settings.getTileExpanded('cadence'),
+              onExpandChanged: (v) => settings.setTileExpanded('cadence', v),
             ),
             SizedBox(height: 10.h),
             _inputTile(
@@ -58,6 +60,7 @@ class SettingsRunningScreen extends StatelessWidget {
                   unit: '초',
                   initialValue: settings.defaultTargetPaceSecPerKm,
                   allowDecimal: false,
+                  rangeHint: '60 ~ 600 초 (1:00 ~ 10:00 min/km)',
                 );
                 if (v == null) return;
                 await settings.setDefaultTargetPaceSecPerKm(v <= 0 ? null : v.toInt());
@@ -87,52 +90,59 @@ class SettingsRunningScreen extends StatelessWidget {
       Color panelColor, Color titleColor, Color subtitleColor, ColorScheme cs) {
     return settingsPanelContainer(
       panelColor: panelColor,
-      child: Row(
+      child: Column(
         children: [
-          settingsIconBox(Icons.flag_outlined),
-          SizedBox(width: 14.w),
-          Expanded(child: settingsTileLabel('랩 간격', '자동 랩 기록 거리 기준', titleColor, subtitleColor)),
-          GestureDetector(
-            onTap: () {
-              SystemSound.play(SystemSoundType.click);
-              if (settings.lapIntervalKmRun > 1) settings.setLapIntervalKmRun(settings.lapIntervalKmRun - 1);
-            },
-            child: Container(
-              width: 32.r, height: 32.r,
-              decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
-              child: Icon(Icons.remove, color: titleColor, size: 16.r),
-            ),
-          ),
-          SizedBox(width: 8.w),
-          GestureDetector(
-            onTap: () async {
-              SystemSound.play(SystemSoundType.click);
-              final result = await NumberInputDialog.show(context,
-                  title: '랩 간격', initialValue: settings.lapIntervalKmRun.toDouble(),
-                  unit: 'km', maxDigits: 2, allowEmpty: false, allowDecimal: false);
-              if (result != null && result > 0) settings.setLapIntervalKmRun(result.toInt());
-            },
-            child: SizedBox(
-              width: 44.w,
-              child: Text(
-                '${settings.lapIntervalKmRun} km',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.indigo, fontSize: 14.sp, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              settingsIconBox(Icons.flag_outlined),
+              SizedBox(width: 14.w),
+              Expanded(child: settingsTileLabel('랩 간격', '자동 랩 기록 거리 기준', titleColor, subtitleColor)),
+              GestureDetector(
+                onTap: () {
+                  SystemSound.play(SystemSoundType.click);
+                  if (settings.lapIntervalKmRun > 1) settings.setLapIntervalKmRun(settings.lapIntervalKmRun - 1);
+                },
+                child: Container(
+                  width: 32.r, height: 32.r,
+                  decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
+                  child: Icon(Icons.remove, color: titleColor, size: 16.r),
+                ),
               ),
-            ),
+              SizedBox(width: 8.w),
+              GestureDetector(
+                onTap: () async {
+                  SystemSound.play(SystemSoundType.click);
+                  final result = await NumberInputDialog.show(context,
+                      title: '랩 간격', initialValue: settings.lapIntervalKmRun.toDouble(),
+                      unit: 'km', maxDigits: 2, allowEmpty: false, allowDecimal: false,
+                      rangeHint: '1 ~ 99 km');
+                  if (result != null && result > 0) settings.setLapIntervalKmRun(result.toInt());
+                },
+                child: SizedBox(
+                  width: 44.w,
+                  child: Text(
+                    '${settings.lapIntervalKmRun} km',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.indigo, fontSize: 14.sp, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              GestureDetector(
+                onTap: () {
+                  SystemSound.play(SystemSoundType.click);
+                  settings.setLapIntervalKmRun(settings.lapIntervalKmRun + 1);
+                },
+                child: Container(
+                  width: 32.r, height: 32.r,
+                  decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
+                  child: Icon(Icons.add, color: titleColor, size: 16.r),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 8.w),
-          GestureDetector(
-            onTap: () {
-              SystemSound.play(SystemSoundType.click);
-              settings.setLapIntervalKmRun(settings.lapIntervalKmRun + 1);
-            },
-            child: Container(
-              width: 32.r, height: 32.r,
-              decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
-              child: Icon(Icons.add, color: titleColor, size: 16.r),
-            ),
-          ),
+          SizedBox(height: 4.h),
+          Center(child: Text('1 ~ 99 km', style: TextStyle(color: subtitleColor, fontSize: 11.sp))),
         ],
       ),
     );
@@ -229,6 +239,8 @@ class _CadenceTile extends StatefulWidget {
   final Color btnBgOff;
   final Color inactiveTrackColor;
   final Color dividerColor;
+  final bool initialExpanded;
+  final void Function(bool)? onExpandChanged;
 
   const _CadenceTile({
     required this.cadenceEnabled,
@@ -245,6 +257,8 @@ class _CadenceTile extends StatefulWidget {
     required this.btnBgOff,
     required this.inactiveTrackColor,
     required this.dividerColor,
+    this.initialExpanded = false,
+    this.onExpandChanged,
   });
 
   @override
@@ -255,15 +269,28 @@ class _CadenceTileState extends State<_CadenceTile> {
   bool _isExpanded = false;
 
   @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.initialExpanded;
+  }
+
+  @override
   void didUpdateWidget(_CadenceTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.cadenceEnabled && !oldWidget.cadenceEnabled) setState(() => _isExpanded = true);
-    if (!widget.cadenceEnabled && oldWidget.cadenceEnabled) setState(() => _isExpanded = false);
+    if (widget.cadenceEnabled && !oldWidget.cadenceEnabled) {
+      setState(() => _isExpanded = true);
+      widget.onExpandChanged?.call(true);
+    }
+    if (!widget.cadenceEnabled && oldWidget.cadenceEnabled) {
+      setState(() => _isExpanded = false);
+      widget.onExpandChanged?.call(false);
+    }
   }
 
   void _toggleExpand() {
     SystemSound.play(SystemSoundType.click);
     setState(() => _isExpanded = !_isExpanded);
+    widget.onExpandChanged?.call(_isExpanded);
   }
 
   @override
@@ -340,7 +367,8 @@ class _CadenceTileState extends State<_CadenceTile> {
                         unit: 'bpm',
                         maxDigits: 3,
                         allowEmpty: false,
-                        allowDecimal: false);
+                        allowDecimal: false,
+                        rangeHint: '40 ~ 240 bpm');
                     if (result != null) widget.onBpmChanged(result.toInt());
                   },
                   child: Container(
@@ -372,6 +400,13 @@ class _CadenceTileState extends State<_CadenceTile> {
                   ),
                 ),
               ],
+            ),
+            SizedBox(height: 4.h),
+            Center(
+              child: Text(
+                '40 ~ 240 bpm',
+                style: TextStyle(color: widget.subtitleColor, fontSize: 11.sp),
+              ),
             ),
             SizedBox(height: 12.h),
             Divider(height: 1, thickness: 0.5, color: widget.dividerColor),

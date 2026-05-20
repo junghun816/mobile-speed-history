@@ -8,6 +8,7 @@ class NumberInputDialog extends StatefulWidget {
   final int maxDigits;
   final bool allowEmpty;
   final bool allowDecimal;
+  final String? rangeHint;
 
   static const double clearValue = -1;
 
@@ -19,6 +20,7 @@ class NumberInputDialog extends StatefulWidget {
     this.maxDigits = 4,
     this.allowEmpty = false,
     this.allowDecimal = false,
+    this.rangeHint,
   });
 
   static Future<double?> show(
@@ -29,6 +31,7 @@ class NumberInputDialog extends StatefulWidget {
     int maxDigits = 4,
     bool allowEmpty = false,
     bool allowDecimal = false,
+    String? rangeHint,
   }) {
     return showGeneralDialog<double>(
       context: context,
@@ -43,6 +46,7 @@ class NumberInputDialog extends StatefulWidget {
         maxDigits: maxDigits,
         allowEmpty: allowEmpty,
         allowDecimal: allowDecimal,
+        rangeHint: rangeHint,
       ),
       transitionBuilder: (_, animation, __, child) => FadeTransition(
         opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
@@ -150,6 +154,13 @@ class _NumberInputDialogState extends State<NumberInputDialog> {
                   fontSize: 16,
                   fontWeight: FontWeight.bold),
             ),
+            if (widget.rangeHint != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                widget.rangeHint!,
+                style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12),
+              ),
+            ],
             const SizedBox(height: 24),
 
             Row(

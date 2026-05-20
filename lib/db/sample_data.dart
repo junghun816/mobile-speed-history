@@ -39,18 +39,24 @@ class SampleDataHelper {
           final sessionCount = random.nextInt(4) + 1;
 
           for (int s = 0; s < sessionCount; s++) {
-            // 거리: 5~40km 랜덤
-            final distance = 5.0 + random.nextDouble() * 35;
+            final activityType = random.nextDouble() > 0.5 ? 'bike' : 'run';
 
-            // 평균속도: 15~28 km/h 랜덤
-            final avgSpeed = 15.0 + random.nextDouble() * 13;
+            // 종목별 거리·속도 범위
+            final double distance;
+            final double avgSpeed;
+            final double maxSpeed;
+            if (activityType == 'bike') {
+              distance = 5.0 + random.nextDouble() * 35;       // 5~40km
+              avgSpeed = 15.0 + random.nextDouble() * 13;      // 15~28 km/h
+              maxSpeed = avgSpeed * (1.3 + random.nextDouble() * 0.4);
+            } else {
+              distance = 3.0 + random.nextDouble() * 12;       // 3~15km
+              avgSpeed = 8.0 + random.nextDouble() * 6;        // 8~14 km/h
+              maxSpeed = avgSpeed * (1.1 + random.nextDouble() * 0.2);
+            }
 
             // 시간 = 거리 / 속도 (초)
             final duration = ((distance / avgSpeed) * 3600).toInt();
-
-            // 최고속도: 평균 * 1.3~1.7
-            final maxSpeed =
-                avgSpeed * (1.3 + random.nextDouble() * 0.4);
 
             // 출발 시간: 오전 6시 ~ 오후 8시
             final hour = 6 + random.nextInt(14);
@@ -58,26 +64,23 @@ class SampleDataHelper {
             final rideTime = DateTime(
                 day.year, day.month, day.day, hour, minute);
 
-            final activityType = random.nextDouble() > 0.5 ? 'bike' : 'run';
-
+            // 랩 데이터 생성 (1km 기준)
+            final lapCount = distance.floor();
             String? lapSplitsJson;
-            if (activityType == 'run') {
-              final lapCount = distance.floor();
-              if (lapCount > 0) {
-                final basePaceSec = (3600 / avgSpeed).round();
-                final laps = <Map<String, dynamic>>[];
-                for (int lap = 1; lap <= lapCount; lap++) {
-                  final lapPaceSec = (basePaceSec * (0.93 + random.nextDouble() * 0.14)).round();
-                  final lapMaxSpeed = avgSpeed * (1.1 + random.nextDouble() * 0.2);
-                  laps.add({
-                    'lap': lap,
-                    'timeMs': lapPaceSec * 1000,
-                    'paceSecPerKm': lapPaceSec,
-                    'maxSpeedKmh': double.parse(lapMaxSpeed.toStringAsFixed(1)),
-                  });
-                }
-                lapSplitsJson = jsonEncode(laps);
+            if (lapCount > 0) {
+              final baseLapTimeSec = (3600 / avgSpeed).round();
+              final laps = <Map<String, dynamic>>[];
+              for (int lap = 1; lap <= lapCount; lap++) {
+                final lapTimeSec = (baseLapTimeSec * (0.93 + random.nextDouble() * 0.14)).round();
+                final lapMaxSpeed = avgSpeed * (1.1 + random.nextDouble() * 0.2);
+                laps.add({
+                  'lap': lap,
+                  'timeMs': lapTimeSec * 1000,
+                  'paceSecPerKm': lapTimeSec,
+                  'maxSpeedKmh': double.parse(lapMaxSpeed.toStringAsFixed(1)),
+                });
               }
+              lapSplitsJson = jsonEncode(laps);
             }
 
             final record = RideRecord(

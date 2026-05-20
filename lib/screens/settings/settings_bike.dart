@@ -44,7 +44,8 @@ class SettingsBikeScreen extends StatelessWidget {
                 SystemSound.play(SystemSoundType.click);
                 final result = await NumberInputDialog.show(context,
                     title: '최고 속도 기준', initialValue: settings.speedAlertKmh,
-                    unit: 'km/h', maxDigits: 3, allowEmpty: false, allowDecimal: false);
+                    unit: 'km/h', maxDigits: 3, allowEmpty: false, allowDecimal: false,
+                    rangeHint: '1 ~ 999 km/h');
                 if (result != null) settings.setSpeedAlertKmh(result.toDouble());
               },
               popupValue: settings.speedMaxAlertPopup,
@@ -59,6 +60,9 @@ class SettingsBikeScreen extends StatelessWidget {
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
               dividerColor: cs.outlineVariant,
+              rangeHint: '1 ~ 999 km/h',
+              initialExpanded: settings.getTileExpanded('bikeSpeedMax'),
+              onExpandChanged: (v) => settings.setTileExpanded('bikeSpeedMax', v),
             ),
             SizedBox(height: 10.h),
             _AlertTileWidget(
@@ -79,7 +83,8 @@ class SettingsBikeScreen extends StatelessWidget {
                 SystemSound.play(SystemSoundType.click);
                 final result = await NumberInputDialog.show(context,
                     title: '최저 속도 기준', initialValue: settings.speedMinAlertKmh,
-                    unit: 'km/h', maxDigits: 3, allowEmpty: false, allowDecimal: false);
+                    unit: 'km/h', maxDigits: 3, allowEmpty: false, allowDecimal: false,
+                    rangeHint: '1 ~ 999 km/h');
                 if (result != null) settings.setSpeedMinAlertKmh(result.toDouble());
               },
               popupValue: settings.speedMinAlertPopup,
@@ -94,6 +99,9 @@ class SettingsBikeScreen extends StatelessWidget {
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
               dividerColor: cs.outlineVariant,
+              rangeHint: '1 ~ 999 km/h',
+              initialExpanded: settings.getTileExpanded('bikeSpeedMin'),
+              onExpandChanged: (v) => settings.setTileExpanded('bikeSpeedMin', v),
             ),
             SizedBox(height: 10.h),
             _AlertTileWidget(
@@ -111,7 +119,8 @@ class SettingsBikeScreen extends StatelessWidget {
                 SystemSound.play(SystemSoundType.click);
                 final result = await NumberInputDialog.show(context,
                     title: '거리 알림 기준', initialValue: settings.distanceAlertKm,
-                    unit: 'km', maxDigits: 3, allowEmpty: false, allowDecimal: false);
+                    unit: 'km', maxDigits: 3, allowEmpty: false, allowDecimal: false,
+                    rangeHint: '1 ~ 999 km');
                 if (result != null) settings.setDistanceAlertKm(result.toInt());
               },
               popupValue: settings.distanceAlertPopup,
@@ -126,6 +135,9 @@ class SettingsBikeScreen extends StatelessWidget {
               btnBgOff: btnBgOff,
               inactiveTrackColor: inactiveTrackColor,
               dividerColor: cs.outlineVariant,
+              rangeHint: '1 ~ 999 km',
+              initialExpanded: settings.getTileExpanded('bikeDistance'),
+              onExpandChanged: (v) => settings.setTileExpanded('bikeDistance', v),
             ),
             SizedBox(height: 10.h),
             _lapIntervalTile(context, settings, panelColor, titleColor, subtitleColor, cs),
@@ -139,52 +151,59 @@ class SettingsBikeScreen extends StatelessWidget {
       Color panelColor, Color titleColor, Color subtitleColor, ColorScheme cs) {
     return settingsPanelContainer(
       panelColor: panelColor,
-      child: Row(
+      child: Column(
         children: [
-          settingsIconBox(Icons.flag_outlined),
-          SizedBox(width: 14.w),
-          Expanded(child: settingsTileLabel('랩 간격', '자동 랩 기록 거리 기준', titleColor, subtitleColor)),
-          GestureDetector(
-            onTap: () {
-              SystemSound.play(SystemSoundType.click);
-              if (settings.lapIntervalKmBike > 1) settings.setLapIntervalKmBike(settings.lapIntervalKmBike - 1);
-            },
-            child: Container(
-              width: 32.r, height: 32.r,
-              decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
-              child: Icon(Icons.remove, color: titleColor, size: 16.r),
-            ),
-          ),
-          SizedBox(width: 8.w),
-          GestureDetector(
-            onTap: () async {
-              SystemSound.play(SystemSoundType.click);
-              final result = await NumberInputDialog.show(context,
-                  title: '랩 간격', initialValue: settings.lapIntervalKmBike.toDouble(),
-                  unit: 'km', maxDigits: 2, allowEmpty: false, allowDecimal: false);
-              if (result != null && result > 0) settings.setLapIntervalKmBike(result.toInt());
-            },
-            child: SizedBox(
-              width: 44.w,
-              child: Text(
-                '${settings.lapIntervalKmBike} km',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.indigo, fontSize: 14.sp, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              settingsIconBox(Icons.flag_outlined),
+              SizedBox(width: 14.w),
+              Expanded(child: settingsTileLabel('랩 간격', '자동 랩 기록 거리 기준', titleColor, subtitleColor)),
+              GestureDetector(
+                onTap: () {
+                  SystemSound.play(SystemSoundType.click);
+                  if (settings.lapIntervalKmBike > 1) settings.setLapIntervalKmBike(settings.lapIntervalKmBike - 1);
+                },
+                child: Container(
+                  width: 32.r, height: 32.r,
+                  decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
+                  child: Icon(Icons.remove, color: titleColor, size: 16.r),
+                ),
               ),
-            ),
+              SizedBox(width: 8.w),
+              GestureDetector(
+                onTap: () async {
+                  SystemSound.play(SystemSoundType.click);
+                  final result = await NumberInputDialog.show(context,
+                      title: '랩 간격', initialValue: settings.lapIntervalKmBike.toDouble(),
+                      unit: 'km', maxDigits: 2, allowEmpty: false, allowDecimal: false,
+                      rangeHint: '1 ~ 99 km');
+                  if (result != null && result > 0) settings.setLapIntervalKmBike(result.toInt());
+                },
+                child: SizedBox(
+                  width: 44.w,
+                  child: Text(
+                    '${settings.lapIntervalKmBike} km',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.indigo, fontSize: 14.sp, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              GestureDetector(
+                onTap: () {
+                  SystemSound.play(SystemSoundType.click);
+                  settings.setLapIntervalKmBike(settings.lapIntervalKmBike + 1);
+                },
+                child: Container(
+                  width: 32.r, height: 32.r,
+                  decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
+                  child: Icon(Icons.add, color: titleColor, size: 16.r),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 8.w),
-          GestureDetector(
-            onTap: () {
-              SystemSound.play(SystemSoundType.click);
-              settings.setLapIntervalKmBike(settings.lapIntervalKmBike + 1);
-            },
-            child: Container(
-              width: 32.r, height: 32.r,
-              decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
-              child: Icon(Icons.add, color: titleColor, size: 16.r),
-            ),
-          ),
+          SizedBox(height: 4.h),
+          Center(child: Text('1 ~ 99 km', style: TextStyle(color: subtitleColor, fontSize: 11.sp))),
         ],
       ),
     );
@@ -215,6 +234,9 @@ class _AlertTileWidget extends StatefulWidget {
   final Color btnBgOff;
   final Color inactiveTrackColor;
   final Color dividerColor;
+  final String? rangeHint;
+  final bool initialExpanded;
+  final void Function(bool)? onExpandChanged;
 
   const _AlertTileWidget({
     required this.iconColor,
@@ -240,6 +262,9 @@ class _AlertTileWidget extends StatefulWidget {
     required this.btnBgOff,
     required this.inactiveTrackColor,
     required this.dividerColor,
+    this.rangeHint,
+    this.initialExpanded = false,
+    this.onExpandChanged,
   });
 
   @override
@@ -250,15 +275,28 @@ class _AlertTileWidgetState extends State<_AlertTileWidget> {
   bool _isExpanded = false;
 
   @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.initialExpanded;
+  }
+
+  @override
   void didUpdateWidget(_AlertTileWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.isOn && !oldWidget.isOn) setState(() => _isExpanded = true);
-    if (!widget.isOn && oldWidget.isOn) setState(() => _isExpanded = false);
+    if (widget.isOn && !oldWidget.isOn) {
+      setState(() => _isExpanded = true);
+      widget.onExpandChanged?.call(true);
+    }
+    if (!widget.isOn && oldWidget.isOn) {
+      setState(() => _isExpanded = false);
+      widget.onExpandChanged?.call(false);
+    }
   }
 
   void _toggleExpand() {
     SystemSound.play(SystemSoundType.click);
     setState(() => _isExpanded = !_isExpanded);
+    widget.onExpandChanged?.call(_isExpanded);
   }
 
   @override
@@ -357,6 +395,15 @@ class _AlertTileWidgetState extends State<_AlertTileWidget> {
                 ),
               ],
             ),
+            if (widget.rangeHint != null) ...[
+              SizedBox(height: 4.h),
+              Center(
+                child: Text(
+                  widget.rangeHint!,
+                  style: TextStyle(color: widget.subtitleColor, fontSize: 11.sp),
+                ),
+              ),
+            ],
             SizedBox(height: 12.h),
             if (widget.popupValue != null &&
                 widget.vibrationValue != null &&
