@@ -7,8 +7,8 @@ import '../../providers/settings_provider.dart';
 import '../../widgets/widgets_number_input.dart';
 import 'settings_widgets.dart';
 
-class SettingsAlertScreen extends StatelessWidget {
-  const SettingsAlertScreen({super.key});
+class SettingsBikeScreen extends StatelessWidget {
+  const SettingsBikeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

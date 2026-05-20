@@ -45,7 +45,11 @@
       "Bash(dart run *)",
       "Bash(Get-Content \"c:\\\\flutter-workspace\\\\speed-mobile\\\\lib\\\\screens\\\\speedometer_screen.dart\")",
       "Bash(Measure-Object -Line)",
-      "Bash(Select-Object -ExpandProperty Lines)"
+      "Bash(Select-Object -ExpandProperty Lines)",
+      "Bash(xargs -I{} sh -c 'echo \"{}\"')",
+      "Bash(Remove-Item \"c:/flutter-workspace/speed-mobile/lib/screens/settings/settings_alert.dart\" -Force)",
+      "Bash(Remove-Item \"c:/flutter-workspace/speed-mobile/lib/screens/settings/settings_ride.dart\" -Force)",
+      "Bash(Write-Host \"Deleted\")"
     ]
   }
 }

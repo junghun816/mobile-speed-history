@@ -257,9 +257,9 @@ GPS 업데이트마다 아래 세 필터를 순서대로 적용한다:
 설정 화면은 2단계 네비게이션으로 구성된다. `lib/screens/settings/` 폴더:
 - `settings_screen.dart` — 대메뉴 목록
 - `settings_widgets.dart` — 공통 위젯: `settingsIconBox`, `settingsPanelContainer`, `settingsOptionButton`
-- `settings_ride.dart` — 속도 측정 모드·자동 일시정지·최소 기록 거리/시간·단위·GPS
+- `settings_general.dart` — 속도 측정 모드·자동 일시정지·최소 기록 거리/시간·단위·GPS
 - `settings_display.dart` — 주행 중 표시 항목·속도계 시계
-- `settings_alert.dart` — **자전거 전용** 속도 초과/미달 알림·거리 알림
+- `settings_bike.dart` — **자전거 전용** 속도 초과/미달 알림·거리 알림
 - `settings_running.dart` — **런닝 전용** 음성 안내·케이던스·목표 페이스
 - `settings_map.dart` — 지도 스타일·경로 색상/두께·추적 모드
 - `settings_user.dart` — 체중

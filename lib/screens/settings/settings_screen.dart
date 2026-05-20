@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'settings_ride.dart';
+import 'settings_general.dart';
 import 'settings_running.dart';
 import 'settings_display.dart';
-import 'settings_alert.dart';
+import 'settings_bike.dart';
 import 'settings_map.dart';
 import 'settings_user.dart';
 import 'settings_system.dart';
@@ -32,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsRideScreen())),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsGeneralScreen())),
             ),
             SizedBox(height: 10.h),
             settingsTile(
@@ -42,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
               panelColor: panelColor,
               titleColor: titleColor,
               subtitleColor: subtitleColor,
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsAlertScreen())),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsBikeScreen())),
             ),
             SizedBox(height: 10.h),
             settingsTile(

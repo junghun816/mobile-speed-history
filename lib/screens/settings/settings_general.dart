@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
 import 'settings_widgets.dart';
 
-class SettingsRideScreen extends StatelessWidget {
-  const SettingsRideScreen({super.key});
+class SettingsGeneralScreen extends StatelessWidget {
+  const SettingsGeneralScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
