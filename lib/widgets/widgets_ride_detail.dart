@@ -12,7 +12,7 @@ import 'widgets_memo_sheet.dart';
 import 'widgets_stat_item.dart';
 
 Widget _buildLapTable(
-    List<Map<String, dynamic>> laps, Color textColor, ColorScheme cs) {
+    List<Map<String, dynamic>> laps, Color textColor, ColorScheme cs, bool isRunning) {
   return Container(
     decoration: BoxDecoration(
       color: cs.surfaceContainerHighest,
@@ -27,7 +27,7 @@ Widget _buildLapTable(
           child: Row(
             children: [
               SizedBox(width: 32.w, child: Text('랩', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
-              Expanded(child: Text('페이스', textAlign: TextAlign.center, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
+              Expanded(child: Text(isRunning ? '페이스' : '평균속도', textAlign: TextAlign.center, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
               Expanded(child: Text('시간', textAlign: TextAlign.center, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
               Expanded(child: Text('최고속도', textAlign: TextAlign.center, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12.sp, fontWeight: FontWeight.bold))),
             ],
@@ -41,9 +41,13 @@ Widget _buildLapTable(
             itemCount: laps.length,
             itemBuilder: (_, i) {
               final lap = laps[i];
-              final paceSecPerKm = (lap['paceSecPerKm'] as num).toInt();
-              final timeSec = (lap['timeMs'] as num).toInt() ~/ 1000;
+              final lapTimeSec = (lap['timeMs'] as num).toInt() ~/ 1000;
               final maxSpeed = (lap['maxSpeedKmh'] as num).toDouble();
+              final firstColText = isRunning
+                  ? formatPace((lap['paceSecPerKm'] as num).toInt())
+                  : lapTimeSec > 0
+                      ? '${(3600 / lapTimeSec).toStringAsFixed(1)} km/h'
+                      : '--';
               return Container(
                 decoration: BoxDecoration(
                   color: i.isOdd ? cs.surfaceContainerHighest : cs.surfaceContainer,
@@ -58,8 +62,8 @@ Widget _buildLapTable(
                       width: 32.w,
                       child: Text('${lap['lap']}', style: TextStyle(color: textColor, fontSize: 13.sp, fontWeight: FontWeight.bold)),
                     ),
-                    Expanded(child: Text(formatPace(paceSecPerKm), textAlign: TextAlign.center, style: TextStyle(color: Colors.lightBlue, fontSize: 13.sp, fontWeight: FontWeight.bold))),
-                    Expanded(child: Text(formatDuration(timeSec), textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
+                    Expanded(child: Text(firstColText, textAlign: TextAlign.center, style: TextStyle(color: Colors.lightBlue, fontSize: 13.sp, fontWeight: FontWeight.bold))),
+                    Expanded(child: Text(formatDuration(lapTimeSec), textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
                     Expanded(child: Text('${maxSpeed.toStringAsFixed(1)} km/h', textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
                   ],
                 ),
@@ -175,9 +179,9 @@ void showRecordDetailDialog(
                     ],
                   ),
                 ),
-                if (isRunning && lapData.isNotEmpty) ...[
+                if (lapData.isNotEmpty) ...[
                   SizedBox(height: 12.h),
-                  _buildLapTable(lapData, textColor, cs),
+                  _buildLapTable(lapData, textColor, cs, isRunning),
                 ],
                 SizedBox(height: 16.h),
                 GestureDetector(

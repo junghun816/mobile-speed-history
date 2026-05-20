@@ -74,10 +74,11 @@ class RideProvider extends ChangeNotifier {
     _cadenceService.prepare();
   }
 
-  // 랩 기록 (런닝 자동 1km)
+  // 랩 기록 (자동 랩)
   List<Map<String, dynamic>> _lapData = [];
   int _completedLaps = 0;
   int _lapStartDurationSec = 0;
+  int _lapIntervalKm = 1;
   double _lapMaxSpeed = 0.0;
 
 
@@ -196,6 +197,7 @@ class RideProvider extends ChangeNotifier {
     bool voiceGuidance = false,
     bool cadenceVibration = true,
     bool cadenceSound = false,
+    int lapIntervalKm = 1,
     bool speedMaxAlertPopupEnabled = true,
     bool speedMaxAlertVibrationEnabled = true,
     bool speedMaxAlertSoundEnabled = false,
@@ -255,6 +257,7 @@ class RideProvider extends ChangeNotifier {
     _completedLaps = 0;
     _lapStartDurationSec = 0;
     _lapMaxSpeed = 0.0;
+    _lapIntervalKm = lapIntervalKm.clamp(1, 99);
     _wasOverTargetPace = false;
 
     _currentSpeedMode = speedMode;
@@ -362,15 +365,16 @@ class RideProvider extends ChangeNotifier {
           }
         }
 
-        // 랩 기록: 1km 단위 자동 랩
-        final newLap = _totalDistance.floor();
+        // 랩 기록: _lapIntervalKm 단위 자동 랩
+        final newLap = (_totalDistance / _lapIntervalKm).floor();
         if (newLap > _completedLaps) {
           final currentDurationSec = duration;
           final lapTimeSec = currentDurationSec - _lapStartDurationSec;
+          final reachedKm = newLap * _lapIntervalKm;
           _lapData.add({
             'lap': newLap,
             'timeMs': lapTimeSec * 1000,
-            'paceSecPerKm': lapTimeSec,
+            'paceSecPerKm': lapTimeSec ~/ _lapIntervalKm,
             'maxSpeedKmh': _lapMaxSpeed,
           });
           _completedLaps = newLap;
@@ -379,7 +383,7 @@ class RideProvider extends ChangeNotifier {
 
           if (_voiceGuidanceEnabled) {
             VoiceGuidanceService.instance.speak(
-              '$newLap킬로미터 완주, 페이스 ${lapTimeSec ~/ 60}분 ${lapTimeSec % 60}초',
+              '$reachedKm킬로미터 완주, 페이스 ${(lapTimeSec ~/ _lapIntervalKm) ~/ 60}분 ${(lapTimeSec ~/ _lapIntervalKm) % 60}초',
             );
           }
         }

@@ -383,6 +383,7 @@ class _SpeedometerScreenState extends State<SpeedometerScreen>
                             settings.runningVoiceGuidance,
                         cadenceVibration: settings.cadenceVibration,
                         cadenceSound: settings.cadenceSound,
+                        lapIntervalKm: isBike ? settings.lapIntervalKmBike : settings.lapIntervalKmRun,
                         speedMaxAlertPopupEnabled: isBike && settings.speedMaxAlertPopup,
                         speedMaxAlertVibrationEnabled: isBike && settings.speedMaxAlertVibration,
                         speedMaxAlertSoundEnabled: isBike && settings.speedMaxAlertSound,

@@ -75,8 +75,65 @@ class SettingsRunningScreen extends StatelessWidget {
               titleColor: titleColor,
               subtitleColor: subtitleColor,
             ),
+            SizedBox(height: 10.h),
+            _lapIntervalTile(context, settings, panelColor, titleColor, subtitleColor, cs),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _lapIntervalTile(BuildContext context, SettingsProvider settings,
+      Color panelColor, Color titleColor, Color subtitleColor, ColorScheme cs) {
+    return settingsPanelContainer(
+      panelColor: panelColor,
+      child: Row(
+        children: [
+          settingsIconBox(Icons.flag_outlined),
+          SizedBox(width: 14.w),
+          Expanded(child: settingsTileLabel('랩 간격', '자동 랩 기록 거리 기준', titleColor, subtitleColor)),
+          GestureDetector(
+            onTap: () {
+              SystemSound.play(SystemSoundType.click);
+              if (settings.lapIntervalKmRun > 1) settings.setLapIntervalKmRun(settings.lapIntervalKmRun - 1);
+            },
+            child: Container(
+              width: 32.r, height: 32.r,
+              decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
+              child: Icon(Icons.remove, color: titleColor, size: 16.r),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          GestureDetector(
+            onTap: () async {
+              SystemSound.play(SystemSoundType.click);
+              final result = await NumberInputDialog.show(context,
+                  title: '랩 간격', initialValue: settings.lapIntervalKmRun.toDouble(),
+                  unit: 'km', maxDigits: 2, allowEmpty: false, allowDecimal: false);
+              if (result != null && result > 0) settings.setLapIntervalKmRun(result.toInt());
+            },
+            child: SizedBox(
+              width: 44.w,
+              child: Text(
+                '${settings.lapIntervalKmRun} km',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.indigo, fontSize: 14.sp, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          GestureDetector(
+            onTap: () {
+              SystemSound.play(SystemSoundType.click);
+              settings.setLapIntervalKmRun(settings.lapIntervalKmRun + 1);
+            },
+            child: Container(
+              width: 32.r, height: 32.r,
+              decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8.r)),
+              child: Icon(Icons.add, color: titleColor, size: 16.r),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -49,6 +49,8 @@ class SettingsProvider extends ChangeNotifier {
   static const _keyDistanceAlertVibration = 'distance_alert_vibration';
   static const _keyDistanceAlertSound = 'distance_alert_sound';
   static const _keyUserName = 'user_name';
+  static const _keyLapIntervalKmBike = 'lap_interval_km_bike';
+  static const _keyLapIntervalKmRun = 'lap_interval_km_run';
 
   late SharedPreferences _prefs;
 
@@ -87,6 +89,8 @@ class SettingsProvider extends ChangeNotifier {
   int _defaultCadenceBpm = 160;
   String _lastActivityType = 'bike';
   int? _defaultTargetPaceSecPerKm;
+  int _lapIntervalKmBike = 1;
+  int _lapIntervalKmRun = 1;
   bool _speedMaxAlertPopup = true;
   bool _speedMaxAlertVibration = true;
   bool _speedMaxAlertSound = false;
@@ -144,6 +148,8 @@ class SettingsProvider extends ChangeNotifier {
   bool get distanceAlertVibration => _distanceAlertVibration;
   bool get distanceAlertSound => _distanceAlertSound;
   String get userName => _userName;
+  int get lapIntervalKmBike => _lapIntervalKmBike;
+  int get lapIntervalKmRun => _lapIntervalKmRun;
 
   Future<void> load() async {
     _prefs = await SharedPreferences.getInstance();
@@ -199,6 +205,8 @@ class SettingsProvider extends ChangeNotifier {
     _distanceAlertVibration = _prefs.getBool(_keyDistanceAlertVibration) ?? true;
     _distanceAlertSound = _prefs.getBool(_keyDistanceAlertSound) ?? false;
     _userName = _prefs.getString(_keyUserName) ?? '';
+    _lapIntervalKmBike = _prefs.getInt(_keyLapIntervalKmBike) ?? 1;
+    _lapIntervalKmRun = _prefs.getInt(_keyLapIntervalKmRun) ?? 1;
     notifyListeners();
   }
 
@@ -507,5 +515,17 @@ class SettingsProvider extends ChangeNotifier {
     value.isNotEmpty
         ? await _prefs.setString(_keyUserName, value)
         : await _prefs.remove(_keyUserName);
+  }
+
+  Future<void> setLapIntervalKmBike(int value) async {
+    _lapIntervalKmBike = value.clamp(1, 99);
+    notifyListeners();
+    await _prefs.setInt(_keyLapIntervalKmBike, _lapIntervalKmBike);
+  }
+
+  Future<void> setLapIntervalKmRun(int value) async {
+    _lapIntervalKmRun = value.clamp(1, 99);
+    notifyListeners();
+    await _prefs.setInt(_keyLapIntervalKmRun, _lapIntervalKmRun);
   }
 }
