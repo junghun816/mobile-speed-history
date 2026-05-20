@@ -27,6 +27,7 @@ class CadenceService {
   bool _useVibration = false;
   bool _useSound = false;
   bool _running = false;
+  bool _isPaused = false;
   int _bpm = 0;
   int _lastBeatMs = 0;
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -97,7 +98,7 @@ class CadenceService {
         await Isolate.spawn(_cadenceLoop, [_receivePort!.sendPort, bpm]);
 
     _receivePort!.listen((_) {
-      if (!_running) return;
+      if (!_running || _isPaused) return;
       // 큐 쌓임 방지: 비트 주기의 70% 이내 재발화 무시
       final nowMs = DateTime.now().millisecondsSinceEpoch;
       final minIntervalMs = (60000 / _bpm * 0.7).round();
@@ -111,8 +112,12 @@ class CadenceService {
     });
   }
 
+  void pause() => _isPaused = true;
+  void resume() => _isPaused = false;
+
   void stop() {
     _running = false;
+    _isPaused = false;
     _isolate?.kill(priority: Isolate.immediate);
     _isolate = null;
     _receivePort?.close();

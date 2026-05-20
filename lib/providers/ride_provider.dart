@@ -410,6 +410,7 @@ class RideProvider extends ChangeNotifier {
         if (_lowSpeedCount >= _autoPauseCountThreshold && !_isAutoPaused) {
           _isAutoPaused = true;
           _autoPausedAt = DateTime.now();
+          _cadenceService.pause();
         }
       } else {
         _lowSpeedCount = 0;
@@ -418,6 +419,7 @@ class RideProvider extends ChangeNotifier {
           _totalPausedMs +=
               DateTime.now().difference(_autoPausedAt!).inMilliseconds;
           _autoPausedAt = null;
+          _cadenceService.resume();
         }
       }
     }
@@ -557,6 +559,7 @@ class RideProvider extends ChangeNotifier {
     if (!_isRiding || _isManuallyPaused) return;
     _isManuallyPaused = true;
     _manualPausedAt = DateTime.now();
+    _cadenceService.pause();
     notifyListeners();
   }
 
@@ -566,6 +569,7 @@ class RideProvider extends ChangeNotifier {
     _isManuallyPaused = false;
     _manualPausedAt = null;
     _lastPosition = null; // 재개 시 이전 위치 초기화로 드리프트 방지
+    _cadenceService.resume();
     notifyListeners();
   }
 
