@@ -17,6 +17,7 @@ Widget _buildLapTable(
     decoration: BoxDecoration(
       color: cs.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(12.r),
+      border: Border.all(color: cs.outlineVariant),
     ),
     child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -146,7 +147,6 @@ void showRecordDetailDialog(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           StatDetailItem(label: '거리', value: formatDistance(record.totalDistance, useKmh), unit: distanceUnit(useKmh), textColor: textColor),
-                          StatDetailItem(label: '시간', value: formatDuration(record.duration), textColor: textColor),
                           if (isRunning) ...[
                             StatDetailItem(
                               label: '최고페이스',
@@ -164,14 +164,14 @@ void showRecordDetailDialog(
                             StatDetailItem(label: '최고속도', value: formatSpeed(record.maxSpeed, useKmh), unit: speedUnit(useKmh), textColor: textColor),
                             StatDetailItem(label: '평균속도', value: formatSpeed(record.avgSpeed, useKmh), unit: speedUnit(useKmh), textColor: textColor),
                           ],
+                          if (calories != null)
+                            StatDetailItem(label: '칼로리', value: formatNumber(calories), unit: 'kcal', textColor: textColor),
                         ],
                       ),
-                      if (calories != null) ...[
-                        SizedBox(height: 10.h),
-                        Divider(color: Colors.blue.withOpacity(0.3), height: 1),
-                        SizedBox(height: 10.h),
-                        StatDetailItem(label: '칼로리', value: formatNumber(calories), unit: 'kcal', textColor: textColor),
-                      ],
+                      SizedBox(height: 10.h),
+                      Divider(color: Colors.blue.withOpacity(0.3), height: 1),
+                      SizedBox(height: 10.h),
+                      StatDetailItem(label: '시간', value: formatDuration(record.duration), textColor: textColor),
                     ],
                   ),
                 ),

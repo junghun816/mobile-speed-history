@@ -123,6 +123,8 @@ class _MainScreenState extends State<MainScreen> {
     final navBottom = MediaQuery.of(context).viewPadding.bottom;
     const navH = 80.0;
 
+    final currentFilter = navigateOnSelect ? null : ride.historyFilter;
+
     showGeneralDialog<String>(
       context: context,
       barrierDismissible: true,
@@ -158,9 +160,9 @@ class _MainScreenState extends State<MainScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _filterBtn(ctx, '전체', 'all', Icons.list_alt, ride.historyFilter, cs),
-                        _filterBtn(ctx, '자전거', 'bike', Icons.directions_bike, ride.historyFilter, cs),
-                        _filterBtn(ctx, '런닝', 'run', Icons.directions_run, ride.historyFilter, cs),
+                        _filterBtn(ctx, '전체', 'all', Icons.list_alt, currentFilter, cs),
+                        _filterBtn(ctx, '자전거', 'bike', Icons.directions_bike, currentFilter, cs),
+                        _filterBtn(ctx, '런닝', 'run', Icons.directions_run, currentFilter, cs),
                       ],
                     ),
                   ),
@@ -179,7 +181,7 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  Widget _filterBtn(BuildContext ctx, String label, String value, IconData icon, String current, ColorScheme cs) {
+  Widget _filterBtn(BuildContext ctx, String label, String value, IconData icon, String? current, ColorScheme cs) {
     final selected = current == value;
     final color = value == 'bike' ? Colors.blue : value == 'run' ? Colors.deepOrange : cs.onSurface;
     return GestureDetector(
