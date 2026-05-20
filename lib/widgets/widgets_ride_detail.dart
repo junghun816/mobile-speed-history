@@ -19,6 +19,7 @@ Widget _buildLapTable(
       borderRadius: BorderRadius.circular(12.r),
     ),
     child: Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
@@ -32,33 +33,39 @@ Widget _buildLapTable(
           ),
         ),
         Divider(color: cs.outlineVariant, height: 1),
-        ...laps.asMap().entries.map((entry) {
-          final i = entry.key;
-          final lap = entry.value;
-          final paceSecPerKm = (lap['paceSecPerKm'] as num).toInt();
-          final timeSec = (lap['timeMs'] as num).toInt() ~/ 1000;
-          final maxSpeed = (lap['maxSpeedKmh'] as num).toDouble();
-          return Container(
-            decoration: BoxDecoration(
-              color: i.isOdd ? cs.surfaceContainerHighest : cs.surfaceContainer,
-              borderRadius: i == laps.length - 1
-                  ? BorderRadius.vertical(bottom: Radius.circular(12.r))
-                  : null,
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 32.w,
-                  child: Text('${lap['lap']}', style: TextStyle(color: textColor, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 200.h),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: laps.length,
+            itemBuilder: (_, i) {
+              final lap = laps[i];
+              final paceSecPerKm = (lap['paceSecPerKm'] as num).toInt();
+              final timeSec = (lap['timeMs'] as num).toInt() ~/ 1000;
+              final maxSpeed = (lap['maxSpeedKmh'] as num).toDouble();
+              return Container(
+                decoration: BoxDecoration(
+                  color: i.isOdd ? cs.surfaceContainerHighest : cs.surfaceContainer,
+                  borderRadius: i == laps.length - 1
+                      ? BorderRadius.vertical(bottom: Radius.circular(12.r))
+                      : null,
                 ),
-                Expanded(child: Text(formatPace(paceSecPerKm), textAlign: TextAlign.center, style: TextStyle(color: Colors.lightBlue, fontSize: 13.sp, fontWeight: FontWeight.bold))),
-                Expanded(child: Text(formatDuration(timeSec), textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
-                Expanded(child: Text('${maxSpeed.toStringAsFixed(1)} km/h', textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
-              ],
-            ),
-          );
-        }),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 32.w,
+                      child: Text('${lap['lap']}', style: TextStyle(color: textColor, fontSize: 13.sp, fontWeight: FontWeight.bold)),
+                    ),
+                    Expanded(child: Text(formatPace(paceSecPerKm), textAlign: TextAlign.center, style: TextStyle(color: Colors.lightBlue, fontSize: 13.sp, fontWeight: FontWeight.bold))),
+                    Expanded(child: Text(formatDuration(timeSec), textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
+                    Expanded(child: Text('${maxSpeed.toStringAsFixed(1)} km/h', textAlign: TextAlign.center, style: TextStyle(color: textColor, fontSize: 13.sp))),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
       ],
     ),
   );

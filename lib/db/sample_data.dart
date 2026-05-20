@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import '../models/ride_record.dart';
 import 'database_helper.dart';
@@ -59,6 +60,26 @@ class SampleDataHelper {
 
             final activityType = random.nextDouble() > 0.5 ? 'bike' : 'run';
 
+            String? lapSplitsJson;
+            if (activityType == 'run') {
+              final lapCount = distance.floor();
+              if (lapCount > 0) {
+                final basePaceSec = (3600 / avgSpeed).round();
+                final laps = <Map<String, dynamic>>[];
+                for (int lap = 1; lap <= lapCount; lap++) {
+                  final lapPaceSec = (basePaceSec * (0.93 + random.nextDouble() * 0.14)).round();
+                  final lapMaxSpeed = avgSpeed * (1.1 + random.nextDouble() * 0.2);
+                  laps.add({
+                    'lap': lap,
+                    'timeMs': lapPaceSec * 1000,
+                    'paceSecPerKm': lapPaceSec,
+                    'maxSpeedKmh': double.parse(lapMaxSpeed.toStringAsFixed(1)),
+                  });
+                }
+                lapSplitsJson = jsonEncode(laps);
+              }
+            }
+
             final record = RideRecord(
               year: day.year,
               month: day.month,
@@ -72,7 +93,8 @@ class SampleDataHelper {
               duration: duration,
               pathPoints: '[]',
               createdAt: rideTime.millisecondsSinceEpoch,
-              activityType: activityType
+              activityType: activityType,
+              lapSplits: lapSplitsJson,
             );
 
             await db.insertRecord(record);
