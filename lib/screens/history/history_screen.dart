@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../providers/ride_provider.dart';
 import 'history_detail_screen.dart';
@@ -37,6 +38,12 @@ class _HistoryScreenState extends State<HistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final historyFilter = context.watch<RideProvider>().historyFilter;
+
+    final filterColor = historyFilter == 'bike' ? Colors.blue : Colors.deepOrange;
+    final filterIcon = historyFilter == 'bike' ? Icons.directions_bike : Icons.directions_run;
+    final filterLabel = historyFilter == 'bike' ? '자전거 기록' : '런닝 기록';
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0,
@@ -55,16 +62,43 @@ class _HistoryScreenState extends State<HistoryScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          const HistoryAverageScreen(),
-          const HistoryYearlyScreen(),
-          const HistoryMonthlyScreen(),
-          const HistoryDailyScreen(),
-          HistoryDetailScreen(),
-          const HistoryTotalScreen(),
-          const HistoryHeatmapScreen(),
+          if (historyFilter != 'all')
+            Container(
+              width: double.infinity,
+              color: filterColor.withValues(alpha: 0.12),
+              padding: EdgeInsets.symmetric(vertical: 6.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(filterIcon, size: 14.r, color: filterColor),
+                  SizedBox(width: 6.w),
+                  Text(
+                    '$filterLabel만 보는 중',
+                    style: TextStyle(
+                      color: filterColor,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                const HistoryAverageScreen(),
+                const HistoryYearlyScreen(),
+                const HistoryMonthlyScreen(),
+                const HistoryDailyScreen(),
+                const HistoryDetailScreen(),
+                const HistoryTotalScreen(),
+                const HistoryHeatmapScreen(),
+              ],
+            ),
+          ),
         ],
       ),
     );

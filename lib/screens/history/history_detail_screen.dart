@@ -23,7 +23,6 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
   bool get wantKeepAlive => true;
 
   DateTime _selectedDate = DateTime.now();
-  String _activityFilter = 'all';
 
   Future<void> _pickDateFromCalendar() async {
     final records = context.read<RideProvider>().records;
@@ -368,31 +367,6 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
     );
   }
 
-  Widget _filterChip(String label, String value, ColorScheme cs) {
-    final selected = _activityFilter == value;
-    return GestureDetector(
-      onTap: () {
-        SystemSound.play(SystemSoundType.click);
-        setState(() => _activityFilter = value);
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-        decoration: BoxDecoration(
-          color: selected ? Colors.indigo : cs.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Colors.white : cs.onSurface,
-            fontSize: 13.sp,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _selectBox<T>({
     required T value,
     required List<T> items,
@@ -430,7 +404,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
   Widget build(BuildContext context) {
     super.build(context);
 
-    final records = context.watch<RideProvider>().records;
+    final records = context.watch<RideProvider>().filteredRecords;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;
@@ -446,8 +420,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
     final dayRecords = records.where((r) =>
       r.year == _selectedDate.year &&
       r.month == _selectedDate.month &&
-      r.day == _selectedDate.day &&
-      (_activityFilter == 'all' || r.activityType == _activityFilter),
+      r.day == _selectedDate.day,
     ).toList();
 
     final totalDistance = dayRecords.fold(0.0, (s, r) => s + r.totalDistance);
@@ -584,20 +557,6 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen>
               ),
             ),
 
-            // 활동 필터
-            Container(
-              color: cardColor,
-              padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
-              child: Row(
-                children: [
-                  _filterChip('전체', 'all', cs),
-                  SizedBox(width: 8.w),
-                  _filterChip('자전거', 'bike', cs),
-                  SizedBox(width: 8.w),
-                  _filterChip('런닝', 'run', cs),
-                ],
-              ),
-            ),
 
             // 하루 합계 요약
             if (dayRecords.isNotEmpty)

@@ -80,6 +80,32 @@ class RideProvider extends ChangeNotifier {
   // 목표 페이스 알림 상태
   bool _wasOverTargetPace = false;
 
+  String _historyFilter = 'all';
+  String get historyFilter => _historyFilter;
+
+  void setHistoryFilter(String filter) {
+    if (_historyFilter == filter) return;
+    _historyFilter = filter;
+    notifyListeners();
+  }
+
+  List<RideRecord> get filteredRecords => _historyFilter == 'all'
+      ? records
+      : records.where((r) => r.activityType == _historyFilter).toList();
+
+  Map<String, int?> get filteredBestRecordIds {
+    final fr = filteredRecords;
+    if (fr.isEmpty) return {};
+    final maxDistance = fr.reduce((a, b) => a.totalDistance > b.totalDistance ? a : b);
+    final maxSpd = fr.reduce((a, b) => a.maxSpeed > b.maxSpeed ? a : b);
+    final maxDuration = fr.reduce((a, b) => a.duration > b.duration ? a : b);
+    return {
+      'distance': maxDistance.id,
+      'speed': maxSpd.id,
+      'duration': maxDuration.id,
+    };
+  }
+
   List<Position> pathPoints = [];
   List<RideRecord> records = [];
   Position? _lastPosition;

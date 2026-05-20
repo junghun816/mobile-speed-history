@@ -53,7 +53,7 @@ class _HistoryYearlyScreenState extends State<HistoryYearlyScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final records = context.watch<RideProvider>().records;
+    final records = context.watch<RideProvider>().filteredRecords;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final cs = Theme.of(context).colorScheme;

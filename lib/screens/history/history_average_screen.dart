@@ -11,7 +11,7 @@ class HistoryAverageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final records = context.watch<RideProvider>().records;
+    final records = context.watch<RideProvider>().filteredRecords;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;

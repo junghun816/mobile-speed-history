@@ -103,8 +103,8 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final records = context.watch<RideProvider>().records;
-    final bestIds = context.read<RideProvider>().bestRecordIds;
+    final records = context.watch<RideProvider>().filteredRecords;
+    final bestIds = context.read<RideProvider>().filteredBestRecordIds;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;
@@ -199,7 +199,8 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
         ? 0.0
         : selectedRecords.fold(0.0, (s, r) => s + r.avgSpeed) / selectedRecords.length;
 
-    return Column(
+    return SingleChildScrollView(
+      child: Column(
       children: [
         // 연도 네비게이션
         Container(
@@ -424,17 +425,19 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
           ),
 
         if (_selectedIndex >= 0)
-          Expanded(
-            child: selectedRecords.isEmpty
-                ? Center(
-              child: Text(
-                '해당 날짜에 기록이 없어요',
-                style: TextStyle(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 14.sp),
-              ),
-            )
-                : SingleChildScrollView(
+          selectedRecords.isEmpty
+              ? Padding(
+                  padding: EdgeInsets.all(24.r),
+                  child: Center(
+                    child: Text(
+                      '해당 날짜에 기록이 없어요',
+                      style: TextStyle(
+                          color: cs.onSurfaceVariant,
+                          fontSize: 14.sp),
+                    ),
+                  ),
+                )
+              : Padding(
               padding: EdgeInsets.all(16.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -577,8 +580,8 @@ class _HistoryDailyScreenState extends State<HistoryDailyScreen>
                 ],
               ),
             ),
-          ),
       ],
+      ),
     );
   }
 

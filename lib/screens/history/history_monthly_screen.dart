@@ -39,7 +39,7 @@ class _HistoryMonthlyScreenState extends State<HistoryMonthlyScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final records = context.watch<RideProvider>().records;
+    final records = context.watch<RideProvider>().filteredRecords;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final cs = Theme.of(context).colorScheme;

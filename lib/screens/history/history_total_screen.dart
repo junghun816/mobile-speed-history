@@ -224,7 +224,7 @@ class _HistoryTotalScreenState extends State<HistoryTotalScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final records = context.watch<RideProvider>().records;
+    final records = context.watch<RideProvider>().filteredRecords;
     final settings = context.watch<SettingsProvider>();
     final useKmh = settings.useKmh;
     final weightKg = settings.weightKg;
