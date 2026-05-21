@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart';
 import 'package:vibration/vibration.dart';
 
 void _cadenceLoop(List<dynamic> args) async {
@@ -22,6 +24,8 @@ void _cadenceLoop(List<dynamic> args) async {
 }
 
 class CadenceService {
+  static const _channel = MethodChannel('com.example.speed_mobile/cadence_beep');
+
   Isolate? _isolate;
   ReceivePort? _receivePort;
   bool _useVibration = false;
@@ -30,7 +34,10 @@ class CadenceService {
   bool _isPaused = false;
   int _bpm = 0;
   int _lastBeatMs = 0;
-  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // iOS 전용
+  AudioPlayer? _audioPlayer;
+
   static final Uint8List _beepWav = _generateBeepWav();
 
   static Uint8List _generateBeepWav() {
@@ -67,21 +74,23 @@ class CadenceService {
     return data;
   }
 
-  // 앱 시작 시 1회 — 오디오 컨텍스트만 설정 (음악 등 다른 오디오와 믹싱)
+  // 앱 시작 시 1회 호출
   Future<void> prepare() async {
-    try {
-      await _audioPlayer.setAudioContext(AudioContext(
-        android: const AudioContextAndroid(
-          audioFocus: AndroidAudioFocus.none,
-          contentType: AndroidContentType.sonification,
-          usageType: AndroidUsageType.media,
-        ),
-        iOS: AudioContextIOS(
-          category: AVAudioSessionCategory.ambient,
-          options: {AVAudioSessionOptions.mixWithOthers},
-        ),
-      ));
-    } catch (_) {}
+    if (Platform.isAndroid) {
+      try {
+        await _channel.invokeMethod('prepare', _beepWav);
+      } catch (_) {}
+    } else {
+      _audioPlayer = AudioPlayer();
+      try {
+        await _audioPlayer!.setAudioContext(AudioContext(
+          iOS: AudioContextIOS(
+            category: AVAudioSessionCategory.ambient,
+            options: {AVAudioSessionOptions.mixWithOthers},
+          ),
+        ));
+      } catch (_) {}
+    }
   }
 
   Future<void> start(int bpm,
@@ -106,9 +115,13 @@ class CadenceService {
       _lastBeatMs = nowMs;
 
       if (_useVibration) Vibration.vibrate(duration: 50);
-      // _beepWav는 정적 메모리 상주(4.4KB) — BytesSource 로딩 오버헤드 무시 가능
-      // play()는 매번 새 재생을 시작하므로 이중 재생·상태 관리 이슈 없음
-      if (_useSound) _audioPlayer.play(BytesSource(_beepWav));
+      if (_useSound) {
+        if (Platform.isAndroid) {
+          _channel.invokeMethod('play');
+        } else {
+          _audioPlayer?.play(BytesSource(_beepWav));
+        }
+      }
     });
   }
 
@@ -122,12 +135,19 @@ class CadenceService {
     _isolate = null;
     _receivePort?.close();
     _receivePort = null;
-    _audioPlayer.stop();
+    if (!Platform.isAndroid) _audioPlayer?.stop();
   }
 
   Future<void> dispose() async {
     stop();
-    await _audioPlayer.dispose();
+    if (Platform.isAndroid) {
+      try {
+        await _channel.invokeMethod('dispose');
+      } catch (_) {}
+    } else {
+      await _audioPlayer?.dispose();
+      _audioPlayer = null;
+    }
   }
 
   bool get isRunning => _running;
